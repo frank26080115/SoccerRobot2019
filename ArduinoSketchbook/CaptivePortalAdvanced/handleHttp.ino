@@ -13,7 +13,7 @@ void handleRoot() {
     "<h1>HELLO WORLD!!</h1>"
   );
   if (server.client().localIP() == apIP) {
-    server.sendContent(String("<p>You are connected through the soft AP: ") + softAP_ssid + "</p>");
+    server.sendContent(String("<p>You are connected through the soft AP: ") + String(BookWorm.SSID) + "</p>");
   } else {
     server.sendContent(String("<p>You are connected through the wifi network: ") + ssid + "</p>");
   }
@@ -48,7 +48,7 @@ void handleWifi() {
     "<h1>Wifi config</h1>"
   );
   if (server.client().localIP() == apIP) {
-    server.sendContent(String("<p>You are connected through the soft AP: ") + softAP_ssid + "</p>");
+    server.sendContent(String("<p>You are connected through the soft AP: ") + String(BookWorm.SSID) + "</p>");
   } else {
     server.sendContent(String("<p>You are connected through the wifi network: ") + ssid + "</p>");
   }
@@ -56,7 +56,7 @@ void handleWifi() {
     "\r\n<br />"
     "<table><tr><th align='left'>SoftAP config</th></tr>"
   );
-  server.sendContent(String() + "<tr><td>SSID " + String(softAP_ssid) + "</td></tr>");
+  server.sendContent(String() + "<tr><td>SSID " + String(BookWorm.SSID) + "</td></tr>");
   server.sendContent(String() + "<tr><td>IP " + toStringIp(WiFi.softAPIP()) + "</td></tr>");
   server.sendContent(
     "</table>"

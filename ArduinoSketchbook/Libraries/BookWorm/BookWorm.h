@@ -6,20 +6,19 @@
 #include "WString.h"
 
 // pin definitions that can be utilized by other libraries
-#define pinButton           10
-#define pinLedLeft           6
-#define pinLedRight          5
-#define pinLedBack          13
-#define pinIrEmitterLeft     3
-#define pinIrEmitterRight    4
-#define pinSensorLeftFloor  A3
-#define pinSensorLeftSide   A2
-#define pinSensorRightFloor A6
-#define pinSensorRightSide  A7
-#define pinPotentiometer    A1
 #define pinServoLeft         9
 #define pinServoRight        7
-#define pinTvRemoteInput     8
+
+typedef struct
+{
+	char ssid[32];
+	uint16_t servoDeadzoneLeft;
+	uint16_t servoDeadzoneRight;
+	int16_t servoBiasLeft;
+	int16_t servoBiasRight;
+	uint16_t checksum;
+}
+bookworm_nvm_t;
 
 class cBookWorm
 {
@@ -44,6 +43,14 @@ public:
 
 	// these are for making it easier to debug
 	int printf(const char *format, ...);
+
+	char SSID[32];
+
+	bool loadNvm();
+	void saveNvm();
+	void setSsid(char*);
+private:
+	bookworm_nvm_t nvm;
 };
 
 extern cBookWorm BookWorm; // declare user accessible instance

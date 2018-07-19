@@ -142,21 +142,25 @@ void cBookWorm::disableAccelLimit(void)
 void cBookWorm::setServoDeadzoneLeft(unsigned int x)
 {
 	servoDeadzoneLeft = x;
+	this->nvm.servoDeadzoneLeft = x;
 }
 
 void cBookWorm::setServoDeadzoneRight(unsigned int x)
 {
 	servoDeadzoneRight = x;
+	this->nvm.servoDeadzoneRight = x;
 }
 
 void cBookWorm::setServoBiasLeft(signed int x)
 {
 	servoBiasLeft = x;
+	this->nvm.servoBiasLeft = x;
 }
 
 void cBookWorm::setServoBiasRight(signed int x)
 {
 	servoBiasRight = x;
+	this->nvm.servoBiasRight = x;
 }
 
 void cBookWorm::setServoStoppedNoPulse(bool x)

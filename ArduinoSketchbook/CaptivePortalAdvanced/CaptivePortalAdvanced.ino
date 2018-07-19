@@ -4,6 +4,7 @@
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <EEPROM.h>
+#include <BookWorm.h>
 
 /*
    This example serves a "hello world" on a WLAN and a SoftAP at the same time.
@@ -18,7 +19,7 @@
 */
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
-const char *softAP_ssid = "ESP_ap";
+//const char *softAP_ssid = "ESP_ap";
 const char *softAP_password = "12345678";
 
 /* hostname for mDNS. Should work at least on windows. Try http://esp8266.local */
@@ -51,12 +52,12 @@ unsigned int status = WL_IDLE_STATUS;
 
 void setup() {
   delay(1000);
-  Serial.begin(9600);
+  BookWorm.begin();
   Serial.println();
   Serial.print("Configuring access point...");
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAPConfig(apIP, apIP, netMsk);
-  WiFi.softAP(softAP_ssid, softAP_password);
+  WiFi.softAP(BookWorm.SSID, softAP_password);
   delay(500); // Without delay I've seen the IP address blank
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
