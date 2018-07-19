@@ -49,7 +49,6 @@ public:
 	bool loadNvm();
 	void saveNvm();
 	void setSsid(char*);
-private:
 	bookworm_nvm_t nvm;
 };
 
