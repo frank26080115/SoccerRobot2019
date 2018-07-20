@@ -1461,8 +1461,8 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 </package>
 <package name="CAP-PTH-SMALL">
 <wire x1="0" y1="0.635" x2="0" y2="-0.635" width="0.2032" layer="21"/>
-<pad name="1" x="-1.27" y="0" drill="0.7" diameter="1.651"/>
-<pad name="2" x="1.27" y="0" drill="0.7" diameter="1.651"/>
+<pad name="1" x="-1.27" y="0" drill="0.9" diameter="1.8288"/>
+<pad name="2" x="1.27" y="0" drill="0.9" diameter="1.8288"/>
 <text x="-0.762" y="1.27" size="0.4064" layer="25">&gt;Name</text>
 <text x="-1.016" y="-1.524" size="0.4064" layer="27">&gt;Value</text>
 <wire x1="-2.54" y1="-1.27" x2="-2.54" y2="1.27" width="0.127" layer="21"/>
@@ -2145,14 +2145,14 @@ by Frank Zhao</text>
 </package>
 <package name="ESP01">
 <description>ESP8266 Module 01</description>
-<pad name="GND" x="-3.825" y="-5.6375" drill="0.8" shape="square" rot="R270"/>
-<pad name="RX" x="3.795" y="-5.6375" drill="0.8" rot="R270"/>
-<pad name="GPIO2" x="-1.285" y="-5.6375" drill="0.8" rot="R270"/>
-<pad name="GPIO0" x="1.255" y="-5.6375" drill="0.8" rot="R270"/>
-<pad name="RST" x="1.255" y="-8.1775" drill="0.8" rot="R270"/>
-<pad name="CH_PD" x="-1.285" y="-8.1775" drill="0.8" rot="R270"/>
-<pad name="TX" x="-3.825" y="-8.1775" drill="0.8" rot="R270"/>
-<pad name="VCC" x="3.795" y="-8.1775" drill="0.8" rot="R270"/>
+<pad name="GND" x="-3.825" y="-5.6375" drill="0.9" shape="square" rot="R270"/>
+<pad name="RX" x="3.795" y="-5.6375" drill="0.9" rot="R270"/>
+<pad name="GPIO2" x="-1.285" y="-5.6375" drill="0.9" rot="R270"/>
+<pad name="GPIO0" x="1.255" y="-5.6375" drill="0.9" rot="R270"/>
+<pad name="RST" x="1.255" y="-8.1775" drill="0.9" rot="R270"/>
+<pad name="CH_PD" x="-1.285" y="-8.1775" drill="0.9" rot="R270"/>
+<pad name="TX" x="-3.825" y="-8.1775" drill="0.9" rot="R270"/>
+<pad name="VCC" x="3.795" y="-8.1775" drill="0.9" rot="R270"/>
 <wire x1="-7" y1="15" x2="-7" y2="7.38" width="0.127" layer="21"/>
 <wire x1="-7" y1="7.38" x2="-7" y2="-9.765" width="0.127" layer="21"/>
 <wire x1="-7" y1="-9.765" x2="7.2875" y2="-9.765" width="0.127" layer="21"/>
@@ -2281,9 +2281,9 @@ by Frank Zhao</text>
 <wire x1="-2.6549" y1="-0.254" x2="-2.2537" y2="-0.254" width="0.2032" layer="21"/>
 <wire x1="-0.2863" y1="-0.254" x2="0.2863" y2="-0.254" width="0.2032" layer="21"/>
 <wire x1="2.2537" y1="-0.254" x2="2.6549" y2="-0.254" width="0.2032" layer="21"/>
-<pad name="3" x="1.27" y="0" drill="0.8128" diameter="1.8796"/>
-<pad name="2" x="0" y="1.905" drill="0.8128" diameter="1.8796"/>
-<pad name="1" x="-1.27" y="0" drill="0.8128" diameter="1.8796"/>
+<pad name="3" x="1.27" y="0" drill="0.9" diameter="1.8796"/>
+<pad name="2" x="0" y="1.905" drill="0.9" diameter="1.8796"/>
+<pad name="1" x="-1.27" y="0" drill="0.9" diameter="1.8796"/>
 <text x="3.175" y="0.635" size="0.4064" layer="25" ratio="10">&gt;NAME</text>
 <text x="3.175" y="-1.27" size="0.4064" layer="27" ratio="10">&gt;VALUE</text>
 </package>
@@ -2356,8 +2356,8 @@ by Frank Zhao</text>
 </package>
 <package name="CPOL-RADIAL-100UF-25V">
 <circle x="0" y="0" radius="3.25" width="0.2032" layer="21"/>
-<pad name="2" x="-1.27" y="0" drill="0.7" diameter="1.651"/>
-<pad name="1" x="1.27" y="0" drill="0.7" diameter="1.651" shape="square"/>
+<pad name="2" x="-1.27" y="0" drill="0.9" diameter="1.8288"/>
+<pad name="1" x="1.27" y="0" drill="0.9" diameter="1.8288" shape="square"/>
 <text x="-1.905" y="-4.318" size="0.8128" layer="27">&gt;Value</text>
 <text x="-0.762" y="1.651" size="0.4064" layer="25">&gt;Name</text>
 <wire x1="-2.54" y1="1.905" x2="-2.54" y2="-1.905" width="0.254" layer="21"/>
