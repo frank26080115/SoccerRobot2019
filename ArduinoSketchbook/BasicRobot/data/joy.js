@@ -205,6 +205,19 @@ VirtualJoystick.prototype._onMove	= function(x, y)
 		if(this._limitStickTravel === true){
 			var deltaX	= this.deltaX();
 			var deltaY	= this.deltaY();
+			if (deltaX > this._stickRadius) {
+				this._stickX = this._stickRadius + this._baseX;
+			}
+			if (deltaY > this._stickRadius) {
+				this._stickY = this._stickRadius + this._baseY;
+			}
+			if (deltaX < -this._stickRadius) {
+				this._stickX = this._baseX - this._stickRadius;
+			}
+			if (deltaY < -this._stickRadius) {
+				this._stickY = this._baseY - this._stickRadius;
+			}
+			/*
 			var stickDistance = Math.sqrt( (deltaX * deltaX) + (deltaY * deltaY) );
 			if(stickDistance > this._stickRadius){
 				var stickNormalizedX = deltaX / stickDistance;
@@ -213,6 +226,7 @@ VirtualJoystick.prototype._onMove	= function(x, y)
 				this._stickX = stickNormalizedX * this._stickRadius + this._baseX;
 				this._stickY = stickNormalizedY * this._stickRadius + this._baseY;
 			}
+			*/
 		}
 
 			this._move(this._stickEl.style, (this._stickX - this._stickEl.width /2), (this._stickY - this._stickEl.height/2));
