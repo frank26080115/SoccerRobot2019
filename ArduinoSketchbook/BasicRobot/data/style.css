@@ -1,0 +1,49 @@
+body {
+	overflow	: hidden;
+	padding		: 0;
+	margin		: 0;
+	background-color: #BBB;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: 50% 50%;
+}
+.bodybg
+{
+	background-image: url('finger.png');
+}
+#info {
+	position	: absolute;
+	top		: 0px;
+	width		: 100%;
+	padding		: 5px;
+	text-align	: center;
+}
+#info a {
+	color		: #66F;
+	text-decoration	: none;
+}
+#info a:hover {
+	text-decoration	: underline;
+}
+#container {
+	width		: 100%;
+	height		: 100%;
+	overflow	: hidden;
+	padding		: 0;
+	margin		: 0;
+	-webkit-user-select	: none;
+	-moz-user-select	: none;
+}
+#sidebar {
+	position	: absolute;
+	top		: 40pt;
+	text-align	: left;
+}
+.rightside {
+	right	: 0pt;
+	text-align	: right;
+}
+table input {
+	height: 40pt;
+	min-width: 100pt;
+}

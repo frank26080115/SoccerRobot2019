@@ -1,5 +1,4 @@
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
@@ -37,12 +36,16 @@ IPAddress apIP(192, 168, 4, 1);
 IPAddress netMsk(255, 255, 255, 0);
 
 /** Current WLAN status */
-unsigned int status = WL_IDLE_STATUS;
+unsigned int wlan_status = WL_IDLE_STATUS;
 
 /** Continuous Servo Movement Variables **/
 uint32_t lastCommTimestamp = 0;
+bool moveMixedMode = false;
 signed int speedLeft = 0;
 signed int speedRight = 0;
+signed int speedX = 0;
+signed int speedY = 0;
+signed int speedWeap = 0;
 
 void setup() {
   delay(1000);
@@ -65,12 +68,12 @@ void setup() {
   server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
 
   server.on("/move", handleMove);
-  server.on("/setssid", handleSetSSID);
-  server.on("/setservo", handleSetServo);
-  server.on("/info", handleInfo);
-  server.on("/config.html", handleConfig);
+  server.on("/setconfig", handleSetConfig);
+  server.on("/config", handleConfig);
 
-  server.on("/background.png", handleBgImage);
+  server.on("/finger.png", handleFingerPng);
+  server.on("/style.css", handleStyleCss);
+  server.on("/joy.js", handleJoyJs);
 
   server.onNotFound(handleNotFound);
   server.begin(); // Web server start
@@ -82,9 +85,9 @@ void loop()
   uint32_t now;
   {
     unsigned int s = WiFi.status();
-    if (status != s) { // WLAN status change
+    if (wlan_status != s) { // WLAN status change
       BookWorm.printf("WiFi Status: 0x%02X\r\n", s);
-      status = s;
+      wlan_status = s;
       if (s == WL_CONNECTED) {
         /* Just connected to WLAN */
         BookWorm.printf("IP addr: %s\r\n", String(WiFi.localIP()).c_str());
@@ -115,7 +118,24 @@ void loop()
     // if timeout, stop the robot
     speedLeft = 0;
     speedRight = 0;
+    speedX = 0;
+    speedY = 0;
+
+    if (BookWorm.nvm.weapPosSafe > 0) {
+      speedWeap = BookWorm.nvm.weapPosSafe;
+    }
+    else {
+      speedWeap = 0;
+    }
   }
-  BookWorm.move(speedLeft, speedRight);
+  if (moveMixedMode == false)
+  {
+    BookWorm.move(speedLeft, speedRight);
+  }
+  else
+  {
+    BookWorm.moveMixed(speedY, speedX);
+  }
+  BookWorm.spinWeapon(speedWeap);
 }
 

@@ -10,6 +10,15 @@ cBookWorm BookWorm; // user accessible instance declared here
 
 ContinuousServo servoLeft;  // not directly user accessible but accessible through library
 ContinuousServo servoRight; // not directly user accessible but accessible through library
+Servo servoWeap; // not directly user accessible but accessible through library
+
+cBookWorm::cBookWorm(void)
+{
+	// resets all nvm to default
+	memset(&(this->nvm), 0, sizeof(bookworm_nvm_t));
+
+	this->defaultValues();
+}
 
 /*
 Initializes all pins to default states, sets up the continuous rotation servos, enables serial port
@@ -19,41 +28,51 @@ parameters:	none
 */
 void cBookWorm::begin(void)
 {
-	//Serial.begin(9600); // 9600 is slower but it's one less thing to screw up in the IDE
+	Serial.begin(9600); // 9600 is slower but it's one less thing to screw up in the IDE
 
-	servoLeft.attach(pinServoLeft);
-	servoRight.attach(pinServoRight);
-	move(0, 0);
-	//enableAccelLimit();
-
-	EEPROM.begin(64);
+	EEPROM.begin(512);
 	if (this->loadNvm() == false)
 	{
 		// failed to load, so create default SSID
-		uint8_t macbuf[6];
-		int i;
-		WiFi.macAddress(macbuf);
-		macbuf[0] += macbuf[3];
-		macbuf[1] += macbuf[4];
-		macbuf[2] += macbuf[5];
-		i  = sprintf(this->SSID, "robo-");
-		i += sprintf(&(this->SSID[i]), "%02x", macbuf[0]);
-		i += sprintf(&(this->SSID[i]), "%02x", macbuf[1]);
-		i += sprintf(&(this->SSID[i]), "%02x", macbuf[2]);
+		this->generateSsid(this->SSID);
+		strcpy(this->nvm.ssid, this->SSID);
 	}
+
+	if ((this->nvm.servoFlip & 0x04) == 0) {
+		servoLeft.attach(pinServoLeft);
+		servoRight.attach(pinServoRight);
+	}
+	else {
+		servoLeft.attach(pinServoLeft);
+		servoRight.attach(pinServoRight);
+	}
+	move(0, 0);
+	positionWeapon(0);
 }
 
 /*
-Moves both left and right continuous rotation servos at a given speed
-Direction for the servos are corrected for you
+Generate a string suitable for usage as a SSID
+Uses the MAC address to be a bit unique
 
-return: none
-parameters:
-				left: left side servo speed, value between -500 and +500, 0 meaning stopped, +500 means full speed forward, -500 means full speed reverse
-				right: right side servo speed, value between -500 and +500, 0 meaning stopped, +500 means full speed forward, -500 means full speed reverse
+returns: the buffer that was given
+parameters: character buffer to be written into
 */
-// void cBookWorm::move(signed int left, signed int right);
-/* this function actually is written inside BookWormMove.cpp but I've put the documentation here for quicker access */
+char* cBookWorm::generateSsid(char* buff)
+{
+	uint8_t macbuf[6];
+	int i;
+	WiFi.macAddress(macbuf);
+	#ifdef ENABLE_SSID_MAC_MIX
+	macbuf[3] += macbuf[0];
+	macbuf[4] += macbuf[1];
+	macbuf[5] += macbuf[2];
+	#endif
+	i  = sprintf(buff, "robo-");
+	i += sprintf(&(buff[i]), "%02x", macbuf[3]);
+	i += sprintf(&(buff[i]), "%02x", macbuf[4]);
+	i += sprintf(&(buff[i]), "%02x", macbuf[5]);
+	return buff;
+}
 
 /*
 Load saved information from NVM
@@ -75,10 +94,6 @@ bool cBookWorm::loadNvm()
 	{
 		memcpy(this->SSID, this->nvm.ssid, 32);
 		this->SSID[31] = 0;
-		this->setServoDeadzoneLeft(this->nvm.servoDeadzoneLeft);
-		this->setServoDeadzoneLeft(this->nvm.servoDeadzoneRight);
-		this->setServoBiasLeft(this->nvm.servoBiasLeft);
-		this->setServoBiasRight(this->nvm.servoBiasRight);
 		return true;
 	}
 	else
@@ -124,8 +139,50 @@ void cBookWorm::setSsid(char* str)
 		}
 		this->nvm.ssid[i] = d;
 		this->SSID[i] = d;
+		if (d == 0) {
+			break;
+		}
+	}
+	if (strlen(this->SSID) <= 0) {
+		this->generateSsid(this->SSID);
+		strcpy(this->nvm.ssid, this->SSID);
 	}
 	this->nvm.ssid[31] = 0;
 	this->SSID[31] = 0;
-	this->saveNvm();
+}
+
+void cBookWorm::setLeftHanded(bool x)
+{
+	this->nvm.leftHanded = x;
+}
+
+void cBookWorm::setAdvanced(bool x)
+{
+	this->nvm.advanced = x;
+}
+
+void cBookWorm::defaultValues()
+{
+	this->nvm.advanced = false;
+	this->nvm.servoMax = 500;
+	this->nvm.servoDeadzoneLeft = 0;
+	this->nvm.servoDeadzoneRight = 0;
+	this->nvm.servoBiasLeft = 0;
+	this->nvm.servoBiasRight = 0;
+	this->nvm.speedGain = 1000;
+	this->nvm.steeringSensitivity = 500;
+	this->nvm.steeringBalance = 1000;
+	this->nvm.servoFlip = 0;
+	this->nvm.servoStoppedNoPulse = true;
+	this->nvm.stickRadius = 100;
+	this->nvm.weapPosSafe = 1000;
+	this->nvm.weapPosA = 1500;
+	this->nvm.weapPosB = 2000;
+	this->nvm.leftHanded = false;
+}
+
+void cBookWorm::factoryReset() {
+	defaultValues();
+	this->generateSsid(this->SSID);
+	this->setSsid(this->SSID);
 }

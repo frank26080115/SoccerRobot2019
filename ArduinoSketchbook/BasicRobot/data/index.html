@@ -1,0 +1,34 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body class="bodybg">
+<div id="container"></div>
+<div id="info">
+Touch the screen and move
+<br />
+<div id="result"></div>
+<div id='topbar'>
+<table width='90%' border='1'>
+<tr><td width='50%'><input type='button' value='Weap Safe' onclick='weapsetpossafe()' /></td><td width='50%'><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>
+<tr><td width='50%'><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip1' onclick='flip()' /></td><td width='50%'><input type='button' value='Pos B' onclick='weapsetposb()' /></td></tr>
+</table>
+</div>
+</div>
+<div id='sidebar'>
+<table border='1'>
+<tr><td><input type='button' value='Weap Safe' onclick='weapsetpossafe()' /></td></tr><tr><td><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>
+<tr><td><input type='button' value='Pos B' onclick='weapsetposb()' /></td></tr><tr><td><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip2' onclick='flip()' /></td></tr>
+</table>
+</div>
+<script>
+var desiredStickRadius = 100;
+var weapPosSafe = 500;
+var weapPosA = 1500;
+var weapPosB = 2000;
+</script>
+<script src="joy.js"></script>
+</body>
+</html>

@@ -66,3 +66,46 @@ bool readServerArg(int argNum, signed int* result)
   return true;
 }
 
+void generateConfigItemStart(const char* label, const char* id)
+{
+  server.sendContent("<form action='setconfig' method='post' onsubmit='return validateform(\"");
+  server.sendContent(id);
+  server.sendContent("\")' id='form_");
+  server.sendContent(id);
+  server.sendContent("' name='form_");
+  server.sendContent(id);
+  server.sendContent("' >");
+  server.sendContent("<tr><td class='tbl_label'>");
+  server.sendContent(label);
+  server.sendContent(":</td><td class='tbl_field'>");
+}
+
+void generateConfigItemEnd()
+{
+  server.sendContent("</td><td class='tbl_submit'><input type='submit' value='set' height='100%' /></td></tr></form>\n");
+}
+
+void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note) {
+  generateConfigItemStart(label, id);
+  server.sendContent("<input id='");
+  server.sendContent(id);
+  server.sendContent("' name='");
+  server.sendContent(id);
+  server.sendContent("' type='");
+  server.sendContent(type);
+  server.sendContent("' value='");
+  server.sendContent(value);
+  server.sendContent("' placeholder='");
+  server.sendContent(value);
+  server.sendContent("' ");
+  if (other != NULL) {
+    server.sendContent(other);
+  }
+  server.sendContent(" />");
+  if (note != NULL && strlen(note) > 0) {
+    server.sendContent("<br />");
+    server.sendContent(note);
+  }
+  generateConfigItemEnd();
+}
+

@@ -19,151 +19,192 @@ extern ContinuousServo servoRight;
 
 #define SERVO_ACCELERATION_LIMIT 2
 
-static unsigned int servoDeadzoneLeft = 0;
-static unsigned int servoDeadzoneRight = 0;
-static signed int servoBiasLeft = 0;
-static signed int servoBiasRight = 0;
-static bool servoStoppedNoPulse = true;
-
 void cBookWorm::move(signed int left, signed int right)
 {
-	moveLeftServo(left);
-	moveRightServo(right);
+	if (this->robotFlip == false) {
+		moveLeftServo(left);
+		moveRightServo(right);
+	}
+	else { // robot is upside down
+		moveLeftServo(-right);
+		moveRightServo(-left);
+	}
 }
 
 void cBookWorm::moveLeftServo(signed int x)
 {
-	signed int ticks = SERVO_CENTER_TICKS;
+	int32_t ticks = SERVO_CENTER_TICKS;
 	if (x > 0) {
 		ticks += x;
-		ticks += servoDeadzoneLeft;
+		ticks += this->nvm.servoDeadzoneLeft;
 		ContinuousServo_BothForward |= (1 << 1);
 	}
 	else if (x <= 0) {
 		ticks += x;
-		ticks -= servoDeadzoneLeft;
+		ticks -= this->nvm.servoDeadzoneLeft;
 		ContinuousServo_BothForward &= ~(1 << 1);
 	}
-	if (x == 0 && servoStoppedNoPulse != false) {
+	if (x == 0 && this->nvm.servoStoppedNoPulse != false) {
 		servoLeft.deactivate();
 	}
 	else {
 		servoLeft.activate();
 	}
-	ticks += servoBiasLeft;
+	if (this->nvm.steeringBalance > 0)
+	{
+		ticks *= this->nvm.steeringBalance;
+		ticks /= 1000;
+	}
+	ticks *= this->nvm.speedGain;
+	ticks += this->nvm.servoBiasLeft;
 	servoLeft.writeTicks(ticks);
 }
 
 void cBookWorm::moveRightServo(signed int x)
 {
-	signed int ticks = SERVO_CENTER_TICKS;
+	int32_t ticks = SERVO_CENTER_TICKS;
 	x *= -1; // flip
 	if (x > 0) {
 		ticks += x;
-		ticks += servoDeadzoneRight;
+		ticks += this->nvm.servoDeadzoneRight;
 		ContinuousServo_BothForward |= (1 << 0);
 	}
 	else if (x <= 0) {
 		ticks += x;
-		ticks -= servoDeadzoneRight;
+		ticks -= this->nvm.servoDeadzoneRight;
 		ContinuousServo_BothForward &= ~(1 << 0);
 	}
-	if (x == 0 && servoStoppedNoPulse != false) {
+	if (x == 0 && this->nvm.servoStoppedNoPulse != false) {
 		servoRight.deactivate();
 	}
 	else {
 		servoRight.activate();
 	}
-	ticks += servoBiasRight;
+	if (this->nvm.steeringBalance < 0)
+	{
+		ticks *= -this->nvm.steeringBalance;
+		ticks /= 1000;
+	}
+	ticks *= this->nvm.speedGain;
+	ticks += this->nvm.servoBiasRight;
 	servoRight.writeTicks(ticks);
 }
 
-#define BOOKWORM_MOVEMIXED_INPUT_LIMIT 1023
-#define BOOKWORM_MOVEMIXED_OUTPUT_SCALE 0.3
 void cBookWorm::moveMixed(signed int throttle, signed int steer)
 {
-	signed int left, right;
+	int32_t left, right;
 	calcMix(throttle, steer, &left, &right);
 	move(left, right);
 }
 
-void cBookWorm::calcMix(signed int throttle, signed int steer, signed int * left, signed int * right)
+void cBookWorm::calcMix(int32_t throttle, int32_t steer, int32_t * left, int32_t * right)
 {
 	double throttled, steerd;
 	double diff;
 	double leftd, rightd;
+	double outputScale, maxTicks, maxRadius;
 
-	if (throttle > BOOKWORM_MOVEMIXED_INPUT_LIMIT) {
-		throttle = BOOKWORM_MOVEMIXED_INPUT_LIMIT;
-	}
-	else if (throttle < -BOOKWORM_MOVEMIXED_INPUT_LIMIT) {
-		throttle = -BOOKWORM_MOVEMIXED_INPUT_LIMIT;
-	}
+	maxTicks = this->nvm.servoMax;
+	maxRadius = this->nvm.stickRadius;
+	outputScale = maxTicks / maxRadius;
 
-	if (steer > BOOKWORM_MOVEMIXED_INPUT_LIMIT) {
-		steer = BOOKWORM_MOVEMIXED_INPUT_LIMIT;
-	}
-	else if (steer < -BOOKWORM_MOVEMIXED_INPUT_LIMIT) {
-		steer = -BOOKWORM_MOVEMIXED_INPUT_LIMIT;
-	}
+	steer *= this->nvm.steeringSensitivity;
+	steer /= 1000;
 
 	throttled = throttle;
 	steerd = steer;
+
+	if (steerd > maxRadius) {
+		steerd = maxRadius;
+	}
+	else if (steerd < -maxRadius) {
+		steerd = -maxRadius;
+	}
+
+	if (throttled > maxRadius) {
+		throttled = maxRadius;
+	}
+	else if (throttled < -maxRadius) {
+		throttled = -maxRadius;
+	}
 
 	leftd = steerd;
 	rightd = -steerd;
 	leftd += throttled;
 	rightd += throttled;
-	leftd *= BOOKWORM_MOVEMIXED_OUTPUT_SCALE;
-	rightd *= BOOKWORM_MOVEMIXED_OUTPUT_SCALE;
+	leftd *= outputScale;
+	rightd *= outputScale;
 
 	*left = (signed int)lround(leftd);
 	*right = (signed int)lround(rightd);
 }
 
-/*
-void cBookWorm::setAccelLimit(unsigned int accel)
-{
-	servoLeft.setAccel(accel);
-	servoRight.setAccel(-accel);
-}
-
-void cBookWorm::enableAccelLimit(void)
-{
-	setAccelLimit(SERVO_ACCELERATION_LIMIT);
-}
-
-void cBookWorm::disableAccelLimit(void)
-{
-	setAccelLimit(0);
-}
-*/
-
 void cBookWorm::setServoDeadzoneLeft(unsigned int x)
 {
-	servoDeadzoneLeft = x;
 	this->nvm.servoDeadzoneLeft = x;
 }
 
 void cBookWorm::setServoDeadzoneRight(unsigned int x)
 {
-	servoDeadzoneRight = x;
 	this->nvm.servoDeadzoneRight = x;
 }
 
 void cBookWorm::setServoBiasLeft(signed int x)
 {
-	servoBiasLeft = x;
 	this->nvm.servoBiasLeft = x;
 }
 
 void cBookWorm::setServoBiasRight(signed int x)
 {
-	servoBiasRight = x;
 	this->nvm.servoBiasRight = x;
 }
 
 void cBookWorm::setServoStoppedNoPulse(bool x)
 {
-	servoStoppedNoPulse = x;
+	this->nvm.servoStoppedNoPulse = x;
+}
+
+void cBookWorm::setServoMax(unsigned int x)
+{
+	this->nvm.servoMax = x;
+}
+
+void cBookWorm::setSpeedGain(unsigned int x)
+{
+	this->nvm.speedGain = x;
+}
+
+void cBookWorm::setSteeringSensitivity(signed int x)
+{
+	this->nvm.steeringSensitivity = x;
+}
+
+void cBookWorm::setSteeringBalance(signed int x)
+{
+	this->nvm.steeringBalance = x;
+}
+
+void cBookWorm::setStickRadius(uint16_t x)
+{
+	this->nvm.stickRadius = x;
+}
+
+void cBookWorm::setServoFlip(uint8_t x)
+{
+	this->nvm.servoFlip = x;
+}
+
+void cBookWorm::setRobotFlip(bool x)
+{
+	this->robotFlip = x;
+}
+
+void cBookWorm::togRobotFlip()
+{
+	this->robotFlip ^= true;;
+}
+
+bool cBookWorm::getRobotFlip()
+{
+	return this->robotFlip;
 }
