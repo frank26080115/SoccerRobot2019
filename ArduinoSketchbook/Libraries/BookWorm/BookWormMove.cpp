@@ -21,6 +21,15 @@ extern ContinuousServo servoRight;
 
 void cBookWorm::move(signed int left, signed int right)
 {
+	if ((this->nvm.servoFlip & 0x01) != 0)
+	{
+		right *= -1;
+	}
+	if ((this->nvm.servoFlip & 0x02) != 0)
+	{
+		left *= -1;
+	}
+
 	if (this->robotFlip == false) {
 		moveLeftServo(left);
 		moveRightServo(right);
