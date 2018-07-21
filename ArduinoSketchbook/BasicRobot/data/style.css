@@ -46,4 +46,8 @@ body {
 table input {
 	height: 40pt;
 	min-width: 100pt;
+	font-size: 20pt;
+}
+table td {
+	vertical-align: top;
 }

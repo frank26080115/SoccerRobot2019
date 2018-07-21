@@ -29,9 +29,9 @@ void handleRoot() {
   server.sendContent("</div>");
   if (BookWorm.nvm.advanced)
   {
-    server.sendContent("<div id='topbar' width='100%'><table width='90%'>");
+    server.sendContent("<div id='topbar' width='100%'><table width='98%'>");
     server.sendContent(
-      "<tr><td width='50%'><input type='button' value='Weap Safe' onclick='weapsetpossafe()' /></td><td width='50%'><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>"
+      "<tr><td width='50%'><input type='button' value='Weapon Safe' onclick='weapsetpossafe()' /></td><td width='50%'><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>"
     );
     server.sendContent(
       "<tr><td width='50%'><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip1' onclick='flip()' /></td><td width='50%'><input type='button' value='Pos B' onclick='weapsetposb()' /></td></tr>"
@@ -43,7 +43,7 @@ void handleRoot() {
     }
     server.sendContent("><table>");
     server.sendContent(
-      "<tr><td><input type='button' value='Weap Safe' onclick='weapsetpossafe()' /></td></tr><tr><td><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>"
+      "<tr><td><input type='button' value='Weapon Safe' onclick='weapsetpossafe()' /></td></tr><tr><td><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>"
     );
     server.sendContent(
       "<tr><td><input type='button' value='Pos B' onclick='weapsetposb()' /></td></tr><tr><td><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip2' onclick='flip()' /></td></tr>"
@@ -280,9 +280,11 @@ void serveConfigHeader()
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
 
-  server.sendContent(String("<html><head><title>Robot Config</title>"));
-  server.sendContent(String("<script src='config.js'></script>"));
-  server.sendContent(String("</head><body><h1>Robot Config</h1>"));
+  server.sendContent("<html><head><title>Robot Config</title>");
+  server.sendContent("<script src='config.js'></script>");
+  server.sendContent("<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>");
+  server.sendContent("<link rel='stylesheet' type='text/css' href='config.css'>");
+  server.sendContent("</head><body><h1>Robot Config</h1>");
 }
 
 void serveConfigHexStr()
@@ -290,13 +292,13 @@ void serveConfigHexStr()
   char str[3];
   int i;
   uint8_t* ptr = (uint8_t*)(&(BookWorm.nvm));
-  server.sendContent(String("\n<p>\n"));
+  server.sendContent("\n<p>\n");
   // spit out the NVM struct as a hex blob
   for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
     sprintf(str, "%02X", ptr[i]);
     server.sendContent(str);
   }
-  server.sendContent(String("\n</p>\n"));
+  server.sendContent("\n</p>\n");
 }
 
 void serveConfigNet()
@@ -304,14 +306,14 @@ void serveConfigNet()
   if (server.client().localIP() == apIP) {
     server.sendContent(String("\n<p>You are connected through the AP: ") + String(BookWorm.SSID) + String("</p>\n"));
   } else {
-    server.sendContent(String("\n<p>Error, local IP does not match AP IP</p>\n"));
+    server.sendContent("\n<p>Error, local IP does not match AP IP</p>\n");
   }
   server.sendContent(String("\n</p>IP: ") + String(WiFi.softAPIP()) + String("</p>\n"));
 }
 
 void serveConfigTable()
 {
-  server.sendContent(String("\n<table border='2' width='100%'>\n"));
+  server.sendContent(String("\n<table border='2' width='98%'>\n"));
 
   // void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note)
   generateConfigItemTxt("SSID", "ssid", "text", BookWorm.SSID, NULL, "* change requires reboot");
@@ -349,10 +351,10 @@ void generateFlipDropdown(uint8_t cur)
 {
   uint8_t i;
   generateConfigItemStart("Signal flip", "servoflip");
-  server.sendContent("\n<select id='servoflip' name='servoflip'>\n");
+  server.sendContent("\n\t<select id='servoflip' name='servoflip'>\n");
   for (i = 0; i <= 7; i++)
   {
-    server.sendContent("<option value='");
+    server.sendContent("\t\t<option value='");
     server.sendContent(String(i));
     server.sendContent("'");
     if (i == cur)
@@ -380,7 +382,7 @@ void generateFlipDropdown(uint8_t cur)
     }
     server.sendContent("</option>\n");
   }
-  server.sendContent("</select><br />* requires reboot to take effect\n");
+  server.sendContent("\t</select><br />* requires reboot to take effect\n");
   generateConfigItemEnd();
 }
 
@@ -401,5 +403,10 @@ void handleStyleCss() {
 
 void handleConfigJs() {
   handleFileRead("/config.js");
+  server.client().stop(); // stop() is needed if we sent no content length
+}
+
+void handleConfigCss() {
+  handleFileRead("/config.css");
   server.client().stop(); // stop() is needed if we sent no content length
 }

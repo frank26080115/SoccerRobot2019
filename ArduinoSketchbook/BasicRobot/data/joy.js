@@ -453,10 +453,12 @@ var joystick	= new VirtualJoystick({
 	stickRadius	: desiredStickRadius,
 });
 joystick.addEventListener('touchStart', function(){
-	console.log('down')
+	console.log('down');
+	//document.getElementsByTagName("body")[0].classList.remove("bodybg");
 })
 joystick.addEventListener('touchEnd', function(){
-	console.log('up')
+	console.log('up');
+	//document.getElementsByTagName("body")[0].classList.add("bodybg");;
 })
 
 var prevX = 0;

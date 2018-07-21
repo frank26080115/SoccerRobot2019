@@ -73,7 +73,9 @@ void setup() {
 
   server.on("/finger.png", handleFingerPng);
   server.on("/style.css", handleStyleCss);
+  server.on("/config.css", handleConfigCss);
   server.on("/joy.js", handleJoyJs);
+  server.on("/config.js", handleConfigJs);
 
   server.onNotFound(handleNotFound);
   server.begin(); // Web server start
