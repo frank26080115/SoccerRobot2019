@@ -21,14 +21,14 @@ typedef struct
 	uint16_t speedGain;
 	int16_t steeringSensitivity;
 	int16_t steeringBalance;
-	uint8_t servoFlip;
+	uint8_t servoFlip; // bit flags, bit 0 right flip, bit 1 left flip, bit 2 swaps left and right
 	bool servoStoppedNoPulse;
-	uint16_t stickRadius;
+	uint16_t stickRadius; // size of the joystick shown on screen
 	uint16_t weapPosSafe;
 	uint16_t weapPosA;
 	uint16_t weapPosB;
 	bool leftHanded;
-	bool advanced;
+	bool advanced; // this option enables/disables weapon controls and inverted controls
 	uint16_t checksum;
 }
 bookworm_nvm_t;

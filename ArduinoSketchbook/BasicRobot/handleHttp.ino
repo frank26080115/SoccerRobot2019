@@ -328,7 +328,7 @@ void serveConfigTable()
   generateConfigItemTxt("Steering balance", "steeringbalance", "number", String(BookWorm.nvm.steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x / 1000 , positive means apply to left, negative means apply to right");
   generateFlipDropdown(BookWorm.nvm.servoFlip);
   generateConfigItemTxt("Joystick size", "stickradius", "number", String(BookWorm.nvm.stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
-  generateConfigItemTxt("Enabled advanced features?", "advanced", "number", BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
+  generateConfigItemTxt("Enabled advanced features?", "advanced", "number", BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable weapon controls and inverted drive");
   if (BookWorm.nvm.advanced)
   {
     generateConfigItemTxt("Left handed?", "lefthanded", "number", BookWorm.nvm.leftHanded ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
