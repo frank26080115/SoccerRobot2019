@@ -85,19 +85,34 @@ bool cBookWorm::loadNvm()
 	int i;
 	uint16_t chksum;
 
+	#ifdef BOOKWORM_DEBUG
+	this->printf("NVM reading: ");
+	#endif
 	for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
 		ptr[i] = EEPROM.read(i);
+		#ifdef BOOKWORM_DEBUG
+		this->printf(" %02X", ptr[i]);
+		#endif
 	}
+	#ifdef BOOKWORM_DEBUG
+	this->printf(" done!\r\n");
+	#endif
 
 	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
 	if (chksum == this->nvm.checksum)
 	{
+		#ifdef BOOKWORM_DEBUG
+		this->printf("NVM loaded successfully, checksum %04X\r\n", chksum);
+		#endif
 		memcpy(this->SSID, this->nvm.ssid, 32);
 		this->SSID[31] = 0;
 		return true;
 	}
 	else
 	{
+		#ifdef BOOKWORM_DEBUG
+		this->printf("NVM load failed due to mismatched checksum %04X != %04X\r\n", chksum, this->nvm.checksum);
+		#endif
 		return false;
 	}
 }
@@ -116,10 +131,19 @@ void cBookWorm::saveNvm()
 	this->SSID[31] = 0;
 	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
 	this->nvm.checksum = chksum;
+	#ifdef BOOKWORM_DEBUG
+	this->printf("EEPROM writing: ");
+	#endif
 	for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
 		EEPROM.write(i, ptr[i]);
+		#ifdef BOOKWORM_DEBUG
+		this->printf(" %02X", ptr[i]);
+		#endif
 	}
 	EEPROM.commit();
+	#ifdef BOOKWORM_DEBUG
+	this->printf(" done!\r\n");
+	#endif
 }
 
 /*
@@ -147,6 +171,9 @@ void cBookWorm::setSsid(char* str)
 		this->generateSsid(this->SSID);
 		strcpy(this->nvm.ssid, this->SSID);
 	}
+	#ifdef BOOKWORM_DEBUG
+	this->printf("set SSID: %s\r\n", this->SSID);
+	#endif
 	this->nvm.ssid[31] = 0;
 	this->SSID[31] = 0;
 }
@@ -179,10 +206,12 @@ void cBookWorm::defaultValues()
 	this->nvm.weapPosA = 1500;
 	this->nvm.weapPosB = 2000;
 	this->nvm.leftHanded = false;
+	this->printf("values set to defaults\r\n");
 }
 
 void cBookWorm::factoryReset() {
 	defaultValues();
 	this->generateSsid(this->SSID);
 	this->setSsid(this->SSID);
+	this->printf("factory reset performed\r\n");
 }
