@@ -10,7 +10,8 @@ boolean isIp(String str) {
 }
 
 /** IP to String? */
-String toStringIp(IPAddress ip) {
+String toStringIp(IPAddress ip)
+{
   String res = "";
   for (int i = 0; i < 3; i++) {
     res += String((ip >> (8 * i)) & 0xFF) + ".";
@@ -28,10 +29,15 @@ String getContentType(String filename) { // convert the file extension to the MI
   return "text/plain";
 }
 
-bool handleFileRead(String path) { // send the right file to the client (if it exists)
-  #ifdef SKETCH_DEBUG
-  BookWorm.printf("handleFileRead: %s\r\n", path.c_str());
-  #endif
+bool handleFileRead(String path) // send the right file to the client (if it exists)
+{
+  static bool hasSPIFFS_Inited = false;
+  if (hasSPIFFS_Inited == false) {
+    SPIFFS.begin();
+    hasSPIFFS_Inited = true;
+  }
+
+  BookWorm.debugf("call handleFileRead: %s\r\n", path.c_str());
   if (path.endsWith("/")) path += "index.html";          // If a folder is requested, send the index file
   String contentType = getContentType(path);             // Get the MIME type
   String pathWithGz = path + ".gz";
@@ -40,6 +46,7 @@ bool handleFileRead(String path) { // send the right file to the client (if it e
       path += ".gz";                                         // Use the compressed verion
     File file = SPIFFS.open(path, "r");                    // Open the file
     size_t sent = server.streamFile(file, contentType);    // Send it to the client
+    serverClientStop();
     file.close();                                          // Close the file again
     #ifdef SKETCH_DEBUG
     BookWorm.printf("\tSent file: %s\r\n", path.c_str());
@@ -82,7 +89,7 @@ void generateConfigItemStart(const char* label, const char* id)
 
 void generateConfigItemEnd()
 {
-  server.sendContent("</td><td class='tbl_submit'><input type='submit' value='set' height='100%' /></td></tr></form>\n");
+  server.sendContent("</td><td class='tbl_submit'><input type='submit' class='btn_submit' value='set' /></td></tr></form>\n");
 }
 
 void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note) {
@@ -108,4 +115,20 @@ void generateConfigItemTxt(const char* label, const char* id, const char* type, 
   }
   generateConfigItemEnd();
 }
+
+void serverClientStop()
+{
+  server.sendContent("");
+  server.client().stop(); // stop() is needed if we sent no content length
+}
+
+void serveBasicHeader()
+{
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  server.sendHeader("Pragma", "no-cache");
+  server.sendHeader("Expires", "-1");
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+  server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
+}
+
 

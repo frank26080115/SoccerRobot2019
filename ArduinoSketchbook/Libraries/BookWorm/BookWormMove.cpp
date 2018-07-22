@@ -43,6 +43,11 @@ void cBookWorm::move(signed int left, signed int right)
 void cBookWorm::moveLeftServo(signed int x)
 {
 	int32_t ticks = SERVO_CENTER_TICKS;
+
+	if (x != 0) {
+		this->checkAttachAllServos();
+	}
+
 	if (x > 0) {
 		ticks += x;
 		ticks += this->nvm.servoDeadzoneLeft;
@@ -72,6 +77,11 @@ void cBookWorm::moveLeftServo(signed int x)
 void cBookWorm::moveRightServo(signed int x)
 {
 	int32_t ticks = SERVO_CENTER_TICKS;
+
+	if (x != 0) {
+		this->checkAttachAllServos();
+	}
+
 	x *= -1; // flip
 	if (x > 0) {
 		ticks += x;
@@ -216,4 +226,61 @@ void cBookWorm::togRobotFlip()
 bool cBookWorm::getRobotFlip()
 {
 	return this->robotFlip;
+}
+
+void cBookWorm::attachAllServos()
+{
+	if ((this->nvm.servoFlip & 0x04) == 0) {
+		servoLeft.attach(pinnumServoLeft);
+		servoRight.attach(pinnumServoRight);
+	}
+	else {
+		servoLeft.attach(pinnumServoLeft);
+		servoRight.attach(pinnumServoRight);
+	}
+	move(0, 0);
+	#ifdef ENABLE_WEAPON
+	if (this->nvm.enableWeapon) {
+		positionWeapon(0);
+	}
+	#endif
+	this->hasServosAttached = true;
+	#ifdef BOOKWORM_DEBUG
+	this->printf("All servos attached\r\n");
+	#endif
+}
+
+void cBookWorm::checkAttachAllServos()
+{
+	if (this->hasServosAttached == false) {
+		this->attachAllServos();
+	}
+}
+
+void cBookWorm::loadPinAssignments()
+{
+	int tmp;
+	this->pinnumServoLeft = pinServoLeft;
+	this->pinnumServoRight = pinServoRight;
+	#ifdef ENABLE_WEAPON
+	if (this->nvm.enableWeapon)
+	{
+		#if pinServoWeapon == pinServoLeft || pinServoWeapon == pinServoRight
+			#ifdef pinServoLeftAlt
+				this->pinnumServoLeft = pinServoLeftAlt;
+			#elif defined(pinServoRightAlt)
+				this->pinnumServoRight = pinServoRightAlt;
+			#else
+				#error impossible weapon servo signal assignment
+			#endif
+		#endif
+		this->pinnumServoWeapon = pinServoWeapon;
+	}
+	#endif
+	if ((this->nvm.servoFlip & 0x04) != 0)
+	{
+		tmp = this->pinnumServoLeft;
+		this->pinnumServoLeft = this->pinnumServoRight;
+		this->pinnumServoRight = tmp;
+	}
 }

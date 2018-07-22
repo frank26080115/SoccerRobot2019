@@ -6,18 +6,6 @@
 #include <FS.h>
 #include <BookWorm.h>
 
-/*
-   This example serves a "hello world" on a WLAN and a SoftAP at the same time.
-   The SoftAP allow you to configure WLAN parameters at run time. They are not setup in the sketch but saved on EEPROM.
-
-   Connect your computer or cell phone to wifi network ESP_ap with password 12345678. A popup may appear and it allow you to go to WLAN config. If it does not then navigate to http://192.168.4.1/wifi and config it there.
-   Then wait for the module to connect to your wifi and take note of the WLAN IP it got. Then you can disconnect from ESP_ap and return to your regular WLAN.
-
-   Now the ESP8266 is in your network. You can reach it through http://192.168.x.x/ (the IP you took note of) or maybe at http://esp8266.local too.
-
-   This is a captive portal because through the softAP it will redirect any http request to http://192.168.4.1/
-*/
-
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 const char *softAP_password = "12345678";
 
@@ -45,7 +33,10 @@ signed int speedLeft = 0;
 signed int speedRight = 0;
 signed int speedX = 0;
 signed int speedY = 0;
+#ifdef ENABLE_WEAPON
 signed int speedWeap = 0;
+#endif
+char ledMode = 0;
 
 void setup() {
   delay(1000);
@@ -56,30 +47,33 @@ void setup() {
   WiFi.softAPConfig(apIP, apIP, netMsk);
   WiFi.softAP(BookWorm.SSID, softAP_password);
   delay(500); // Without delay I've seen the IP address blank
-  BookWorm.printf("AP IP address: %s\r\n", String(WiFi.softAPIP()).c_str());
+  BookWorm.printf("AP IP address: %s\r\n", toStringIp(WiFi.softAPIP()).c_str());
 
   /* Setup the DNS server redirecting all the domains to the apIP */
   dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
   dnsServer.start(DNS_PORT, "*", apIP);
 
   /* Setup web pages */
-  server.on("/", handleRoot);
+  server.on("/",             handleRoot);
+  server.on("/index.htm",    handleRoot);
+  server.on("/index.html",   handleRoot);
   server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/fwlink",       handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
 
-  server.on("/move", handleMove);
+  server.on("/move",      handleMove);
   server.on("/setconfig", handleSetConfig);
-  server.on("/config", handleConfig);
+  server.on("/config",    handleConfig);
 
   server.on("/finger.png", handleFingerPng);
-  server.on("/style.css", handleStyleCss);
+  server.on("/style.css",  handleStyleCss);
   server.on("/config.css", handleConfigCss);
-  server.on("/joy.js", handleJoyJs);
-  server.on("/config.js", handleConfigJs);
+  server.on("/joy.js",     handleJoyJs);
+  server.on("/config.js",  handleConfigJs);
 
   server.onNotFound(handleNotFound);
   server.begin(); // Web server start
   BookWorm.printf("HTTP server started\r\n");
+  BookWorm.debugf("Free RAM %u\r\n", system_get_free_heap_size());
 }
 
 void loop()
@@ -115,6 +109,10 @@ void loop()
 
   // Move the robot if needed
   now = millis();
+  int now10 = now / 100;
+  now10 %= 10;
+  bool ledOn = false;
+
   if ((now - lastCommTimestamp) > 1000)
   {
     // if timeout, stop the robot
@@ -123,13 +121,31 @@ void loop()
     speedX = 0;
     speedY = 0;
 
+    #ifdef ENABLE_WEAPON
     if (BookWorm.nvm.weapPosSafe > 0) {
       speedWeap = BookWorm.nvm.weapPosSafe;
     }
     else {
       speedWeap = 0;
     }
+    #endif
+
+    if (now10 == 0) {
+      ledOn = true;
+    }
   }
+  else {
+    if (now10 == 0 || now10 == 2 || now10 == 4
+      || (((moveMixedMode != false && (speedX != 0 || speedY != 0)) || (moveMixedMode == false && (speedLeft != 0 || speedRight != 0))) && (now10 == 6 || now10 == 8))
+      ) {
+      ledOn = true;
+    }
+  }
+  if (lastCommTimestamp > 0 && now10 == 2)
+  {
+    ledOn = true;
+  }
+
   if (moveMixedMode == false)
   {
     BookWorm.move(speedLeft, speedRight);
@@ -138,6 +154,17 @@ void loop()
   {
     BookWorm.moveMixed(speedY, speedX);
   }
-  BookWorm.spinWeapon(speedWeap);
+  #ifdef ENABLE_WEAPON
+  if (BookWorm.nvm.advanced && BookWorm.nvm.enableWeapon) {
+    BookWorm.spinWeapon(speedWeap);
+  }
+  #endif
+
+  if (ledOn) {
+    BookWorm.setLedOn();
+  }
+  else {
+    BookWorm.setLedOff();
+  }
 }
 

@@ -2,6 +2,8 @@
 #include "BookWorm.h"
 #include "ContinuousServo.h"
 
+#ifdef ENABLE_WEAPON
+
 extern Servo servoWeap;
 
 void cBookWorm::spinWeapon(uint16_t x)
@@ -15,7 +17,7 @@ void cBookWorm::spinWeapon(uint16_t x)
 			x = 2500;
 		}
 		if (servoWeap.attached() == false) {
-			servoWeap.attach(pinServoWeap);
+			servoWeap.attach(pinnumServoWeapon);
 		}
 		servoWeap.writeTicks(x);
 	}
@@ -55,3 +57,10 @@ void cBookWorm::setWeapPosB(uint16_t x)
 {
 	this->nvm.weapPosB = x;
 }
+
+void cBookWorm::setEnableWeapon(bool x)
+{
+	this->nvm.enableWeapon = x;
+}
+
+#endif

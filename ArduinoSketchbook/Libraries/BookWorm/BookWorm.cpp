@@ -10,14 +10,14 @@ cBookWorm BookWorm; // user accessible instance declared here
 
 ContinuousServo servoLeft;  // not directly user accessible but accessible through library
 ContinuousServo servoRight; // not directly user accessible but accessible through library
+#ifdef ENABLE_WEAPON
 Servo servoWeap; // not directly user accessible but accessible through library
+#endif
 
 cBookWorm::cBookWorm(void)
 {
-	// resets all nvm to default
 	memset(&(this->nvm), 0, sizeof(bookworm_nvm_t));
-
-	this->defaultValues();
+	this->serialHasBegun = false;
 }
 
 /*
@@ -28,26 +28,40 @@ parameters:	none
 */
 void cBookWorm::begin(void)
 {
-	Serial.begin(9600); // 9600 is slower but it's one less thing to screw up in the IDE
+	#if (!defined(ENABLE_WEAPON)) || (pinServoWeapon != pinServoLeft && pinServoWeapon != pinServoRight)
+	Serial.begin(BOOKWORM_BAUD);
+	this->serialHasBegun = true;
+	#else
+	system_set_os_print(0);
+	#endif
 
 	EEPROM.begin(512);
 	if (this->loadNvm() == false)
 	{
-		// failed to load, so create default SSID
+		// failed to load
+		this->defaultValues();
 		this->generateSsid(this->SSID);
-		strcpy(this->nvm.ssid, this->SSID);
+		this->setSsid(this->SSID);
 	}
 
-	if ((this->nvm.servoFlip & 0x04) == 0) {
-		servoLeft.attach(pinServoLeft);
-		servoRight.attach(pinServoRight);
-	}
-	else {
-		servoLeft.attach(pinServoLeft);
-		servoRight.attach(pinServoRight);
-	}
-	move(0, 0);
-	positionWeapon(0);
+	this->hasServosAttached = false;
+}
+
+void cBookWorm::setLedOn()
+{
+	#ifdef LED_BUILTIN
+	pinMode(LED_BUILTIN, OUTPUT);
+	// LOW is ON when using ESP-01
+	digitalWrite(LED_BUILTIN, LOW);
+	#endif
+}
+
+void cBookWorm::setLedOff()
+{
+	#ifdef LED_BUILTIN
+	// HIGH is OFF when using ESP-01
+	digitalWrite(LED_BUILTIN, HIGH);
+	#endif
 }
 
 /*
@@ -85,34 +99,36 @@ bool cBookWorm::loadNvm()
 	int i;
 	uint16_t chksum;
 
-	#ifdef BOOKWORM_DEBUG
-	this->printf("NVM reading: ");
-	#endif
+	this->debugf("NVM reading: ");
 	for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
 		ptr[i] = EEPROM.read(i);
-		#ifdef BOOKWORM_DEBUG
-		this->printf(" %02X", ptr[i]);
-		#endif
+		this->debugf(" %02X", ptr[i]);
 	}
-	#ifdef BOOKWORM_DEBUG
-	this->printf(" done!\r\n");
-	#endif
+	this->debugf(" done!\r\n");
 
 	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
-	if (chksum == this->nvm.checksum)
+	if (chksum == this->nvm.checksum && BOOKWORM_EEPROM_VERSION == this->nvm.eeprom_version)
 	{
-		#ifdef BOOKWORM_DEBUG
-		this->printf("NVM loaded successfully, checksum %04X\r\n", chksum);
-		#endif
 		memcpy(this->SSID, this->nvm.ssid, 32);
 		this->SSID[31] = 0;
+
+		loadPinAssignments();
+
+		#if defined(ENABLE_WEAPON) && (pinServoWeapon == pinServoLeft || pinServoWeapon == pinServoRight)
+		if (this->nvm.enableWeapon == false) {
+			Serial.begin(BOOKWORM_BAUD);
+			this->serialHasBegun = true;
+		}
+		#endif
+
+		this->debugf("NVM loaded successfully, checksum %04X\r\n", chksum);
+
 		return true;
 	}
 	else
 	{
-		#ifdef BOOKWORM_DEBUG
-		this->printf("NVM load failed due to mismatched checksum %04X != %04X\r\n", chksum, this->nvm.checksum);
-		#endif
+		this->debugf("NVM load failed, \r\n\tchecksum %04X != %04X\r\n", chksum, this->nvm.checksum);
+		this->debugf("\tversion %04X != %04X\r\n", BOOKWORM_EEPROM_VERSION, this->nvm.eeprom_version);
 		return false;
 	}
 }
@@ -131,19 +147,13 @@ void cBookWorm::saveNvm()
 	this->SSID[31] = 0;
 	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
 	this->nvm.checksum = chksum;
-	#ifdef BOOKWORM_DEBUG
-	this->printf("EEPROM writing: ");
-	#endif
+	this->debugf("EEPROM writing: ");
 	for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
 		EEPROM.write(i, ptr[i]);
-		#ifdef BOOKWORM_DEBUG
-		this->printf(" %02X", ptr[i]);
-		#endif
+		this->debugf(" %02X", ptr[i]);
 	}
 	EEPROM.commit();
-	#ifdef BOOKWORM_DEBUG
-	this->printf(" done!\r\n");
-	#endif
+	this->debugf(" done!\r\n");
 }
 
 /*
@@ -158,7 +168,7 @@ void cBookWorm::setSsid(char* str)
 	int i;
 	for (i = 0; i < 31; i++) {
 		char d = str[i];
-		if (((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z') || (d >= '0' && d <= '9')) == false) {
+		if (((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z') || (d >= '0' && d <= '9') || d == 0) == false) {
 			d = '-';
 		}
 		this->nvm.ssid[i] = d;
@@ -171,11 +181,9 @@ void cBookWorm::setSsid(char* str)
 		this->generateSsid(this->SSID);
 		strcpy(this->nvm.ssid, this->SSID);
 	}
-	#ifdef BOOKWORM_DEBUG
-	this->printf("set SSID: %s\r\n", this->SSID);
-	#endif
 	this->nvm.ssid[31] = 0;
 	this->SSID[31] = 0;
+	this->debugf("set SSID: %s\r\n", this->SSID);
 }
 
 void cBookWorm::setLeftHanded(bool x)
@@ -190,6 +198,7 @@ void cBookWorm::setAdvanced(bool x)
 
 void cBookWorm::defaultValues()
 {
+	this->nvm.eeprom_version = BOOKWORM_EEPROM_VERSION;
 	this->nvm.advanced = false;
 	this->nvm.servoMax = 500;
 	this->nvm.servoDeadzoneLeft = 0;
@@ -202,11 +211,16 @@ void cBookWorm::defaultValues()
 	this->nvm.servoFlip = 0;
 	this->nvm.servoStoppedNoPulse = true;
 	this->nvm.stickRadius = 100;
+	#ifdef ENABLE_WEAPON
 	this->nvm.weapPosSafe = 1000;
 	this->nvm.weapPosA = 1500;
 	this->nvm.weapPosB = 2000;
+	this->nvm.enableWeapon = false;
+	#endif
 	this->nvm.leftHanded = false;
-	this->printf("values set to defaults\r\n");
+	this->nvm.checksum = 0xABCD;
+	loadPinAssignments();
+	this->debugf("values set to defaults\r\n");
 }
 
 void cBookWorm::factoryReset() {

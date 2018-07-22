@@ -1,16 +1,15 @@
 /** Handle root or redirect to captive portal */
-void handleRoot() {
+void handleRoot()
+{
+  BookWorm.printf("call handleRoot\r\n");
+  
   if (captivePortal()) { // If caprive portal redirect instead of displaying the page.
     return;
   }
-  //handleFileRead("/index.html");
+
   // code borrowed from https://automatedhome.party/2017/07/15/wifi-controlled-car-with-a-self-hosted-htmljs-joystick-using-a-wemos-d1-miniesp8266/
 
-  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  server.sendHeader("Pragma", "no-cache");
-  server.sendHeader("Expires", "-1");
-  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-  server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
+  serveBasicHeader();
   server.sendContent(
     "<html>"
     "<head>"
@@ -25,33 +24,61 @@ void handleRoot() {
     "<div id='info'>"
     "Touch the screen and move<br />Robot SSID: "
   );
-  server.sendContent(String(BookWorm.SSID));
+  server.sendContent(BookWorm.SSID);
   server.sendContent("</div>");
   if (BookWorm.nvm.advanced)
   {
     server.sendContent("<div id='topbar' width='100%'><table width='98%'>");
+    #ifdef ENABLE_WEAPON
     server.sendContent(
       "<tr><td width='50%'><input type='button' value='Weapon Safe' onclick='weapsetpossafe()' /></td><td width='50%'><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>"
     );
+    #endif
     server.sendContent(
-      "<tr><td width='50%'><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip1' onclick='flip()' /></td><td width='50%'><input type='button' value='Pos B' onclick='weapsetposb()' /></td></tr>"
+      "<tr><td width='50%'><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip1' onclick='flip()' /></td>"
+      "<td width='50%'>"
     );
+    #ifdef ENABLE_WEAPON
+    if (BookWorm.nvm.enableWeapon) {
+      server.sendContent("<input type='button' value='Pos B' onclick='weapsetposb()' />");
+    }
+    else {
+      server.sendContent("&nbsp;");
+    }
+    #else
+    server.sendContent("&nbsp;");
+    #endif
+    server.sendContent("</td></tr>");
     server.sendContent("</table></div>");
     server.sendContent("<div id='sidebar' ");
     if (BookWorm.nvm.leftHanded) {
       server.sendContent(" class='rightside' ");
     }
     server.sendContent("><table>");
-    server.sendContent(
-      "<tr><td><input type='button' value='Weapon Safe' onclick='weapsetpossafe()' /></td></tr><tr><td><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>"
-    );
-    server.sendContent(
-      "<tr><td><input type='button' value='Pos B' onclick='weapsetposb()' /></td></tr><tr><td><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip2' onclick='flip()' /></td></tr>"
-    );
+    #ifdef ENABLE_WEAPON
+    if (BookWorm.nvm.enableWeapon) {
+      server.sendContent("<tr><td><input type='button' value='Weapon Safe' onclick='weapsetpossafe()' /></td></tr><tr><td><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>");
+    }
+    #endif
+    #ifdef ENABLE_WEAPON
+    if (BookWorm.nvm.enableWeapon) {
+      server.sendContent("<tr><td><input type='button' value='Pos B' onclick='weapsetposb()' /></td></tr>");
+    }
+    #endif
+    server.sendContent("<tr><td><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip2' onclick='flip()' /></td></tr>");
     server.sendContent("</table></div>");
   }
   server.sendContent("<script>\n");
   server.sendContent("var desiredStickRadius = "); server.sendContent(String(BookWorm.nvm.stickRadius)); server.sendContent(";\n");
+  server.sendContent("var advancedFeatures = ");
+  if (BookWorm.nvm.advanced) {
+     server.sendContent("1");
+  }
+  else {
+    server.sendContent("0");
+  }
+  server.sendContent(";\n");
+  #ifdef ENABLE_WEAPON
   server.sendContent("var weapPosSafe = ");
   if (BookWorm.nvm.advanced) {
     server.sendContent(String(BookWorm.nvm.weapPosSafe));
@@ -62,29 +89,34 @@ void handleRoot() {
   server.sendContent(";\n");
   server.sendContent("var weapPosA = "); server.sendContent(String(BookWorm.nvm.weapPosA)); server.sendContent(";\n");
   server.sendContent("var weapPosB = "); server.sendContent(String(BookWorm.nvm.weapPosB)); server.sendContent(";\n");
+  if (BookWorm.nvm.advanced && BookWorm.nvm.enableWeapon) {
+    server.sendContent("advancedFeatures += 1;\n");
+  }
+  #endif
   server.sendContent(
     "</script>"
     "<script src='joy.js'></script>"
     "</body>"
     "</html>"
   );
-  
-  server.client().stop(); // stop() is needed if we sent no content length
+
+  serverClientStop();
 }
 
 /** Redirect to captive portal if we got a request for another domain. Return true in that case so the page handler do not try to handle the request again. */
 boolean captivePortal() {
   if (!isIp(server.hostHeader()) && server.hostHeader() != (String(myHostname) + ".local")) {
-    Serial.print("Request redirected to captive portal");
+    BookWorm.printf("Request redirected to captive portal");
     server.sendHeader("Location", String("http://") + toStringIp(server.client().localIP()), true);
     server.send(302, "text/plain", "");   // Empty content inhibits Content-length header so we have to close the socket ourselves.
-    server.client().stop(); // stop() is needed if we sent no content length
+    serverClientStop();
     return true;
   }
   return false;
 }
 
 void handleNotFound() {
+  BookWorm.debugf("call handleNotFound\r\n");
   if (captivePortal()) { // If caprive portal redirect instead of displaying the error page.
     return;
   }
@@ -104,9 +136,11 @@ void handleNotFound() {
   server.sendHeader("Pragma", "no-cache");
   server.sendHeader("Expires", "-1");
   server.send(404, "text/plain", message);
+  serverClientStop();
 }
 
 void handleMove() {
+  BookWorm.debugf("call handleMove\r\n");
   int i;
   bool gotLeft = false;
   bool gotRight = false;
@@ -128,7 +162,9 @@ void handleMove() {
     else IF_HANDLE_MOVE_ARG("right", speedRight, signed int, gotRight)
     else IF_HANDLE_MOVE_ARG("x",     speedX,     signed int, gotX)
     else IF_HANDLE_MOVE_ARG("y",     speedY,     signed int, gotY)
+    #ifdef ENABLE_WEAPON
     else IF_HANDLE_MOVE_ARG("weap",  speedWeap,  signed int, gotWeap)
+    #endif
     else if (argName.equalsIgnoreCase(String("flipped")))
     {
       String argVal = server.arg(i);
@@ -149,21 +185,19 @@ void handleMove() {
   {
     BookWorm.setRobotFlip(false);
   }
+  #ifdef ENABLE_WEAPON
   if (gotWeap)
   {
-    // TODO: weapon motor is unimplemented
     gotWeap = gotWeap;
   }
+  #endif
   if ((gotLeft && gotRight) || (gotX && gotY))
   {
     lastCommTimestamp = millis();
     moveMixedMode = (gotX && gotY);
   }
-}
-
-void handleSetSSID() {
-  String str = server.arg("ssid");
-  BookWorm.setSsid((char*)str.c_str());
+  serveBasicHeader();
+  serverClientStop();
 }
 
 void handleSetConfig() {
@@ -171,6 +205,8 @@ void handleSetConfig() {
   bool commit = false;
   bool reboot = false;
   bool factoryreset = false;
+
+  BookWorm.debugf("call handleSetConfig\r\n");
 
   serveConfigHeader();
 
@@ -193,13 +229,16 @@ void handleSetConfig() {
     else IF_HANDLE_CONFIG_ARG("steeringsensitivity", setSteeringSensitivity, unsigned int)
     else IF_HANDLE_CONFIG_ARG("steeringbalance",     setSteeringBalance,     signed int)
     else IF_HANDLE_CONFIG_ARG("servostoppednopulse", setServoStoppedNoPulse, bool)
-    else IF_HANDLE_CONFIG_ARG("servoflip",   setServoFlip,   bool)
-    else IF_HANDLE_CONFIG_ARG("stickradius", setStickRadius, uint16_t)
-    else IF_HANDLE_CONFIG_ARG("advanced",    setAdvanced,    bool)
-    else IF_HANDLE_CONFIG_ARG("weappossafe", setWeapPosSafe, uint16_t)
-    else IF_HANDLE_CONFIG_ARG("weapposa",    setWeapPosA,    uint16_t)
-    else IF_HANDLE_CONFIG_ARG("weapposb",    setWeapPosB,    uint16_t)
-    else IF_HANDLE_CONFIG_ARG("lefthanded",  setLeftHanded,  bool)
+    else IF_HANDLE_CONFIG_ARG("servoflip",     setServoFlip,    bool)
+    else IF_HANDLE_CONFIG_ARG("stickradius",   setStickRadius,  uint16_t)
+    else IF_HANDLE_CONFIG_ARG("advanced",      setAdvanced,     bool)
+    #ifdef ENABLE_WEAPON
+    else IF_HANDLE_CONFIG_ARG("enableweapon",  setEnableWeapon, bool)
+    else IF_HANDLE_CONFIG_ARG("weappossafe",   setWeapPosSafe,  uint16_t)
+    else IF_HANDLE_CONFIG_ARG("weapposa",      setWeapPosA,     uint16_t)
+    else IF_HANDLE_CONFIG_ARG("weapposb",      setWeapPosB,     uint16_t)
+    #endif
+    else IF_HANDLE_CONFIG_ARG("lefthanded",   setLeftHanded,   bool)
     else if (argName.equalsIgnoreCase(String("ssid")))
     {
       String argVal = server.arg(i);
@@ -248,16 +287,23 @@ void handleSetConfig() {
 
   serveConfigHexStr();
 
-  server.sendContent(String("</body></html>"));
-  server.client().stop(); // Stop is needed because we sent no content length
+  server.sendContent("</body></html>");
+  serverClientStop();
 
   if (reboot)
   {
-    ESP.restart();
+    BookWorm.printf("Reboot!\r\n");
+    delay(200);
+    //ESP.restart();
+    ESP.reset();
   }
 }
 
-void handleConfig() {
+void handleConfig()
+{
+
+  BookWorm.printf("call handleConfig\r\n");
+
   if (captivePortal()) { // If caprive portal redirect instead of displaying the page.
     return;
   }
@@ -267,18 +313,14 @@ void handleConfig() {
   serveConfigNet();
   serveConfigTable();
   
-  server.sendContent(String("</body></html>"));
+  server.sendContent("</body></html>");
 
-  server.client().stop(); // Stop is needed because we sent no content length
+  serverClientStop();
 }
 
 void serveConfigHeader()
 {
-  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  server.sendHeader("Pragma", "no-cache");
-  server.sendHeader("Expires", "-1");
-  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-  server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
+  serveBasicHeader();
 
   server.sendContent("<html><head><title>Robot Config</title>");
   server.sendContent("<script src='config.js'></script>");
@@ -297,6 +339,9 @@ void serveConfigHexStr()
   for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
     sprintf(str, "%02X", ptr[i]);
     server.sendContent(str);
+    if (((i+1) % 16) == 0) {
+      server.sendContent("<br />");
+    }
   }
   server.sendContent("\n</p>\n");
 }
@@ -308,7 +353,7 @@ void serveConfigNet()
   } else {
     server.sendContent("\n<p>Error, local IP does not match AP IP</p>\n");
   }
-  server.sendContent(String("\n</p>IP: ") + String(WiFi.softAPIP()) + String("</p>\n"));
+  server.sendContent(String("\n</p>IP: ") + toStringIp(WiFi.softAPIP()) + String("</p>\n"));
 }
 
 void serveConfigTable()
@@ -317,33 +362,39 @@ void serveConfigTable()
 
   // void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note)
   generateConfigItemTxt("SSID", "ssid", "text", BookWorm.SSID, NULL, "* change requires reboot");
-  generateConfigItemTxt("Drive no pulse on stop", "servostoppednopulse", "number", BookWorm.nvm.servoStoppedNoPulse ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
-  generateConfigItemTxt("Drive pulse range", "servomax", "number", String(BookWorm.nvm.servoMax).c_str(), "min='0' max='1000' step='50'", "range = 1500 +/- x microseconds");
-  generateConfigItemTxt("Drive pulse deadzone left", "deadzoneleft", "number", String(BookWorm.nvm.servoDeadzoneLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateConfigItemTxt("Drive no pulse on stop",     "servostoppednopulse", "number",  BookWorm.nvm.servoStoppedNoPulse ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
+  generateConfigItemTxt("Drive pulse range",          "servomax", "number",      String(BookWorm.nvm.servoMax).c_str(), "min='0' max='1000' step='50'", "range = 1500 &plusmn; x microseconds");
+  generateConfigItemTxt("Drive pulse deadzone left",  "deadzoneleft", "number",  String(BookWorm.nvm.servoDeadzoneLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateConfigItemTxt("Drive pulse deadzone right", "deadzoneright", "number", String(BookWorm.nvm.servoDeadzoneRight).c_str(), "min='0' max='500' step='1'", "microseconds");
-  generateConfigItemTxt("Drive pulse offset left", "biasleft", "number", String(BookWorm.nvm.servoBiasLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
-  generateConfigItemTxt("Drive pulse offset right", "biasright", "number", String(BookWorm.nvm.servoBiasRight).c_str(), "min='0' max='500' step='1'", "microseconds");
-  generateConfigItemTxt("Speed multiplier", "speedgain", "number", String(BookWorm.nvm.speedGain).c_str(), "min='100' max='10000' step='100'", "multiplier = x / 1000 , 1000 is normal");
-  generateConfigItemTxt("Steering sensitivity", "steeringsensitivity", "number", String(BookWorm.nvm.steeringSensitivity).c_str(), "min='100' max='10000' step='100'", "sensitivity = x / 1000 , 1000 is normal");
-  generateConfigItemTxt("Steering balance", "steeringbalance", "number", String(BookWorm.nvm.steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x / 1000 , positive means apply to left, negative means apply to right");
+  generateConfigItemTxt("Drive pulse offset left",    "biasleft", "number",      String(BookWorm.nvm.servoBiasLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateConfigItemTxt("Drive pulse offset right",   "biasright", "number",     String(BookWorm.nvm.servoBiasRight).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateConfigItemTxt("Speed multiplier",           "speedgain", "number",     String(BookWorm.nvm.speedGain).c_str(), "min='100' max='10000' step='100'", "multiplier = x&#247;1000 , 1000 is normal");
+  generateConfigItemTxt("Steering sensitivity",       "steeringsensitivity", "number", String(BookWorm.nvm.steeringSensitivity).c_str(), "min='100' max='10000' step='100'", "sensitivity = x&#247;1000 , 1000 is normal");
+  generateConfigItemTxt("Steering balance",           "steeringbalance", "number",     String(BookWorm.nvm.steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
   generateFlipDropdown(BookWorm.nvm.servoFlip);
-  generateConfigItemTxt("Joystick size", "stickradius", "number", String(BookWorm.nvm.stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
-  generateConfigItemTxt("Enabled advanced features?", "advanced", "number", BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable weapon controls and inverted drive");
+  generateConfigItemTxt("Joystick size",              "stickradius", "number",   String(BookWorm.nvm.stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
+  generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable weapon controls and inverted drive, * requires reboot");
   if (BookWorm.nvm.advanced)
   {
-    generateConfigItemTxt("Left handed?", "lefthanded", "number", BookWorm.nvm.leftHanded ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
-    generateConfigItemTxt("Weapon safe pulse", "weappossafe", "number", String(BookWorm.nvm.weapPosSafe).c_str(), "min='0' max='1500' step='100'", "0 = no need (servo weapon), otherwise use pulse width to stop ESC");
-    generateConfigItemTxt("Weapon position \"A\"", "weapposa", "number", String(BookWorm.nvm.weapPosA).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
-    generateConfigItemTxt("Weapon position \"B\"", "weapposb", "number", String(BookWorm.nvm.weapPosB).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
+    generateConfigItemTxt("Left handed?",             "lefthanded", "number", BookWorm.nvm.leftHanded ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
+    #ifdef ENABLE_WEAPON
+    generateConfigItemTxt("Enabled weapon features?", "enableweapon", "number",       BookWorm.nvm.enableWeapon ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, * requires reboot");
+    generateConfigItemTxt("Weapon safe pulse",        "weappossafe", "number", String(BookWorm.nvm.weapPosSafe).c_str(), "min='0' max='1500' step='100'", "0 = no need (servo weapon), otherwise use pulse width to stop ESC");
+    generateConfigItemTxt("Weapon position \"A\"",    "weapposa", "number",    String(BookWorm.nvm.weapPosA).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
+    generateConfigItemTxt("Weapon position \"B\"",    "weapposb", "number",    String(BookWorm.nvm.weapPosB).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
+    #endif
   }
 
   generateConfigItemStart("Factory reset", "factoryreset");
   server.sendContent("click the button to reset all settings to factory default values</td>");
-  server.sendContent("</td><td class='tbl_submit'><input type='hidden' id='factoryreset' name='factoryreset' value='true' /><input type='submit' value='Go!' height='100%' /></td></tr></form>\n");
+  server.sendContent("</td><td class='tbl_submit'><input type='hidden' id='factoryreset' name='factoryreset' value='true' /><input type='submit' class='btn_submit' value='Go!' height='100%' /></td></tr></form>\n");
 
+  #if 1
   generateConfigItemStart("Reboot", "reboot");
   server.sendContent("click the button to reboot the ESP8266</td>");
-  server.sendContent("</td><td class='tbl_submit'><input type='hidden' id='reboot' name='reboot' value='true' /><input type='submit' value='REBOOT' height='100%' /></td></tr></form>\n");
+  server.sendContent("</td><td class='tbl_submit'><input type='hidden' id='reboot' name='reboot' value='true' /><input type='submit' class='btn_submit' value='REBOOT' height='100%' /></td></tr></form>\n");
+  #endif
+
   server.sendContent("</table>\n");
 }
 
@@ -374,7 +425,7 @@ void generateFlipDropdown(uint8_t cur)
     else {
       server.sendContent("Left is normal ; ");
     }
-    if ((i & 0x02) != 0) {
+    if ((i & 0x01) != 0) {
       server.sendContent("Right IS REVERSED ; ");
     }
     else {
@@ -388,25 +439,25 @@ void generateFlipDropdown(uint8_t cur)
 
 void handleFingerPng() {
   handleFileRead("/finger.png");
-  server.client().stop(); // stop() is needed if we sent no content length
+  serverClientStop();
 }
 
 void handleJoyJs() {
   handleFileRead("/joy.js");
-  server.client().stop(); // stop() is needed if we sent no content length
+  serverClientStop();
 }
 
 void handleStyleCss() {
   handleFileRead("/style.css");
-  server.client().stop(); // stop() is needed if we sent no content length
+  serverClientStop();
 }
 
 void handleConfigJs() {
   handleFileRead("/config.js");
-  server.client().stop(); // stop() is needed if we sent no content length
+  serverClientStop();
 }
 
 void handleConfigCss() {
   handleFileRead("/config.css");
-  server.client().stop(); // stop() is needed if we sent no content length
+  serverClientStop();
 }

@@ -481,14 +481,20 @@ setInterval(function(){
 	{
 		var xhr = new XMLHttpRequest();
 		var querystring = "./move?x="+newX+"&y="+newY;
-		querystring += "&weap=" + weapspeed;
-		querystring += "&flipped=" + flipped;
+		if (advancedFeatures >= 1) {
+			querystring += "&flipped=" + flipped;
+		}
+		if (advancedFeatures >= 2) {
+			querystring += "&weap=" + weapspeed;
+		}
 		xhr.open('PUT', querystring);
 		xhr.send();
 	}
 	prevX = newX;
 	prevY = newY;
-	prevW = weapspeed;
+	if (advancedFeatures) {
+		prevW = weapspeed;
+	}
 }, 1/30 * 1000);
 
 function doOnOrientationChange()
@@ -536,21 +542,30 @@ doOnResize();
 
 function weapsetpossafe()
 {
-	weapspeed = weapPosSafe;
+	if (advancedFeatures >= 2) {
+		weapspeed = weapPosSafe;
+	}
 }
 
 function weapsetposa()
 {
-	weapspeed = weapPosA;
+	if (advancedFeatures >= 2) {
+		weapspeed = weapPosA;
+	}
 }
 
 function weapsetposb()
 {
-	weapspeed = weapPosB;
+	if (advancedFeatures >= 2) {
+		weapspeed = weapPosB;
+	}
 }
 
 function flip()
 {
+	if (advancedFeatures <= 0) {
+		return;
+	}
 	var ele1 = document.getElementById("flip1");
 	var ele2 = document.getElementById("flip2");
 	if (flipped == 0) {
@@ -565,4 +580,6 @@ function flip()
 	}
 }
 
-weapsetpossafe();
+if (advancedFeatures >= 2) {
+	weapsetpossafe();
+}
