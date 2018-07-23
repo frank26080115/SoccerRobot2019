@@ -69,11 +69,12 @@ bool readServerArg(int argNum, signed int* result)
   String argVal = server.arg(argNum);
   char* str = (char*)argVal.c_str();
   char* end;
-  signed int v = strtol(str, &end, 10);
+  double dv = strtod(str, &end);
   if (str == end)
   {
     return false;
   }
+  signed int v = lround(dv);
   *result = v;
   return true;
 }

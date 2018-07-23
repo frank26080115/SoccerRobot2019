@@ -466,6 +466,8 @@ var prevY = 0;
 var prevW = 0;
 var newX = 0;
 var newY = 0;
+var xDeadzone = desiredStickRadius / 6;
+var yDeadzone = xDeadzone / 2;
 
 var weapspeed = 0;
 var flipped = 0;
@@ -474,13 +476,43 @@ setInterval(function(){
 	var outputEl	= document.getElementById('result');
 	newX = Math.round(joystick.deltaX());
 	newY = Math.round(joystick.deltaY()) * -1;
-	if (outputEl) {
-		outputEl.innerHTML	= '<b>Position:</b> ' + ' X:'+newX + ' Y:'+newY;
+
+	var reportedX = newX;
+	var reportedY = newY;
+
+	if (reportedX > xDeadzone) {
+		reportedX = reportedX - xDeadzone;
 	}
+	else if (reportedX < (-xDeadzone)) {
+		reportedX = reportedX + xDeadzone;
+	}
+	else {
+		reportedX = 0;
+	}
+	reportedX = reportedX * desiredStickRadius;
+	reportedX = reportedX / (desiredStickRadius - xDeadzone);
+
+	if (reportedY > yDeadzone) {
+		reportedY = reportedY - yDeadzone;
+	}
+	else if (reportedY < (-yDeadzone)) {
+		reportedY = reportedY + yDeadzone;
+	}
+	else {
+		reportedY = 0;
+	}
+	reportedY = reportedY * desiredStickRadius;
+	reportedY = reportedY / (desiredStickRadius - yDeadzone);
+
+	if (outputEl) {
+		outputEl.innerHTML	= '<b>Position:</b> ' + ' X:'+reportedX + ' Y:'+reportedY;
+	}
+
 	if ( newX != prevX || newY != prevY || weapspeed != prevW || weapPosSafe > 0)
 	{
 		var xhr = new XMLHttpRequest();
-		var querystring = "./move?x="+newX+"&y="+newY;
+
+		var querystring = "./move?x="+Math.round(reportedX)+"&y="+Math.round(reportedY);
 		if (advancedFeatures >= 1) {
 			querystring += "&flipped=" + flipped;
 		}
