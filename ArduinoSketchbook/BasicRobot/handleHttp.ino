@@ -109,37 +109,13 @@ void handleRoot()
 /** Redirect to captive portal if we got a request for another domain. Return true in that case so the page handler do not try to handle the request again. */
 boolean captivePortal() {
   if (!isIp(server.hostHeader()) && server.hostHeader() != (String(myHostname) + ".local")) {
-    BookWorm.printf("Request redirected to captive portal");
+    BookWorm.printf("Request redirected to captive portal, host header: %s\r\n", server.hostHeader().c_str());
     server.sendHeader("Location", String("http://") + toStringIp(server.client().localIP()), true);
     server.send(302, "text/plain", "");   // Empty content inhibits Content-length header so we have to close the socket ourselves.
     serverClientStop();
     return true;
   }
   return false;
-}
-
-void handleNotFound() {
-  BookWorm.debugf("call handleNotFound\r\n");
-  if (captivePortal()) { // If caprive portal redirect instead of displaying the error page.
-    return;
-  }
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  server.sendHeader("Pragma", "no-cache");
-  server.sendHeader("Expires", "-1");
-  server.send(404, "text/plain", message);
-  serverClientStop();
 }
 
 void handleMove() {
@@ -280,7 +256,7 @@ void handleSetConfig() {
 
   if (reboot)
   {
-    server.sendContent(String("\n<h1>WARNING: REBOOTING!!!</h1>\n"));
+    server.sendContent("\n<h1>WARNING: REBOOTING!!!</h1>\n");
   }
   else
   {
@@ -364,7 +340,7 @@ void serveConfigTable()
   server.sendContent(String("\n<table border='2' width='98%'>\n"));
 
   // void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note)
-  generateConfigItemTxt("SSID", "ssid", "text", BookWorm.SSID, NULL, "* change requires reboot");
+  generateConfigItemTxt("SSID", "ssid", "text", BookWorm.SSID, (String("maxlength='") + String(BOOKWORM_SSID_SIZE) + String("'")).c_str(), "* change requires reboot");
   generateConfigItemTxt("Drive no pulse on stop",     "servostoppednopulse", "number",  BookWorm.nvm.servoStoppedNoPulse ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
   generateConfigItemTxt("Drive pulse range",          "servomax", "number",      String(BookWorm.nvm.servoMax).c_str(), "min='0' max='1000' step='50'", "range = 1500 &plusmn; x microseconds");
   generateConfigItemTxt("Drive pulse deadzone left",  "deadzoneleft", "number",  String(BookWorm.nvm.servoDeadzoneLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
@@ -376,12 +352,12 @@ void serveConfigTable()
   generateConfigItemTxt("Steering balance",           "steeringbalance", "number",     String(BookWorm.nvm.steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
   generateFlipDropdown(BookWorm.nvm.servoFlip);
   generateConfigItemTxt("Joystick size",              "stickradius", "number",   String(BookWorm.nvm.stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
-  generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable weapon controls and inverted drive, * requires reboot");
+  generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable weapon controls and inverted drive, * change requires reboot");
   if (BookWorm.nvm.advanced)
   {
     generateConfigItemTxt("Left handed?",             "lefthanded", "number", BookWorm.nvm.leftHanded ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
     #ifdef ENABLE_WEAPON
-    generateConfigItemTxt("Enabled weapon features?", "enableweapon", "number",       BookWorm.nvm.enableWeapon ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, * requires reboot");
+    generateConfigItemTxt("Enabled weapon features?", "enableweapon", "number",       BookWorm.nvm.enableWeapon ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, * change requires reboot");
     generateConfigItemTxt("Weapon safe pulse",        "weappossafe", "number", String(BookWorm.nvm.weapPosSafe).c_str(), "min='0' max='1500' step='100'", "0 = no need (servo weapon), otherwise use pulse width to stop ESC");
     generateConfigItemTxt("Weapon position \"A\"",    "weapposa", "number",    String(BookWorm.nvm.weapPosA).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
     generateConfigItemTxt("Weapon position \"B\"",    "weapposb", "number",    String(BookWorm.nvm.weapPosB).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
@@ -440,27 +416,3 @@ void generateFlipDropdown(uint8_t cur)
   generateConfigItemEnd();
 }
 
-void handleFingerImg() {
-  handleFileRead("/finger.svg");
-  serverClientStop();
-}
-
-void handleJoyJs() {
-  handleFileRead("/joy.js");
-  serverClientStop();
-}
-
-void handleStyleCss() {
-  handleFileRead("/style.css");
-  serverClientStop();
-}
-
-void handleConfigJs() {
-  handleFileRead("/config.js");
-  serverClientStop();
-}
-
-void handleConfigCss() {
-  handleFileRead("/config.css");
-  serverClientStop();
-}

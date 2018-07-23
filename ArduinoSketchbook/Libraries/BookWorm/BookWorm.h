@@ -7,6 +7,7 @@
 #define ENABLE_WEAPON
 #define BOOKWORM_DEBUG
 #define BOOKWORM_BAUD 9600
+#define BOOKWORM_SSID_SIZE 31
 
 #include <Arduino.h>
 #include "WString.h"
@@ -38,28 +39,28 @@ extern "C" {
 #pragma pack(push, 1)
 typedef struct
 {
-	uint32_t eeprom_version;
-	char ssid[32];
-	uint16_t servoMax;
-	uint16_t servoDeadzoneLeft;
-	uint16_t servoDeadzoneRight;
-	int16_t servoBiasLeft;
-	int16_t servoBiasRight;
-	uint16_t speedGain;
-	int16_t steeringSensitivity;
-	int16_t steeringBalance;
-	uint8_t servoFlip; // bit flags, bit 0 right flip, bit 1 left flip, bit 2 swaps left and right
-	bool servoStoppedNoPulse;
-	uint16_t stickRadius; // size of the joystick shown on screen
+	uint32_t eeprom_version;            // used in case the layout changes
+	char ssid[BOOKWORM_SSID_SIZE + 1];
+	uint16_t servoMax;                  // maximum servo range, 500 means 1000 to 2000 microseconds
+	uint16_t servoDeadzoneLeft;         // overcomes deadzones in motor driver or continuous servos
+	uint16_t servoDeadzoneRight;        // overcomes deadzones in motor driver or continuous servos
+	int16_t servoBiasLeft;              // offset for calibration
+	int16_t servoBiasRight;             // offset for calibration
+	int16_t speedGain;                  // makes it go faster or slower, out of 1000
+	int16_t steeringSensitivity;        // makes it turn slower or faster, out of 1000
+	int16_t steeringBalance;            // correction for not driving straight, out of 1000, positive adjusts left side, nagative adjusts right side 
+	uint8_t servoFlip;                  // bit flags, bit 0 right flip, bit 1 left flip, bit 2 swaps left and right
+	bool servoStoppedNoPulse;           // used for continuous servos, no pulses to stop the servos instead of a 1500us pulse
+	uint16_t stickRadius;               // size of the joystick shown on screen
 	#ifdef ENABLE_WEAPON
 	bool enableWeapon;
 	uint16_t weapPosSafe;
 	uint16_t weapPosA;
 	uint16_t weapPosB;
 	#endif
-	bool leftHanded;
-	bool advanced; // this option enables/disables weapon controls and inverted controls
-	uint16_t checksum;
+	bool leftHanded;   // makes the advanced controls show up on right side of the screen
+	bool advanced;     // this option enables/disables weapon controls and inverted controls
+	uint16_t checksum; // makes sure the contents isn't junk
 }
 bookworm_nvm_t;
 #pragma pack(pop)
@@ -72,6 +73,7 @@ public:
 
 	void setLedOn(void);
 	void setLedOff(void);
+	void setLed(bool);
 
 	void move(signed int left, signed int right);
 	void moveLeftServo(signed int left);
@@ -80,7 +82,7 @@ public:
 
 	// these functions below require more understanding of how servo signals work
 	void calcMix(int32_t throttle, int32_t steer, int32_t * left, int32_t * right);
-	void setSpeedGain(unsigned int x);
+	void setSpeedGain(signed int x);
 	void setServoMax(unsigned int x);
 	void setServoDeadzoneLeft(unsigned int x);
 	void setServoDeadzoneRight(unsigned int x);
@@ -93,6 +95,7 @@ public:
 	void setStickRadius(uint16_t);
 	void setLeftHanded(bool);
 
+	// temporary flip, for inverted drive
 	void setRobotFlip(bool);
 	bool getRobotFlip();
 	void togRobotFlip();
@@ -122,7 +125,7 @@ public:
 	char* generateSsid(char*);
 	void setSsid(char*);
 	bookworm_nvm_t nvm;
-	bool robotFlip;
+	bool robotFlip; // temporary flip, for inverted drive
 private:
 	void loadPinAssignments();
 	int pinnumServoLeft;

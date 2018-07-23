@@ -51,6 +51,12 @@ void cBookWorm::begin(void)
 	}
 }
 
+/*
+Turn on the LED
+
+return:	none
+parameters:	none
+*/
 void cBookWorm::setLedOn()
 {
 	#ifdef pinLed
@@ -77,6 +83,12 @@ void cBookWorm::setLedOn()
 	#endif
 }
 
+/*
+Turn off the LED
+
+return:	none
+parameters:	none
+*/
 void cBookWorm::setLedOff()
 {
 	#ifdef pinLed
@@ -103,10 +115,26 @@ void cBookWorm::setLedOff()
 }
 
 /*
+Turn on or off the LED
+
+return:	none
+parameters:	boolean, true for ON, false for OFF
+*/
+void cBookWorm::setLed(bool x)
+{
+	if (x) {
+		setLedOn();
+	}
+	else {
+		setLedOff();
+	}
+}
+
+/*
 Generate a string suitable for usage as a SSID
 Uses the MAC address to be a bit unique
 
-returns: the buffer that was given
+return: the buffer that was given
 parameters: character buffer to be written into
 */
 char* cBookWorm::generateSsid(char* buff)
@@ -128,6 +156,7 @@ char* cBookWorm::generateSsid(char* buff)
 
 /*
 Load saved information from NVM
+
 return: successful or not
 parameters: none
 */
@@ -148,7 +177,7 @@ bool cBookWorm::loadNvm()
 	if (chksum == this->nvm.checksum && BOOKWORM_EEPROM_VERSION == this->nvm.eeprom_version)
 	{
 		memcpy(this->SSID, this->nvm.ssid, 32);
-		this->SSID[31] = 0;
+		this->SSID[BOOKWORM_SSID_SIZE] = 0;
 
 		loadPinAssignments();
 
@@ -173,6 +202,7 @@ bool cBookWorm::loadNvm()
 
 /*
 Save information into NVM
+
 return: none
 parameters: none
 */
@@ -181,8 +211,9 @@ void cBookWorm::saveNvm()
 	uint8_t* ptr = (uint8_t*)&(this->nvm);
 	int i;
 	uint16_t chksum;
-	this->nvm.ssid[31] = 0;
-	this->SSID[31] = 0;
+	this->nvm.eeprom_version = BOOKWORM_EEPROM_VERSION;
+	this->nvm.ssid[BOOKWORM_SSID_SIZE] = 0;
+	this->SSID[BOOKWORM_SSID_SIZE] = 0;
 	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
 	this->nvm.checksum = chksum;
 	this->debugf("EEPROM writing: ");
@@ -198,42 +229,69 @@ void cBookWorm::saveNvm()
 Set the SSID, saves into NVM
 Requires reboot to take effect
 Does very basic input sanitation
+
 return: none
 parameters: string containing the SSID
 */
 void cBookWorm::setSsid(char* str)
 {
 	int i;
-	for (i = 0; i < 31; i++) {
+	for (i = 0; i < BOOKWORM_SSID_SIZE; i++) { // for all chars
 		char d = str[i];
+		// input sanitation, non-alphanum chars are turned into hyphens
 		if (((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z') || (d >= '0' && d <= '9') || d == 0) == false) {
 			d = '-';
 		}
 		this->nvm.ssid[i] = d;
 		this->SSID[i] = d;
-		if (d == 0) {
+		if (d == 0) { // stop at null terminator
 			break;
 		}
 	}
-	if (strlen(this->SSID) <= 0) {
+
+	if (strlen(this->SSID) <= 0) { // why is the length zero? autogenerate the default SSID and try again
 		this->generateSsid(this->SSID);
 		strcpy(this->nvm.ssid, this->SSID);
 	}
-	this->nvm.ssid[31] = 0;
-	this->SSID[31] = 0;
+
+	// safety null-terminate
+	this->nvm.ssid[BOOKWORM_SSID_SIZE] = 0;
+	this->SSID[BOOKWORM_SSID_SIZE] = 0;
+
 	this->debugf("set SSID: %s\r\n", this->SSID);
 }
 
+/*
+Sets if robot advanced features should be shown on the right side of the screen
+(weapon control and inverted drive)
+
+return: none
+parameters: boolean, if advanced features should be shown on the right side of the screen
+*/
 void cBookWorm::setLeftHanded(bool x)
 {
 	this->nvm.leftHanded = x;
 }
 
+/*
+Sets if robot advanced features should be enabled
+(including weapon control and inverted drive)
+
+return: none
+parameters: boolean, if advanced features should be enabled
+*/
 void cBookWorm::setAdvanced(bool x)
 {
 	this->nvm.advanced = x;
 }
 
+/*
+Sets all NVM items to default values
+Does not generate SSID
+
+return: none
+parameters: none
+*/
 void cBookWorm::defaultValues()
 {
 	this->nvm.eeprom_version = BOOKWORM_EEPROM_VERSION;
@@ -261,6 +319,12 @@ void cBookWorm::defaultValues()
 	this->debugf("values set to defaults\r\n");
 }
 
+/*
+Sets all NVM items to default values, and generates a SSID
+
+return: none
+parameters: none
+*/
 void cBookWorm::factoryReset() {
 	defaultValues();
 	this->generateSsid(this->SSID);
@@ -268,10 +332,24 @@ void cBookWorm::factoryReset() {
 	this->printf("factory reset performed\r\n");
 }
 
+/*
+Delays a number of milliseconds, while feeding the watchdog timer
+Insanely inaccurate
+
+return: none
+parameters: number of milliseconds to delay
+*/
 void cBookWorm::delayWhileFeeding(int x)
 {
 	int i;
-	for (i = 0; i < x; i++)
+	for (i = 0; i < (x - 10); i += 10)
+	{
+		delay(10);
+		if ((i % 200) == 0) {
+			ESP.wdtFeed();
+		}
+	}
+	for (; i < x; i += 1)
 	{
 		delay(1);
 		ESP.wdtFeed();

@@ -26,7 +26,7 @@ IPAddress netMsk(255, 255, 255, 0);
 /** Current WLAN status */
 unsigned int wlan_status = WL_IDLE_STATUS;
 
-/** Continuous Servo Movement Variables **/
+/** Servo Movement Variables **/
 uint32_t lastCommTimestamp = 0;
 bool moveMixedMode = false;
 signed int speedLeft = 0;
@@ -36,11 +36,12 @@ signed int speedY = 0;
 #ifdef ENABLE_WEAPON
 signed int speedWeap = 0;
 #endif
-char ledMode = 0;
 
-void setup() {
+void setup()
+{
   delay(1000);
   BookWorm.begin();
+  SPIFFS.begin();
   BookWorm.printf("\r\n");
   BookWorm.printf("Configuring access point...\r\n");
   /* You can remove the password parameter if you want the AP to be open. */
@@ -54,23 +55,33 @@ void setup() {
   dnsServer.start(DNS_PORT, "*", apIP);
 
   /* Setup web pages */
+  /* these are the ones that lead to the control page */
   server.on("/",             handleRoot);
   server.on("/index.htm",    handleRoot);
   server.on("/index.html",   handleRoot);
   server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/fwlink",       handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
 
+  /* handlers for the XHR and configuration */
   server.on("/move",      handleMove);
   server.on("/setconfig", handleSetConfig);
   server.on("/config",    handleConfig);
 
-  server.on("/finger.svg", handleFingerImg);
-  server.on("/style.css",  handleStyleCss);
-  server.on("/config.css", handleConfigCss);
-  server.on("/joy.js",     handleJoyJs);
-  server.on("/config.js",  handleConfigJs);
-
-  server.onNotFound(handleNotFound);
+  /* handlers for files inside the SPIFFS */
+  server.onNotFound( []()
+  {
+    BookWorm.debugf("call handleNotFound\r\n");
+    if (captivePortal()) { // If caprive portal redirect instead of displaying the error page.
+      return;
+    }
+    server.sendHeader("Connection", "close");
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    if (!handleFileRead(server.uri())) {
+      server.send(404, "text/plain", "FileNotFound");
+    }
+    serverClientStop();
+  });
+  
   server.begin(); // Web server start
   BookWorm.printf("HTTP server started\r\n");
   BookWorm.debugf("Free RAM %u\r\n", system_get_free_heap_size());
@@ -79,6 +90,8 @@ void setup() {
 void loop()
 {
   uint32_t now;
+
+  /* this chunk of code is for WiFi client, not really needed since we are an AP, not a client */
   {
     unsigned int s = WiFi.status();
     if (wlan_status != s) { // WLAN status change
@@ -101,6 +114,7 @@ void loop()
       }
     }
   }
+
   // Do work:
   //DNS
   dnsServer.processNextRequest();
@@ -109,11 +123,12 @@ void loop()
 
   // Move the robot if needed
   now = millis();
+
   int now10 = now / 100;
   now10 %= 10;
   bool ledOn = false;
 
-  if ((now - lastCommTimestamp) > 1000)
+  if ((now - lastCommTimestamp) > 1000) // check for timeout
   {
     // if timeout, stop the robot
     speedLeft = 0;
@@ -130,17 +145,21 @@ void loop()
     }
     #endif
 
-    if (now10 == 0) {
+    if (now10 == 0) { // blink at least once
       ledOn = true;
     }
   }
-  else {
+  else
+  {
+    // blink frequently if moving
     if (now10 == 0 || now10 == 2 || now10 == 4
       || (((moveMixedMode != false && (speedX != 0 || speedY != 0)) || (moveMixedMode == false && (speedLeft != 0 || speedRight != 0))) && (now10 == 6 || now10 == 8))
       ) {
       ledOn = true;
     }
   }
+
+  // blink twice if at least something is connected
   if (lastCommTimestamp > 0 && now10 == 2)
   {
     ledOn = true;
@@ -154,12 +173,15 @@ void loop()
   {
     BookWorm.moveMixed(speedY, speedX);
   }
+
+  // spin/move the weapon if needed
   #ifdef ENABLE_WEAPON
   if (BookWorm.nvm.advanced && BookWorm.nvm.enableWeapon) {
     BookWorm.spinWeapon(speedWeap);
   }
   #endif
 
+  // blink the LED
   if (ledOn) {
     BookWorm.setLedOn();
   }

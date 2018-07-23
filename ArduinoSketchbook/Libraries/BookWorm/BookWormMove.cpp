@@ -39,7 +39,7 @@ void cBookWorm::move(signed int left, signed int right)
 		moveLeftServo(left);
 		moveRightServo(right);
 	}
-	else { // robot is upside down
+	else { // robot is upside down, inverted drive
 		moveLeftServo(-right);
 		moveRightServo(-left);
 	}
@@ -171,6 +171,46 @@ void cBookWorm::calcMix(int32_t throttle, int32_t steer, int32_t * left, int32_t
 	*right = (signed int)lround(rightd);
 }
 
+void cBookWorm::loadPinAssignments()
+{
+	int tmp;
+	this->pinnumServoLeft = pinServoLeft;
+	this->pinnumServoRight = pinServoRight;
+	#ifdef ENABLE_WEAPON
+	if (this->nvm.enableWeapon)
+	{
+		#if pinServoWeapon == pinServoLeft || pinServoWeapon == pinServoRight
+			#ifdef pinServoLeftAlt
+				this->pinnumServoLeft = pinServoLeftAlt;
+			#elif defined(pinServoRightAlt)
+				this->pinnumServoRight = pinServoRightAlt;
+			#else
+				#error impossible weapon servo signal assignment
+			#endif
+		#endif
+		this->pinnumServoWeapon = pinServoWeapon;
+		if (this->pinsHaveLoaded == false) {
+			pinMode(this->pinnumServoWeapon, OUTPUT);
+			digitalWrite(this->pinnumServoWeapon, LOW);
+		}
+	}
+	#endif
+	if ((this->nvm.servoFlip & 0x04) != 0) // need to swap left and right
+	{
+		tmp = this->pinnumServoLeft;
+		this->pinnumServoLeft = this->pinnumServoRight;
+		this->pinnumServoRight = tmp;
+	}
+	if (this->pinsHaveLoaded == false)
+	{
+		pinMode(this->pinnumServoLeft, OUTPUT);
+		digitalWrite(this->pinnumServoLeft, LOW);
+		pinMode(this->pinnumServoRight, OUTPUT);
+		digitalWrite(this->pinnumServoRight, LOW);
+	}
+	this->pinsHaveLoaded = true;
+}
+
 void cBookWorm::setServoDeadzoneLeft(unsigned int x)
 {
 	this->nvm.servoDeadzoneLeft = x;
@@ -201,7 +241,7 @@ void cBookWorm::setServoMax(unsigned int x)
 	this->nvm.servoMax = x;
 }
 
-void cBookWorm::setSpeedGain(unsigned int x)
+void cBookWorm::setSpeedGain(signed int x)
 {
 	this->nvm.speedGain = x;
 }
@@ -233,50 +273,10 @@ void cBookWorm::setRobotFlip(bool x)
 
 void cBookWorm::togRobotFlip()
 {
-	this->robotFlip ^= true;;
+	this->robotFlip ^= true;
 }
 
 bool cBookWorm::getRobotFlip()
 {
 	return this->robotFlip;
-}
-
-void cBookWorm::loadPinAssignments()
-{
-	int tmp;
-	this->pinnumServoLeft = pinServoLeft;
-	this->pinnumServoRight = pinServoRight;
-	#ifdef ENABLE_WEAPON
-	if (this->nvm.enableWeapon)
-	{
-		#if pinServoWeapon == pinServoLeft || pinServoWeapon == pinServoRight
-			#ifdef pinServoLeftAlt
-				this->pinnumServoLeft = pinServoLeftAlt;
-			#elif defined(pinServoRightAlt)
-				this->pinnumServoRight = pinServoRightAlt;
-			#else
-				#error impossible weapon servo signal assignment
-			#endif
-		#endif
-		this->pinnumServoWeapon = pinServoWeapon;
-		if (this->pinsHaveLoaded == false) {
-			pinMode(this->pinnumServoWeapon, OUTPUT);
-			digitalWrite(this->pinnumServoWeapon, LOW);
-		}
-	}
-	#endif
-	if ((this->nvm.servoFlip & 0x04) != 0)
-	{
-		tmp = this->pinnumServoLeft;
-		this->pinnumServoLeft = this->pinnumServoRight;
-		this->pinnumServoRight = tmp;
-	}
-	if (this->pinsHaveLoaded == false)
-	{
-		pinMode(this->pinnumServoLeft, OUTPUT);
-		digitalWrite(this->pinnumServoLeft, LOW);
-		pinMode(this->pinnumServoRight, OUTPUT);
-		digitalWrite(this->pinnumServoRight, LOW);
-	}
-	this->pinsHaveLoaded = true;
 }
