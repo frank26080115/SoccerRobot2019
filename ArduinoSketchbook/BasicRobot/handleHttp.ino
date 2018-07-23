@@ -25,7 +25,6 @@ void handleRoot()
     "Touch the screen and move<br />Robot SSID: "
   );
   server.sendContent(BookWorm.SSID);
-  server.sendContent("</div>");
   if (BookWorm.nvm.advanced)
   {
     server.sendContent("<div id='topbar' width='100%'><table width='98%'>");
@@ -50,6 +49,10 @@ void handleRoot()
     #endif
     server.sendContent("</td></tr>");
     server.sendContent("</table></div>");
+  }
+  server.sendContent("</div>");
+  if (BookWorm.nvm.advanced)
+  {
     server.sendContent("<div id='sidebar' ");
     if (BookWorm.nvm.leftHanded) {
       server.sendContent(" class='rightside' ");
@@ -437,8 +440,8 @@ void generateFlipDropdown(uint8_t cur)
   generateConfigItemEnd();
 }
 
-void handleFingerPng() {
-  handleFileRead("/finger.png");
+void handleFingerImg() {
+  handleFileRead("/finger.svg");
   serverClientStop();
 }
 

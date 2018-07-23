@@ -22,10 +22,13 @@ String toStringIp(IPAddress ip)
 
 String getContentType(String filename) { // convert the file extension to the MIME type
   if (filename.endsWith(".html")) return "text/html";
+  else if (filename.endsWith(".htm")) return "text/html";
   else if (filename.endsWith(".css")) return "text/css";
   else if (filename.endsWith(".js")) return "application/javascript";
   else if (filename.endsWith(".ico")) return "image/x-icon";
   else if (filename.endsWith(".gz")) return "application/x-gzip";
+  else if (filename.endsWith(".png")) return "image/png";
+  else if (filename.endsWith(".svg")) return "image/svg+xml";
   return "text/plain";
 }
 

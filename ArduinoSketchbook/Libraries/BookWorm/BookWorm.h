@@ -4,6 +4,10 @@
 #define BOOKWORM_VERSION 1
 #define BOOKWORM_EEPROM_VERSION 1
 
+#define ENABLE_WEAPON
+#define BOOKWORM_DEBUG
+#define BOOKWORM_BAUD 9600
+
 #include <Arduino.h>
 #include "WString.h"
 
@@ -15,17 +19,14 @@ extern "C" {
 #define pinServoLeft         2
 #define pinServoRight        0
 
-// There's not enough pins on ESP-01 for a weapon
-// Only enable this if you can find a pin for it
-//#define ENABLE_WEAPON
-
 #ifdef ENABLE_WEAPON
 #define pinServoWeapon       2
 #define pinServoLeftAlt      1
 #endif
 
-#define BOOKWORM_DEBUG
-#define BOOKWORM_BAUD 9600
+#define pinLed LED_BUILTIN // WARNING: ESP-01, usage of LED will disable serial port
+#define pinLedOnState LOW
+#define pinLedOffState HIGH
 
 #define USE_CUSTOM_SERVO_LIB
 #ifdef USE_CUSTOM_SERVO_LIB
@@ -106,6 +107,8 @@ public:
 	#endif
 	void setAdvanced(bool);
 
+	void delayWhileFeeding(int);
+
 	// these are for making it easier to debug
 	int printf(const char *format, ...);
 	int debugf(const char *format, ...);
@@ -128,6 +131,7 @@ private:
 	int pinnumServoWeapon;
 	#endif
 	bool serialHasBegun;
+	bool pinsHaveLoaded;
 };
 
 extern cBookWorm BookWorm; // declare user accessible instance

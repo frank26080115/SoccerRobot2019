@@ -23,6 +23,7 @@ cBookWorm::cBookWorm(void)
 {
 	memset(&(this->nvm), 0, sizeof(bookworm_nvm_t));
 	this->serialHasBegun = false;
+	this->pinsHaveLoaded = false;
 }
 
 /*
@@ -52,18 +53,52 @@ void cBookWorm::begin(void)
 
 void cBookWorm::setLedOn()
 {
-	#ifdef LED_BUILTIN
-	pinMode(LED_BUILTIN, OUTPUT);
-	// LOW is ON when using ESP-01
-	digitalWrite(LED_BUILTIN, LOW);
+	#ifdef pinLed
+		#ifdef ENABLE_WEAPON
+			#if pinServoWeapon == pinLed
+				return;
+			#endif
+			#ifdef pinServoLeftAlt
+				#if pinServoLeftAlt == pinLed
+					return;
+				#endif
+			#endif
+			#ifdef pinServoRightAlt
+				#if pinServoRightAlt == pinLed
+					return;
+				#endif
+			#endif
+		#endif
+		#if pinServoLeft == pinLed || pinServoRight == pinLed
+			return;
+		#endif
+	pinMode(pinLed, OUTPUT);
+	digitalWrite(pinLed, pinLedOnState);
 	#endif
 }
 
 void cBookWorm::setLedOff()
 {
-	#ifdef LED_BUILTIN
-	// HIGH is OFF when using ESP-01
-	digitalWrite(LED_BUILTIN, HIGH);
+	#ifdef pinLed
+		#ifdef ENABLE_WEAPON
+			#if pinServoWeapon == pinLed
+				return;
+			#endif
+			#ifdef pinServoLeftAlt
+				#if pinServoLeftAlt == pinLed
+					return;
+				#endif
+			#endif
+			#ifdef pinServoRightAlt
+				#if pinServoRightAlt == pinLed
+					return;
+				#endif
+			#endif
+		#endif
+		#if pinServoLeft == pinLed || pinServoRight == pinLed
+			return;
+		#endif
+	digitalWrite(pinLed, pinLedOffState);
 	#endif
 }
 
@@ -202,7 +237,7 @@ void cBookWorm::setAdvanced(bool x)
 void cBookWorm::defaultValues()
 {
 	this->nvm.eeprom_version = BOOKWORM_EEPROM_VERSION;
-	this->nvm.advanced = false;
+	this->nvm.advanced = true;
 	this->nvm.servoMax = 500;
 	this->nvm.servoDeadzoneLeft = 0;
 	this->nvm.servoDeadzoneRight = 0;
@@ -218,7 +253,7 @@ void cBookWorm::defaultValues()
 	this->nvm.weapPosSafe = 1000;
 	this->nvm.weapPosA = 1500;
 	this->nvm.weapPosB = 2000;
-	this->nvm.enableWeapon = false;
+	this->nvm.enableWeapon = true;
 	#endif
 	this->nvm.leftHanded = false;
 	this->nvm.checksum = 0xABCD;
@@ -231,4 +266,14 @@ void cBookWorm::factoryReset() {
 	this->generateSsid(this->SSID);
 	this->setSsid(this->SSID);
 	this->printf("factory reset performed\r\n");
+}
+
+void cBookWorm::delayWhileFeeding(int x)
+{
+	int i;
+	for (i = 0; i < x; i++)
+	{
+		delay(1);
+		ESP.wdtFeed();
+	}
 }

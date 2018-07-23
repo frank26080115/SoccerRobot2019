@@ -2,14 +2,14 @@ body {
 	overflow	: hidden;
 	padding		: 0;
 	margin		: 0;
-	background-color: #BBB;
+	background-color: #BBBBBB;
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-position: 50% 50%;
 }
 .bodybg
 {
-	background-image: url('finger.png');
+	background-image: url('finger.svg');
 }
 #info {
 	position	: absolute;
@@ -44,9 +44,9 @@ body {
 	text-align	: right;
 }
 table input {
-	height: 40pt;
-	min-width: 100pt;
-	font-size: 20pt;
+	height: 20pt;
+	min-width: 60pt;
+	font-size: 10pt;
 }
 table td {
 	vertical-align: top;

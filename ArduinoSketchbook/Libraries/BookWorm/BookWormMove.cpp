@@ -49,8 +49,6 @@ void cBookWorm::moveLeftServo(signed int x)
 {
 	int32_t ticks = SERVO_CENTER_TICKS;
 
-	this->debugf("input left %d\r\n", x);
-
 	if (x > 0) {
 		ticks += x;
 		ticks += this->nvm.servoDeadzoneLeft;
@@ -71,13 +69,7 @@ void cBookWorm::moveLeftServo(signed int x)
 	}
 	else if (x != 0 && servoLeft.attached() == false)
 	{
-		this->debugf("attach left servo\r\n");
-		if ((this->nvm.servoFlip & 0x04) == 0) {
-			servoLeft.attach(this->pinnumServoLeft);
-		}
-		else {
-			servoLeft.attach(this->pinnumServoRight);
-		}
+		servoLeft.attach(this->pinnumServoLeft);
 	}
 	if (this->nvm.steeringBalance > 0)
 	{
@@ -88,16 +80,12 @@ void cBookWorm::moveLeftServo(signed int x)
 	ticks /= 1000;
 	ticks += this->nvm.servoBiasLeft;
 
-	this->debugf("final left %u\r\n", ticks);
-
 	servoLeft.write(ticks);
 }
 
 void cBookWorm::moveRightServo(signed int x)
 {
 	int32_t ticks = SERVO_CENTER_TICKS;
-
-	this->debugf("input right %d\r\n", x);
 
 	x *= -1; // flip
 	if (x > 0) {
@@ -120,13 +108,7 @@ void cBookWorm::moveRightServo(signed int x)
 	}
 	else if (x != 0 && servoRight.attached() == false)
 	{
-		this->debugf("attach right servo\r\n");
-		if ((this->nvm.servoFlip & 0x04) == 0) {
-			servoRight.attach(this->pinnumServoRight);
-		}
-		else {
-			servoRight.attach(this->pinnumServoLeft);
-		}
+		servoRight.attach(this->pinnumServoRight);
 	}
 	if (this->nvm.steeringBalance < 0)
 	{
@@ -136,8 +118,6 @@ void cBookWorm::moveRightServo(signed int x)
 	ticks *= this->nvm.speedGain;
 	ticks /= 1000;
 	ticks += this->nvm.servoBiasRight;
-
-	this->debugf("final right %u\r\n", ticks);
 
 	servoRight.write(ticks);
 }
@@ -279,6 +259,10 @@ void cBookWorm::loadPinAssignments()
 			#endif
 		#endif
 		this->pinnumServoWeapon = pinServoWeapon;
+		if (this->pinsHaveLoaded == false) {
+			pinMode(this->pinnumServoWeapon, OUTPUT);
+			digitalWrite(this->pinnumServoWeapon, LOW);
+		}
 	}
 	#endif
 	if ((this->nvm.servoFlip & 0x04) != 0)
@@ -287,4 +271,12 @@ void cBookWorm::loadPinAssignments()
 		this->pinnumServoLeft = this->pinnumServoRight;
 		this->pinnumServoRight = tmp;
 	}
+	if (this->pinsHaveLoaded == false)
+	{
+		pinMode(this->pinnumServoLeft, OUTPUT);
+		digitalWrite(this->pinnumServoLeft, LOW);
+		pinMode(this->pinnumServoRight, OUTPUT);
+		digitalWrite(this->pinnumServoRight, LOW);
+	}
+	this->pinsHaveLoaded = true;
 }

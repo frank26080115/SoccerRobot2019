@@ -64,7 +64,7 @@ void setup() {
   server.on("/setconfig", handleSetConfig);
   server.on("/config",    handleConfig);
 
-  server.on("/finger.png", handleFingerPng);
+  server.on("/finger.svg", handleFingerImg);
   server.on("/style.css",  handleStyleCss);
   server.on("/config.css", handleConfigCss);
   server.on("/joy.js",     handleJoyJs);
