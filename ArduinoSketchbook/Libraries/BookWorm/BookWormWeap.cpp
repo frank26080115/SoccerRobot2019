@@ -1,6 +1,11 @@
 #include <Arduino.h>
 #include "BookWorm.h"
+
+#ifdef USE_CUSTOM_SERVO_LIB
 #include "ContinuousServo.h"
+#else
+#include <Servo.h>
+#endif
 
 #ifdef ENABLE_WEAPON
 
@@ -8,6 +13,10 @@ extern Servo servoWeap;
 
 void cBookWorm::spinWeapon(uint16_t x)
 {
+	if (this->nvm.enableWeapon == false) {
+		servoWeap.detach();
+		return;
+	}
 	if (x > 0)
 	{
 		if (x < 500) {
@@ -19,7 +28,7 @@ void cBookWorm::spinWeapon(uint16_t x)
 		if (servoWeap.attached() == false) {
 			servoWeap.attach(pinnumServoWeapon);
 		}
-		servoWeap.writeTicks(x);
+		servoWeap.write(x);
 	}
 	else // x == 0
 	{

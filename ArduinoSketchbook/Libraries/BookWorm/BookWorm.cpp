@@ -1,10 +1,15 @@
 #include <Arduino.h>
 #include "BookWorm.h"
-#include "ContinuousServo.h"
 #include <EEPROM.h>
 #include <ESP8266WiFi.h>
 #include "checksum.h"
 #include <string.h>
+
+#ifdef USE_CUSTOM_SERVO_LIB
+#include "ContinuousServo.h"
+#else
+#include <Servo.h>
+#endif
 
 cBookWorm BookWorm; // user accessible instance declared here
 
@@ -43,8 +48,6 @@ void cBookWorm::begin(void)
 		this->generateSsid(this->SSID);
 		this->setSsid(this->SSID);
 	}
-
-	this->hasServosAttached = false;
 }
 
 void cBookWorm::setLedOn()
@@ -207,7 +210,7 @@ void cBookWorm::defaultValues()
 	this->nvm.servoBiasRight = 0;
 	this->nvm.speedGain = 1000;
 	this->nvm.steeringSensitivity = 500;
-	this->nvm.steeringBalance = 1000;
+	this->nvm.steeringBalance = 0;
 	this->nvm.servoFlip = 0;
 	this->nvm.servoStoppedNoPulse = true;
 	this->nvm.stickRadius = 100;

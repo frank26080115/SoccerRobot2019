@@ -44,6 +44,8 @@
 
 #if defined(__AVR__)
 
+#error why are we compiling for AVR?
+
 #include <avr/interrupt.h>
 #include <Arduino.h>
 
@@ -448,6 +450,9 @@ bool ContinuousServo::attached()
 
 
 #elif defined(__arm__) && (defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__))
+
+#error why are we compiling for ARM?
+
 // ******************************************************************************
 // Teensy 3.0 implementation, using Programmable Delay Block
 // ******************************************************************************
@@ -618,6 +623,9 @@ extern "C" void pdb_isr(void)
 
 
 #elif defined(__arm__) && defined(__MKL26Z64__)
+
+#error why are we compiling for ARM?
+
 // ******************************************************************************
 // Teensy-LC implementation, using Low Power Timer
 // ******************************************************************************

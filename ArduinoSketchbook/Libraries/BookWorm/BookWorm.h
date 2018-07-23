@@ -5,7 +5,6 @@
 #define BOOKWORM_EEPROM_VERSION 1
 
 #include <Arduino.h>
-#include "ContinuousServo.h"
 #include "WString.h"
 
 extern "C" {
@@ -13,7 +12,7 @@ extern "C" {
 }
 
 // pin definitions that can be utilized by other libraries
-#define pinServoLeft         3
+#define pinServoLeft         2
 #define pinServoRight        0
 
 // There's not enough pins on ESP-01 for a weapon
@@ -21,12 +20,19 @@ extern "C" {
 //#define ENABLE_WEAPON
 
 #ifdef ENABLE_WEAPON
-#define pinServoWeapon       3
+#define pinServoWeapon       2
 #define pinServoLeftAlt      1
 #endif
 
 #define BOOKWORM_DEBUG
 #define BOOKWORM_BAUD 9600
+
+#define USE_CUSTOM_SERVO_LIB
+#ifdef USE_CUSTOM_SERVO_LIB
+#include "ContinuousServo.h"
+#else
+#define ContinuousServo Servo
+#endif
 
 #pragma pack(push, 1)
 typedef struct
@@ -115,9 +121,6 @@ public:
 	bookworm_nvm_t nvm;
 	bool robotFlip;
 private:
-	bool hasServosAttached;
-	void attachAllServos();
-	void checkAttachAllServos();
 	void loadPinAssignments();
 	int pinnumServoLeft;
 	int pinnumServoRight;

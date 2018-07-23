@@ -1,6 +1,11 @@
 #include <Arduino.h>
 #include "BookWorm.h"
+
+#ifdef USE_CUSTOM_SERVO_LIB
 #include "ContinuousServo.h"
+#else
+#include <Servo.h>
+#endif
 
 extern ContinuousServo servoLeft;
 extern ContinuousServo servoRight;
@@ -44,25 +49,35 @@ void cBookWorm::moveLeftServo(signed int x)
 {
 	int32_t ticks = SERVO_CENTER_TICKS;
 
-	if (x != 0) {
-		this->checkAttachAllServos();
-	}
+	this->debugf("input left %d\r\n", x);
 
 	if (x > 0) {
 		ticks += x;
 		ticks += this->nvm.servoDeadzoneLeft;
+		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward |= (1 << 1);
+		#endif
 	}
 	else if (x <= 0) {
 		ticks += x;
 		ticks -= this->nvm.servoDeadzoneLeft;
+		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward &= ~(1 << 1);
+		#endif
 	}
-	if (x == 0 && this->nvm.servoStoppedNoPulse != false) {
-		servoLeft.deactivate();
+	if (x == 0 && this->nvm.servoStoppedNoPulse != false)
+	{
+		servoLeft.detach();
 	}
-	else {
-		servoLeft.activate();
+	else if (x != 0 && servoLeft.attached() == false)
+	{
+		this->debugf("attach left servo\r\n");
+		if ((this->nvm.servoFlip & 0x04) == 0) {
+			servoLeft.attach(this->pinnumServoLeft);
+		}
+		else {
+			servoLeft.attach(this->pinnumServoRight);
+		}
 	}
 	if (this->nvm.steeringBalance > 0)
 	{
@@ -70,34 +85,48 @@ void cBookWorm::moveLeftServo(signed int x)
 		ticks /= 1000;
 	}
 	ticks *= this->nvm.speedGain;
+	ticks /= 1000;
 	ticks += this->nvm.servoBiasLeft;
-	servoLeft.writeTicks(ticks);
+
+	this->debugf("final left %u\r\n", ticks);
+
+	servoLeft.write(ticks);
 }
 
 void cBookWorm::moveRightServo(signed int x)
 {
 	int32_t ticks = SERVO_CENTER_TICKS;
 
-	if (x != 0) {
-		this->checkAttachAllServos();
-	}
+	this->debugf("input right %d\r\n", x);
 
 	x *= -1; // flip
 	if (x > 0) {
 		ticks += x;
 		ticks += this->nvm.servoDeadzoneRight;
+		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward |= (1 << 0);
+		#endif
 	}
 	else if (x <= 0) {
 		ticks += x;
 		ticks -= this->nvm.servoDeadzoneRight;
+		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward &= ~(1 << 0);
+		#endif
 	}
-	if (x == 0 && this->nvm.servoStoppedNoPulse != false) {
-		servoRight.deactivate();
+	if (x == 0 && this->nvm.servoStoppedNoPulse != false)
+	{
+		servoRight.detach();
 	}
-	else {
-		servoRight.activate();
+	else if (x != 0 && servoRight.attached() == false)
+	{
+		this->debugf("attach right servo\r\n");
+		if ((this->nvm.servoFlip & 0x04) == 0) {
+			servoRight.attach(this->pinnumServoRight);
+		}
+		else {
+			servoRight.attach(this->pinnumServoLeft);
+		}
 	}
 	if (this->nvm.steeringBalance < 0)
 	{
@@ -105,8 +134,12 @@ void cBookWorm::moveRightServo(signed int x)
 		ticks /= 1000;
 	}
 	ticks *= this->nvm.speedGain;
+	ticks /= 1000;
 	ticks += this->nvm.servoBiasRight;
-	servoRight.writeTicks(ticks);
+
+	this->debugf("final right %u\r\n", ticks);
+
+	servoRight.write(ticks);
 }
 
 void cBookWorm::moveMixed(signed int throttle, signed int steer)
@@ -226,35 +259,6 @@ void cBookWorm::togRobotFlip()
 bool cBookWorm::getRobotFlip()
 {
 	return this->robotFlip;
-}
-
-void cBookWorm::attachAllServos()
-{
-	if ((this->nvm.servoFlip & 0x04) == 0) {
-		servoLeft.attach(pinnumServoLeft);
-		servoRight.attach(pinnumServoRight);
-	}
-	else {
-		servoLeft.attach(pinnumServoLeft);
-		servoRight.attach(pinnumServoRight);
-	}
-	move(0, 0);
-	#ifdef ENABLE_WEAPON
-	if (this->nvm.enableWeapon) {
-		positionWeapon(0);
-	}
-	#endif
-	this->hasServosAttached = true;
-	#ifdef BOOKWORM_DEBUG
-	this->printf("All servos attached\r\n");
-	#endif
-}
-
-void cBookWorm::checkAttachAllServos()
-{
-	if (this->hasServosAttached == false) {
-		this->attachAllServos();
-	}
 }
 
 void cBookWorm::loadPinAssignments()
