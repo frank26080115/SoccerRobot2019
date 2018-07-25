@@ -12,12 +12,12 @@
 void  IRsend::sendHexbug(uint64_t data, uint16_t nbits, uint16_t repeat)
 {
 	sendGeneric(
-		1750, 320,   // headermark, headerspace,
-		1020, 320,   // onemark,    onespace,
-		340, 320,    // zeromark,   zerospace,
-		0, 2000,      // footermark, gap,
+		1730, 350,   // headermark, headerspace,
+		1020, 360,   // onemark,    onespace,
+		320, 360,    // zeromark,   zerospace,
+		0, 2000,     // footermark, gap,
 		data, nbits, // data,       nbits,
-		38, true,    // frequency,  MSBfirst,
+		54, true,    // frequency,  MSBfirst,
 		0, 50        // repeat,     dutycycle
 	);
 }

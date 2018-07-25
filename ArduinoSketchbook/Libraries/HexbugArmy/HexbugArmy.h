@@ -24,6 +24,8 @@ class cHexbug
 		void setBugId(uint8_t);
 	private:
 		void sendIrOff();
+		uint8_t calcIdOn();
+		uint8_t calcIdOff();
 		uint8_t id;
 		uint8_t sendCnt;
 		int cmdX;

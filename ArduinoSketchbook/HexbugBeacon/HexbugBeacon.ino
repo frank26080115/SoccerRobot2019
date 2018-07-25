@@ -28,6 +28,10 @@ uint8_t seridx = 0;
 uint32_t sertime = 0;
 #endif
 
+uint32_t packet_cnt = 0;
+uint32_t packet_cntPrev = 0;
+uint32_t packet_rptTime = 0;
+
 void setup()
 {
   Serial.begin(9600);
@@ -65,11 +69,22 @@ void loop()
 #endif
 
 #ifdef ENABLE_TCP_MODE
+  static bool tcpavailable = false;
+  static bool tcpconnected = false;
   tcpclient = tcpserver.available();
   if (tcpclient)
   {
+    if (tcpavailable == false) {
+      Serial.println("TCP available");
+    }
+    tcpavailable = true;
+    
     if (tcpclient.connected())
     {
+      if (tcpavailable == false) {
+        Serial.println("TCP connected");
+      }
+      tcpconnected = true;
       int avail = tcpclient.available();
       if (avail > 0)
       {
@@ -77,17 +92,33 @@ void loop()
 
         tcpclient.read(buff, (size_t )avail);
 
+        packet_cnt += avail;
+
         handlePacket(buff, avail);
 
         free(buff);
       }
     }
+    else
+    {
+      if (tcpconnected) {
+        Serial.println("TCP disconnected");
+      }
+      tcpconnected = false;
+    }
+  }
+  else {
+    if (tcpavailable) {
+      Serial.println("TCP unavailable");
+    }
+    tcpavailable = false;
   }
 #endif
 
 #ifdef ENABLE_KEYBOARD_MODE
   while (Serial.available() > 0) {
     char c = Serial.read();
+    packet_cnt++;
     HexbugArmy.handleKey(c);
   }
 #elif defined(ENABLE_SERIAL_MODE)
@@ -96,6 +127,7 @@ void loop()
   }
   while (Serial.available() > 0) {
     char c = Serial.read();
+    packet_cnt++;
     sertime = now = millis();
     if (seridx == 0 && c != 0xAA) {
       seridx = 0;
@@ -121,6 +153,15 @@ void loop()
     lastIrTime = now;
     HexbugArmy.sendIr();
   }
+
+  if ((now - packet_rptTime) > 1000) {
+    packet_rptTime = now;
+    if (packet_cntPrev != packet_cnt) {
+      packet_cntPrev = packet_cnt;
+      Serial.print("pktcnt: ");
+      Serial.println(packet_cnt, DEC);
+    }
+  }
 }
 
 void handleRoot()
@@ -139,6 +180,7 @@ void handleRoot()
     if (argName.length() <= 0) {
       continue;
     }
+    packet_cnt++;
     for (j = 0; j < 4; j++)
     {
       if (argName.equalsIgnoreCase(String("x") + String(j)))

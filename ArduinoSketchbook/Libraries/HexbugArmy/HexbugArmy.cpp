@@ -5,11 +5,11 @@
 
 #define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 #define MAX_HEXBUG_CNT 4
-#define MAX_CMD_OFF_CNT 5
+#define MAX_CMD_OFF_CNT 10
 #define DEADBAND 8
 #define DUTY_SLICE 4
 #define MAX_STICK 100
-#define CMD_TIMEOUT 1000
+#define CMD_TIMEOUT 500
 
 #define BTNSHIFT_LEFT     6
 #define BTNSHIFT_RIGHT    5
@@ -61,6 +61,38 @@ void cHexbugArmy::sendIr()
 	{
 		hexbug[i]->sendIr();
 	}
+}
+
+uint8_t cHexbug::calcIdOn()
+{
+	switch (this->id)
+	{
+		case 0:
+			return 0x07;
+		case 1:
+			return 0x01;
+		case 2:
+			return 0x04;
+		case 3:
+			return 0x02;
+	}
+	return 0;
+}
+
+uint8_t cHexbug::calcIdOff()
+{
+	switch (this->id)
+	{
+		case 0:
+			return 0x03;
+		case 1:
+			return 0x05;
+		case 2:
+			return 0x00;
+		case 3:
+			return 0x06;
+	}
+	return 0;
 }
 
 void cHexbug::sendIr()
@@ -132,16 +164,16 @@ void cHexbug::sendIr()
 		return;
 	}
 
-	code |= id;
+	code |= calcIdOn();
 
 	this->irsend->sendHexbug(code, 8, 0);
 }
 
 void cHexbug::sendIrOff()
 {
-	uint32_t code = !id;
+	uint32_t code = calcIdOn();
 	code &= (MAX_HEXBUG_CNT * 2) - 1;
-	this->irsend->sendHexbug(code, 8, 0);
+	this->irsend->sendHexbug(calcIdOff(), 8, 0);
 }
 
 void cHexbug::command(int x, int y, bool btn)
