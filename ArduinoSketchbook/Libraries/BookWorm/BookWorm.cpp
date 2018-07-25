@@ -34,7 +34,7 @@ parameters:	none
 */
 void cBookWorm::begin(void)
 {
-	#if (!defined(ENABLE_WEAPON)) || (pinServoWeapon != pinServoLeft && pinServoWeapon != pinServoRight)
+	#if (!defined(ENABLE_WEAPON)) || (pinServoWeapon != pinServoLeft && pinServoWeapon != pinServoRight) || defined(ALL_SAFE_DEBUG_MODE)
 	Serial.begin(BOOKWORM_BAUD);
 	this->serialHasBegun = true;
 	#else
@@ -78,6 +78,9 @@ void cBookWorm::setLedOn()
 		#if pinServoLeft == pinLed || pinServoRight == pinLed
 			return;
 		#endif
+		#if pinLed == 1 && defined(ALL_SAFE_DEBUG_MODE)
+			return;
+		#endif
 	pinMode(pinLed, OUTPUT);
 	digitalWrite(pinLed, pinLedOnState);
 	#endif
@@ -108,6 +111,9 @@ void cBookWorm::setLedOff()
 			#endif
 		#endif
 		#if pinServoLeft == pinLed || pinServoRight == pinLed
+			return;
+		#endif
+		#if pinLed == 1 && defined(ALL_SAFE_DEBUG_MODE)
 			return;
 		#endif
 	digitalWrite(pinLed, pinLedOffState);

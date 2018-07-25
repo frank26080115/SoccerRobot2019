@@ -8,6 +8,7 @@
 #define BOOKWORM_DEBUG
 #define BOOKWORM_BAUD 9600
 #define BOOKWORM_SSID_SIZE 31
+#define ALL_SAFE_DEBUG_MODE
 
 #include <Arduino.h>
 #include "WString.h"

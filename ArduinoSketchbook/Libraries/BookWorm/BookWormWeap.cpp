@@ -26,13 +26,19 @@ void cBookWorm::spinWeapon(uint16_t x)
 			x = 2500;
 		}
 		if (servoWeap.attached() == false) {
+			#ifndef ALL_SAFE_DEBUG_MODE
 			servoWeap.attach(pinnumServoWeapon);
+			#endif
 		}
+		#ifndef ALL_SAFE_DEBUG_MODE
 		servoWeap.write(x);
+		#endif
 	}
 	else // x == 0
 	{
+		#ifndef ALL_SAFE_DEBUG_MODE
 		servoWeap.detach();
+		#endif
 	}
 }
 

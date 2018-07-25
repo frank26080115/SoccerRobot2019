@@ -69,7 +69,9 @@ void cBookWorm::moveLeftServo(signed int x)
 	}
 	else if (x != 0 && servoLeft.attached() == false)
 	{
+		#ifndef ALL_SAFE_DEBUG_MODE
 		servoLeft.attach(this->pinnumServoLeft);
+		#endif
 	}
 	if (this->nvm.steeringBalance > 0)
 	{
@@ -80,7 +82,9 @@ void cBookWorm::moveLeftServo(signed int x)
 	ticks /= 1000;
 	ticks += this->nvm.servoBiasLeft;
 
+	#ifndef ALL_SAFE_DEBUG_MODE
 	servoLeft.write(ticks);
+	#endif
 }
 
 void cBookWorm::moveRightServo(signed int x)
@@ -108,7 +112,9 @@ void cBookWorm::moveRightServo(signed int x)
 	}
 	else if (x != 0 && servoRight.attached() == false)
 	{
+		#ifndef ALL_SAFE_DEBUG_MODE
 		servoRight.attach(this->pinnumServoRight);
+		#endif
 	}
 	if (this->nvm.steeringBalance < 0)
 	{
@@ -119,7 +125,9 @@ void cBookWorm::moveRightServo(signed int x)
 	ticks /= 1000;
 	ticks += this->nvm.servoBiasRight;
 
+	#ifndef ALL_SAFE_DEBUG_MODE
 	servoRight.write(ticks);
+	#endif
 }
 
 void cBookWorm::moveMixed(signed int throttle, signed int steer)
@@ -190,8 +198,10 @@ void cBookWorm::loadPinAssignments()
 		#endif
 		this->pinnumServoWeapon = pinServoWeapon;
 		if (this->pinsHaveLoaded == false) {
+			#ifndef ALL_SAFE_DEBUG_MODE
 			pinMode(this->pinnumServoWeapon, OUTPUT);
 			digitalWrite(this->pinnumServoWeapon, LOW);
+			#endif
 		}
 	}
 	#endif
@@ -203,10 +213,12 @@ void cBookWorm::loadPinAssignments()
 	}
 	if (this->pinsHaveLoaded == false)
 	{
+		#ifndef #ifndef ALL_SAFE_DEBUG_MODE
 		pinMode(this->pinnumServoLeft, OUTPUT);
 		digitalWrite(this->pinnumServoLeft, LOW);
 		pinMode(this->pinnumServoRight, OUTPUT);
 		digitalWrite(this->pinnumServoRight, LOW);
+		#endif
 	}
 	this->pinsHaveLoaded = true;
 }
