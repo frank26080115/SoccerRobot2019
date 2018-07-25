@@ -15,7 +15,7 @@ const char* ssid     = "RobotArmy_2.4";
 const char* password = "robotsoccer";
 
 ESP8266WebServer webserver(80);
-WiFiServer tcpserver(5045);
+WiFiServer tcpserver(3333);
 WiFiClient tcpclient;
 
 #define IR_INTERVAL 1
@@ -31,10 +31,11 @@ uint32_t sertime = 0;
 uint32_t packet_cnt = 0;
 uint32_t packet_cntPrev = 0;
 uint32_t packet_rptTime = 0;
+bool     packet_canPrint = true;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -71,7 +72,9 @@ void loop()
 #ifdef ENABLE_TCP_MODE
   static bool tcpavailable = false;
   static bool tcpconnected = false;
-  tcpclient = tcpserver.available();
+  if (tcpconnected == false || tcpclient.connected() == false) {
+    tcpclient = tcpserver.available();
+  }
   if (tcpclient)
   {
     if (tcpavailable == false) {
@@ -81,7 +84,7 @@ void loop()
     
     if (tcpclient.connected())
     {
-      if (tcpavailable == false) {
+      if (tcpconnected == false) {
         Serial.println("TCP connected");
       }
       tcpconnected = true;
@@ -156,6 +159,7 @@ void loop()
 
   if ((now - packet_rptTime) > 1000) {
     packet_rptTime = now;
+    packet_canPrint = true;
     if (packet_cntPrev != packet_cnt) {
       packet_cntPrev = packet_cnt;
       Serial.print("pktcnt: ");
@@ -212,7 +216,11 @@ void handleRoot()
     if (filled[j] == 0x07) {
       HexbugArmy.command(j, &(cmds[j]));
     }
+    if (packet_canPrint) {
+      Serial.print("HTTP "); Serial.print(j, DEC); Serial.print(" "), Serial.print(cmds[j].x, DEC); Serial.print(" "), Serial.print(cmds[j].y, DEC); Serial.print(" "), Serial.println(cmds[j].btn);
+    }
   }
+  packet_canPrint = false;
 
   webserver.send(200, "text/plain", "done");
 }
@@ -252,7 +260,12 @@ void handlePacket(uint8_t* buff, int avail)
     if (j == 3) {
       HexbugArmy.command(id, &cmd);
     }
+
+    if (j == 3 && packet_canPrint) {
+      Serial.print("TCP "); Serial.print(id, DEC); Serial.print(" "), Serial.print(cmd.x, DEC); Serial.print(" "), Serial.print(cmd.y, DEC); Serial.print(" "), Serial.println(cmd.btn);
+    }
   }
+  packet_canPrint = false;
 }
 
 bool readServerArg(int argNum, signed int* result)
