@@ -504,6 +504,9 @@ setInterval(function(){
 	reportedY = reportedY * desiredStickRadius;
 	reportedY = reportedY / (desiredStickRadius - yDeadzone);
 
+	reportedX = Math.round(reportedX);
+	reportedY = Math.round(reportedY);
+
 	if (outputEl) {
 		outputEl.innerHTML	= '<b>Position:</b> ' + ' X:'+reportedX + ' Y:'+reportedY;
 	}
@@ -512,7 +515,7 @@ setInterval(function(){
 	{
 		var xhr = new XMLHttpRequest();
 
-		var querystring = "./move?x="+Math.round(reportedX)+"&y="+Math.round(reportedY);
+		var querystring = "./move?x="+reportedX+"&y="+reportedY;
 		if (advancedFeatures >= 1) {
 			querystring += "&flipped=" + flipped;
 		}

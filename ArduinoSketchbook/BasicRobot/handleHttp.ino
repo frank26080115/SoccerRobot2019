@@ -27,7 +27,7 @@ void handleRoot()
   server.sendContent(BookWorm.SSID);
   if (BookWorm.nvm.advanced)
   {
-    server.sendContent("<div id='topbar' width='100%'><table width='98%'>");
+    server.sendContent("<div id='topbar' width='100%'><table width='98%' border='1'>");
     #ifdef ENABLE_WEAPON
     server.sendContent(
       "<tr><td width='50%'><input type='button' value='Weapon Safe' onclick='weapsetpossafe()' /></td><td width='50%'><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>"
@@ -57,7 +57,7 @@ void handleRoot()
     if (BookWorm.nvm.leftHanded) {
       server.sendContent(" class='rightside' ");
     }
-    server.sendContent("><table>");
+    server.sendContent("><table border='1'>");
     #ifdef ENABLE_WEAPON
     if (BookWorm.nvm.enableWeapon) {
       server.sendContent("<tr><td><input type='button' value='Weapon Safe' onclick='weapsetpossafe()' /></td></tr><tr><td><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>");
