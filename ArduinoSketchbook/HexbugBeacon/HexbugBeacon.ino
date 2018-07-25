@@ -4,6 +4,11 @@
 #include <ESP8266mDNS.h>
 #include <HexbugArmy.h>
 
+#define ENABLE_TCP_MODE
+#define ENABLE_HTTP_MODE
+#define ENABLE_KEYBOARD_MODE
+//#define ENABLE_SERIAL_MODE
+
 cHexbugArmy HexbugArmy;
 
 const char* ssid     = "........";
@@ -17,6 +22,12 @@ WiFiClient tcpclient;
 uint32_t now;
 uint32_t lastIrTime = 0;
 
+#ifdef ENABLE_SERIAL_MODE
+uint8_t serbuff[(4 * 4) + 2];
+uint8_t seridx = 0;
+uint32_t sertime = 0;
+#endif
+
 void setup()
 {
   Serial.begin(9600);
@@ -29,16 +40,31 @@ void setup()
   if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
+
+#ifdef ENABLE_TCP_MODE
+  tcpserver.begin();
+#endif
+
+#ifdef ENABLE_HTTP_MODE
   webserver.on("/", handleRoot);
   webserver.onNotFound(handleRoot);
   webserver.begin();
+#endif
+
   HexbugArmy.begin();
+
   Serial.println("All init done");
 }
 
 void loop()
 {
+  now = millis();
+
+#ifdef ENABLE_HTTP_MODE
   webserver.handleClient();
+#endif
+
+#ifdef ENABLE_TCP_MODE
   tcpclient = tcpserver.available();
   if (tcpclient)
   {
@@ -57,13 +83,39 @@ void loop()
       }
     }
   }
+#endif
 
+#ifdef ENABLE_KEYBOARD_MODE
   while (Serial.available() > 0) {
     char c = Serial.read();
     HexbugArmy.handleKey(c);
   }
+#elif defined(ENABLE_SERIAL_MODE)
+  if ((sertime - now) > 500) {
+    seridx = 0;
+  }
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    sertime = now = millis();
+    if (seridx == 0 && c != 0xAA) {
+      seridx = 0;
+      continue;
+    }
+    if (seridx == 1 && c != 0x55) {
+      seridx = 0;
+      if (c != 0xAA) {
+        continue;
+      }
+    }
+    serbuff[seridx] = c;
+    seridx++;
+    if (seridx >= ((4 * 4) + 2)) {
+      handlePacket(&(serbuff[2]), seridx);
+      seridx = 0;
+    }
+  }
+#endif
 
-  now = millis();
   if ((now - lastIrTime) > IR_INTERVAL)
   {
     lastIrTime = now;
@@ -76,6 +128,9 @@ void handleRoot()
   int i, j;
   uint8_t filled[4];
   hexbug_cmd_t cmds[4];
+  #ifndef ENABLE_HTTP_MODE
+  return;
+  #endif
 
   for (i = 0; i < webserver.args(); i++)
   {
