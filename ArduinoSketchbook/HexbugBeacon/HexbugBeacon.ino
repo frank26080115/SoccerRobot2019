@@ -11,8 +11,8 @@
 
 cHexbugArmy HexbugArmy;
 
-const char* ssid     = "........";
-const char* password = "........";
+const char* ssid     = "RobotArmy_2.4";
+const char* password = "robotsoccer";
 
 ESP8266WebServer webserver(80);
 WiFiServer tcpserver(5045);
@@ -177,6 +177,17 @@ void handleRoot()
 
 void handlePacket(uint8_t* buff, int avail)
 {
+  /*
+   * packet format
+   * 
+   * ID, X, Y, B, ID, X, Y, B, ID, X, Y, B, ID, X, Y, B,
+   * 
+   * all fields are one byte
+   * ID is 0, 1, 2, or 3
+   * X and Y are signed 8 bit integers, -127 to 127, 0 means stopped
+   * negative means left and down, positive means up and right
+   * B means button, the button on the shoulder, true = 1, false = 0
+   */
   uint8_t id;
   hexbug_cmd_t cmd;
   for (int i = 0; i < avail; i++)

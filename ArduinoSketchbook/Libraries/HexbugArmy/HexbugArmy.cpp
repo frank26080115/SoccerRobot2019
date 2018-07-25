@@ -11,12 +11,11 @@
 #define MAX_STICK 100
 #define CMD_TIMEOUT 1000
 
-#define ID_SHIFT          0
-#define BTNSHIFT_LEFT     7
-#define BTNSHIFT_RIGHT    7
+#define BTNSHIFT_LEFT     6
+#define BTNSHIFT_RIGHT    5
 #define BTNSHIFT_UP       7
-#define BTNSHIFT_DOWN     7
-#define BTNSHIFT_TRIGGER  7
+#define BTNSHIFT_DOWN     4
+#define BTNSHIFT_TRIGGER  3
 
 void cHexbugArmy::begin()
 {
@@ -28,6 +27,7 @@ void cHexbugArmy::begin(uint8_t pin, uint8_t bugs)
 	int i;
 
 	irsend = new IRsend(pin);
+	irsend->begin();
 
 	this->bugCnt = bugs;
 	if (this->bugCnt < 1) {
@@ -271,6 +271,7 @@ bool cHexbugArmy::handleKey(char c)
 		{
 			this->command(id, &cmd);
 		}
+		//Serial.print(id, DEC); Serial.print(" "); Serial.print(cmd.x, DEC); Serial.print(" "); Serial.print(cmd.y, DEC); Serial.print(" "); Serial.println(cmd.btn, DEC);
 	}
 
 	return ret;
