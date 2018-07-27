@@ -152,17 +152,15 @@ void cHexbug::sendIr()
 
 	this->cmdOffCnt = 0;
 
+	int absX = cmdX > 0 ? cmdX : -cmdX;
+	int absY = cmdY > 0 ? cmdY : -cmdY;
+
+	#ifdef ENABLE_PULSED_SPEED
+
 	this->sendCnt++;
 	if (this->sendCnt >= DUTY_SLICE) {
 		this->sendCnt = 0;
 	}
-
-	int absX = cmdX > 0 ? cmdX : -cmdX;
-	int absY = cmdY > 0 ? cmdY : -cmdY;
-
-	#
-
-	#ifdef ENABLE_PULSED_SPEED
 
 	int j = 0, k = 0;
 
@@ -187,7 +185,8 @@ void cHexbug::sendIr()
 	{
 		code |= (1 << (cmdX < 0 ? BTNSHIFT_LEFT : BTNSHIFT_RIGHT));
 	}
-	else if (k >= sendCnt)
+
+	if (k >= sendCnt)
 	{
 		code |= (1 << (cmdY < 0 ? BTNSHIFT_DOWN : BTNSHIFT_UP));
 	}
@@ -196,6 +195,7 @@ void cHexbug::sendIr()
 	if (absX >= DEADBAND) {
 		code |= (1 << (cmdX < 0 ? BTNSHIFT_LEFT : BTNSHIFT_RIGHT));
 	}
+
 	if (absY >= DEADBAND) {
 		code |= (1 << (cmdY < 0 ? BTNSHIFT_DOWN : BTNSHIFT_UP));
 	}
@@ -391,6 +391,9 @@ bool cHexbugArmy::handleKey(char c, int8_t spd)
 			ret = true;
 			break;
 	}
+
+	//cmd.x = MAX_STICK;
+	//cmd.y = MAX_STICK;
 
 	if (ret)
 	{

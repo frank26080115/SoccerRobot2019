@@ -28,8 +28,8 @@ class cHexbug
 		uint8_t calcIdOff();
 		uint8_t id;
 		uint8_t sendCnt;
-		int cmdX;
-		int cmdY;
+		int8_t cmdX;
+		int8_t cmdY;
 		bool cmdBtn;
 		uint32_t cmdMillis;
 		uint8_t cmdOffCnt;
