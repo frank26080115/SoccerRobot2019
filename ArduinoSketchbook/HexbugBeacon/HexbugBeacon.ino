@@ -242,7 +242,7 @@ void loop()
       packet_canPrint = false;
     }
     looptmr = millis();
-    Serial.println((looptmr - now), DEC);
+    //Serial.println((looptmr - now), DEC);
   }
   packet_canPrint = false;
 }

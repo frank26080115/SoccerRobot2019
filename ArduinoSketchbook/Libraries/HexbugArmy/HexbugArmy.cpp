@@ -246,7 +246,7 @@ void cHexbug::sendIrOff()
 	this->irsend->sendHexbug(calcIdOff(), 8, 0, HEXBUG_DEFAULT_GAP);
 }
 
-void cHexbug::command(int x, int y, bool btn)
+void cHexbug::command(int8_t x, int8_t y, bool btn)
 {
 	this->cmdX = x;
 	this->cmdY = y;

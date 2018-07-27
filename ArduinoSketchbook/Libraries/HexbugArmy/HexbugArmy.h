@@ -18,7 +18,7 @@ class cHexbug
 {
 	public:
 		void begin(uint8_t id, IRsend* ir);
-		void command(int x, int y, bool btn);
+		void command(int8_t x, int8_t y, bool btn);
 		void command(hexbug_cmd_t*);
 		void sendIr();
 		void setBugId(uint8_t);
