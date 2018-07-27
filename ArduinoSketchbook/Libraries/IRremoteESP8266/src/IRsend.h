@@ -269,8 +269,9 @@ void send(uint16_t type, uint64_t data, uint16_t nbits);
                    uint16_t repeat = GICABLE_MIN_REPEAT);
 #endif
 #if SEND_HEXBUG
-  void sendHexbug(uint64_t data, uint16_t nbits = 8,
-                   uint16_t repeat = 0);
+  #define HEXBUG_DEFAULT_GAP 1
+  //void sendHexbug(uint64_t data, uint16_t nbits = 8, uint16_t repeat = 0);
+  void sendHexbug(uint64_t data, uint16_t nbits = 8, uint16_t repeat = 0, uint16_t gap = HEXBUG_DEFAULT_GAP);
 #endif
 
  protected:

@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <WiFiUdp.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <HexbugArmy.h>
@@ -7,7 +8,9 @@
 #define ENABLE_TCP_MODE
 #define ENABLE_HTTP_MODE
 #define ENABLE_KEYBOARD_MODE
-//#define ENABLE_SERIAL_MODE
+//#define ENABLE_SERIAL_MODE // fallback in case networking doesn't work
+
+//#define USE_UDP
 
 cHexbugArmy HexbugArmy;
 
@@ -16,9 +19,17 @@ const char* password = "robotsoccer";
 
 ESP8266WebServer webserver(80);
 WiFiServer tcpserver(3333);
-WiFiClient tcpclient;
+#ifdef USE_UDP
+WiFiUDP
+#else
+WiFiClient
+#endif
+  tcpclient;
+uint8_t tcpbuff[4 * 4];
 
-#define IR_INTERVAL 1
+bool wificonnected = false;
+
+#define IR_INTERVAL 70
 uint32_t now;
 uint32_t lastIrTime = 0;
 
@@ -32,95 +43,156 @@ uint32_t packet_cnt = 0;
 uint32_t packet_cntPrev = 0;
 uint32_t packet_rptTime = 0;
 bool     packet_canPrint = true;
+bool     packet_didRx = false;
+int      packet_hasContinuous = 0;
+
+uint32_t looptmr = 0;
 
 void setup()
 {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
-  }
-
-#ifdef ENABLE_TCP_MODE
-  tcpserver.begin();
-#endif
-
-#ifdef ENABLE_HTTP_MODE
-  webserver.on("/", handleRoot);
-  webserver.onNotFound(handleRoot);
-  webserver.begin();
-#endif
 
   HexbugArmy.begin();
-
-  Serial.println("All init done");
 }
 
 void loop()
 {
   now = millis();
 
+  if (wificonnected)
+  {
 #ifdef ENABLE_HTTP_MODE
-  webserver.handleClient();
+    webserver.handleClient();
 #endif
 
 #ifdef ENABLE_TCP_MODE
-  static bool tcpavailable = false;
-  static bool tcpconnected = false;
-  if (tcpconnected == false || tcpclient.connected() == false) {
-    tcpclient = tcpserver.available();
-  }
-  if (tcpclient)
-  {
-    if (tcpavailable == false) {
-      Serial.println("TCP available");
+    static bool tcpavailable = false;
+    static bool tcpconnected = false;
+    if (tcpconnected == false
+    #ifndef USE_UDP
+    || tcpclient.connected() == false
+    #endif
+    ) {
+      #ifndef USE_UDP
+      tcpclient = tcpserver.available();
+      #endif
     }
-    tcpavailable = true;
-    
-    if (tcpclient.connected())
+    #ifndef USE_UDP
+    if (tcpclient)
+    #endif
     {
-      if (tcpconnected == false) {
-        Serial.println("TCP connected");
+      #ifndef USE_UDP
+      if (tcpavailable == false) {
+        Serial.println("TCP available");
       }
-      tcpconnected = true;
-      int avail = tcpclient.available();
-      if (avail > 0)
+      #endif
+      tcpavailable = true;
+
+      #ifndef USE_UDP
+      if (tcpclient.connected())
+      #endif
       {
-        uint8_t* buff = (uint8_t*)malloc(avail);
+        #ifndef USE_UDP
+        if (tcpconnected == false) {
+          Serial.println("TCP connected");
+        }
+        #endif
+        tcpconnected = true;
+        int avail;
+        #ifdef USE_UDP
+        avail = tcpclient.parsePacket();
+        #else
+        avail = tcpclient.available();
+        #endif
+        if (avail > 0)
+        {
+          if (avail > 16) {
+            avail = 16;  
+          }
+          tcpclient.read(tcpbuff, (size_t )avail);
+  
+          packet_cnt += avail;
+  
+          handlePacket(tcpbuff, avail);
 
-        tcpclient.read(buff, (size_t )avail);
-
-        packet_cnt += avail;
-
-        handlePacket(buff, avail);
-
-        free(buff);
+          if (packet_didRx == false) {
+            packet_hasContinuous = 1;
+          }
+          else {
+            packet_hasContinuous++;
+          }
+          packet_didRx = true;
+        }
+        else
+        {
+          packet_didRx = false;
+        }
       }
+      #ifndef USE_UDP
+      else
+      {
+        if (tcpconnected) {
+          Serial.println("TCP disconnected");
+        }
+        tcpconnected = false;
+        packet_didRx = false;
+      }
+      #endif
+    }
+    #ifndef USE_UDP
+    else
+    {
+      if (tcpavailable) {
+        Serial.println("TCP unavailable");
+      }
+      tcpavailable = false;
+      tcpconnected = false;
+      packet_didRx = false;
+    }
+    #endif
+#endif
+  }
+  else // wificonnected == false
+  {
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      wificonnected = true;
+      if (MDNS.begin("esp8266")) {
+        Serial.println("MDNS responder started");
+      }
+    
+      #ifdef ENABLE_TCP_MODE
+      tcpserver.begin();
+      #endif
+    
+      #ifdef ENABLE_HTTP_MODE
+      webserver.on("/", handleRoot);
+      webserver.onNotFound(handleRoot);
+      webserver.begin();
+      #endif
+
+      Serial.println("WiFi connected");
     }
     else
     {
-      if (tcpconnected) {
-        Serial.println("TCP disconnected");
-      }
-      tcpconnected = false;
+      wificonnected = false;
     }
   }
-  else {
-    if (tcpavailable) {
-      Serial.println("TCP unavailable");
-    }
-    tcpavailable = false;
+
+  if (packet_didRx == false)
+  {
+    packet_hasContinuous = 0;
   }
-#endif
 
 #ifdef ENABLE_KEYBOARD_MODE
   while (Serial.available() > 0) {
     char c = Serial.read();
+    if (c == 'p') {
+      HexbugArmy.printStats();
+      continue;
+    }
     packet_cnt++;
     HexbugArmy.handleKey(c);
   }
@@ -162,10 +234,17 @@ void loop()
     packet_canPrint = true;
     if (packet_cntPrev != packet_cnt) {
       packet_cntPrev = packet_cnt;
-      Serial.print("pktcnt: ");
-      Serial.println(packet_cnt, DEC);
+      //Serial.print("pktcnt: ");
+      //Serial.println(packet_cnt, DEC);
     }
+    if (packet_hasContinuous > 0) {
+      //Serial.println("busy");
+      packet_canPrint = false;
+    }
+    looptmr = millis();
+    Serial.println((looptmr - now), DEC);
   }
+  packet_canPrint = false;
 }
 
 void handleRoot()

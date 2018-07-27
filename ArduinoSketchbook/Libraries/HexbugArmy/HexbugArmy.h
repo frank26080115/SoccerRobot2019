@@ -8,8 +8,8 @@
 
 typedef struct
 {
-	int x;
-	int y;
+	int8_t x;
+	int8_t y;
 	bool btn;
 }
 hexbug_cmd_t;
@@ -43,8 +43,11 @@ class cHexbugArmy
 		void begin(uint8_t pin, uint8_t bugs);
 		void command(uint8_t idx, hexbug_cmd_t* cmd);
 		void sendIr();
+		void sendIrNext();
 		void setBugId(uint8_t idx, uint8_t id);
 		bool handleKey(char);
+		bool handleKey(char c, int8_t spd);
+		void printStats();
 	private:
 		cHexbug* hexbug[4];
 		IRsend* irsend;
