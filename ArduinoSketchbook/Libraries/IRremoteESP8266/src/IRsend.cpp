@@ -549,7 +549,7 @@ void IRsend::send(uint16_t type, uint64_t data, uint16_t nbits) {
     case GICABLE: sendGICable(data, nbits); break;
 #endif
 #if SEND_HEXBUG
-    case HEXBUG: sendHexbug(data, nbits); break;
+    case HEXBUG: sendHexbug((uint64_t)data, (uint16_t)nbits, (uint16_t)HEXBUG_DEFAULT_GAP); break;
 #endif
   }
 }

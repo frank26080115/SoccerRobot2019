@@ -5,18 +5,21 @@
 
 #define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 #define MAX_HEXBUG_CNT 4
-#define MAX_CMD_OFF_CNT 5
+#define MAX_CMD_OFF_CNT 8
 #define DEADBAND 8
 #define DUTY_SLICE 4
 #define MAX_STICK 100
-#define CMD_TIMEOUT 1000
+#define CMD_TIMEOUT 290
 
-#define ID_SHIFT          0
-#define BTNSHIFT_LEFT     7
-#define BTNSHIFT_RIGHT    7
+#define BTNSHIFT_LEFT     6
+#define BTNSHIFT_RIGHT    5
 #define BTNSHIFT_UP       7
-#define BTNSHIFT_DOWN     7
-#define BTNSHIFT_TRIGGER  7
+#define BTNSHIFT_DOWN     4
+#define BTNSHIFT_TRIGGER  3
+
+static uint32_t totalMoveCommands = 0;
+static uint32_t totalZeroCommands = 0;
+static uint32_t totalOffCommands = 0;
 
 void cHexbugArmy::begin()
 {
@@ -28,6 +31,7 @@ void cHexbugArmy::begin(uint8_t pin, uint8_t bugs)
 	int i;
 
 	irsend = new IRsend(pin);
+	irsend->begin();
 
 	this->bugCnt = bugs;
 	if (this->bugCnt < 1) {
@@ -63,6 +67,50 @@ void cHexbugArmy::sendIr()
 	}
 }
 
+void cHexbugArmy::sendIrNext()
+{
+	static uint8_t idx = 0;
+
+	this->hexbug[idx]->sendIr();
+
+	idx++;
+	if (idx >= this->bugCnt) {
+		idx = 0;
+	}
+}
+
+uint8_t cHexbug::calcIdOn()
+{
+	switch (this->id)
+	{
+		case 0:
+			return 0x07;
+		case 1:
+			return 0x01;
+		case 2:
+			return 0x04;
+		case 3:
+			return 0x02;
+	}
+	return 0;
+}
+
+uint8_t cHexbug::calcIdOff()
+{
+	switch (this->id)
+	{
+		case 0:
+			return 0x03;
+		case 1:
+			return 0x05;
+		case 2:
+			return 0x00;
+		case 3:
+			return 0x06;
+	}
+	return 0;
+}
+
 void cHexbug::sendIr()
 {
 	uint32_t now = millis();
@@ -82,18 +130,37 @@ void cHexbug::sendIr()
 		}
 		this->cmdOffCnt++;
 		sendIrOff();
+		/*
+		if (this->cmdOffCnt > 5) {
+			sendIrOff();
+		}
+		else {
+			this->irsend->sendHexbug(calcIdOn(), 8, 0);
+			totalZeroCommands++;
+		}
+		//*/
+		/*
+		if ((this->cmdOffCnt & 1) == 0) {
+			this->irsend->sendHexbug(calcIdOn(), 8, 0);
+		}
+		else {
+			sendIrOff();
+		}
+		*/
 		return;
 	}
 
 	this->cmdOffCnt = 0;
 
-	this->sendCnt++;
-	if (this->sendCnt > DUTY_SLICE) {
-		this->sendCnt = 0;
-	}
-
 	int absX = cmdX > 0 ? cmdX : -cmdX;
 	int absY = cmdY > 0 ? cmdY : -cmdY;
+
+	#ifdef ENABLE_PULSED_SPEED
+
+	this->sendCnt++;
+	if (this->sendCnt >= DUTY_SLICE) {
+		this->sendCnt = 0;
+	}
 
 	int j = 0, k = 0;
 
@@ -118,33 +185,68 @@ void cHexbug::sendIr()
 	{
 		code |= (1 << (cmdX < 0 ? BTNSHIFT_LEFT : BTNSHIFT_RIGHT));
 	}
-	else if (k >= sendCnt)
+
+	if (k >= sendCnt)
 	{
 		code |= (1 << (cmdY < 0 ? BTNSHIFT_DOWN : BTNSHIFT_UP));
 	}
+
+	#else
+	if (absX >= DEADBAND) {
+		code |= (1 << (cmdX < 0 ? BTNSHIFT_LEFT : BTNSHIFT_RIGHT));
+	}
+
+	if (absY >= DEADBAND) {
+		code |= (1 << (cmdY < 0 ? BTNSHIFT_DOWN : BTNSHIFT_UP));
+	}
+	#endif
 
 	if (cmdBtn) {
 		code |= (1 << BTNSHIFT_TRIGGER);
 	}
 
-	if (code == 0) {
+	if (code != 0) {
+		totalMoveCommands++;
+	}
+	else {
+		//totalZeroCommands++;
 		sendIrOff();
-		return;
 	}
 
-	code |= id;
+	code |= calcIdOn();
 
-	this->irsend->sendHexbug(code, 8, 0);
+	uint16_t gap = HEXBUG_DEFAULT_GAP;
+
+	#ifdef ENABLE_PULSED_SPEED
+	if (absX >= DEADBAND && absY < DEADBAND) {
+		if (absX < (MAX_STICK - DUTY_CHUNK)) {
+			gap = 6000;
+		}
+	}
+	else if (absY >= DEADBAND && absX < DEADBAND) {
+		if (absY < (MAX_STICK - DUTY_CHUNK)) {
+			gap = 6000;
+		}
+	}
+	else if (absY >= DEADBAND && absX >= DEADBAND) {
+		if (absX < (MAX_STICK - DUTY_CHUNK) || absY < (MAX_STICK - DUTY_CHUNK)) {
+			gap = 6000;
+		}
+	}
+	#endif
+
+	this->irsend->sendHexbug(code, 8, 0, gap);
 }
 
 void cHexbug::sendIrOff()
 {
-	uint32_t code = !id;
+	uint32_t code = calcIdOn();
 	code &= (MAX_HEXBUG_CNT * 2) - 1;
-	this->irsend->sendHexbug(code, 8, 0);
+	totalOffCommands++;
+	this->irsend->sendHexbug(calcIdOff(), 8, 0, HEXBUG_DEFAULT_GAP);
 }
 
-void cHexbug::command(int x, int y, bool btn)
+void cHexbug::command(int8_t x, int8_t y, bool btn)
 {
 	this->cmdX = x;
 	this->cmdY = y;
@@ -174,6 +276,39 @@ void cHexbugArmy::setBugId(uint8_t idx, uint8_t id)
 
 bool cHexbugArmy::handleKey(char c)
 {
+	static int8_t spd = MAX_STICK;
+	if (c == 'e') {
+		spd = DEADBAND + 1;
+		Serial.print("Speed set ");
+		Serial.println(spd, DEC);
+	}
+	else if (c == 'u') {
+		spd = MAX_STICK;
+		Serial.print("Speed set ");
+		Serial.println(spd, DEC);
+	}
+	else if (c == 'y') {
+		spd = MAX_STICK / 4;
+		spd *= 3;
+		Serial.print("Speed set ");
+		Serial.println(spd, DEC);
+	}
+	else if (c == 't') {
+		spd = MAX_STICK / 4;
+		spd *= 2;
+		Serial.print("Speed set ");
+		Serial.println(spd, DEC);
+	}
+	else if (c == 'r') {
+		spd = MAX_STICK / 4;
+		Serial.print("Speed set ");
+		Serial.println(spd, DEC);
+	}
+	return handleKey(c, spd);
+}
+
+bool cHexbugArmy::handleKey(char c, int8_t spd)
+{
 	hexbug_cmd_t cmd;
 	cmd.x = 0; cmd.y = 0; cmd.btn = false;
 	uint8_t id;
@@ -200,7 +335,7 @@ bool cHexbugArmy::handleKey(char c)
 		case 'W':
 		case 'i':
 		case 'I':
-			cmd.y = MAX_STICK;
+			cmd.y = spd;
 			ret = true;
 			break;
 		case '2':
@@ -208,7 +343,7 @@ bool cHexbugArmy::handleKey(char c)
 		case 'S':
 		case 'k':
 		case 'K':
-			cmd.y = -MAX_STICK;
+			cmd.y = -spd;
 			ret = true;
 			break;
 		case '6':
@@ -216,7 +351,7 @@ bool cHexbugArmy::handleKey(char c)
 		case 'D':
 		case 'l':
 		case 'L':
-			cmd.x = MAX_STICK;
+			cmd.x = spd;
 			ret = true;
 			break;
 		case '4':
@@ -224,7 +359,7 @@ bool cHexbugArmy::handleKey(char c)
 		case 'A':
 		case 'j':
 		case 'J':
-			cmd.x = -MAX_STICK;
+			cmd.x = -spd;
 			ret = true;
 			break;
 		case '5':
@@ -236,26 +371,29 @@ bool cHexbugArmy::handleKey(char c)
 			ret = true;
 			break;
 		case '7':
-			cmd.x = -MAX_STICK;
-			cmd.y =  MAX_STICK;
+			cmd.x = -spd;
+			cmd.y =  spd;
 			ret = true;
 			break;
 		case '9':
-			cmd.x =  MAX_STICK;
-			cmd.y =  MAX_STICK;
+			cmd.x =  spd;
+			cmd.y =  spd;
 			ret = true;
 			break;
 		case '1':
-			cmd.x = -MAX_STICK;
-			cmd.y = -MAX_STICK;
+			cmd.x = -spd;
+			cmd.y = -spd;
 			ret = true;
 			break;
 		case '3':
-			cmd.x =  MAX_STICK;
-			cmd.y = -MAX_STICK;
+			cmd.x =  spd;
+			cmd.y = -spd;
 			ret = true;
 			break;
 	}
+
+	//cmd.x = MAX_STICK;
+	//cmd.y = MAX_STICK;
 
 	if (ret)
 	{
@@ -271,7 +409,13 @@ bool cHexbugArmy::handleKey(char c)
 		{
 			this->command(id, &cmd);
 		}
+		//Serial.print(id, DEC); Serial.print(" "); Serial.print(cmd.x, DEC); Serial.print(" "); Serial.print(cmd.y, DEC); Serial.print(" "); Serial.println(cmd.btn, DEC);
 	}
 
 	return ret;
+}
+
+void cHexbugArmy::printStats()
+{
+	Serial.print("IR stats "); Serial.print(totalMoveCommands, DEC); Serial.print(" "); Serial.print(totalZeroCommands, DEC); Serial.print(" "); Serial.println(totalOffCommands, DEC);
 }
