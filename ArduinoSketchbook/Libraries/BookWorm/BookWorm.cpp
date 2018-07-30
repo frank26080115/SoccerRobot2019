@@ -59,6 +59,12 @@ parameters:	none
 */
 void cBookWorm::setLedOn()
 {
+	#ifdef HWBOARD_ESP12
+	pinMode(pinLed1, OUTPUT);
+	pinMode(pinLed2, OUTPUT);
+	digitalWrite(pinLed1, pinLed1OnState);
+	digitalWrite(pinLed2, pinLed2OnState);
+	#else
 	#ifdef pinLed
 		#ifdef ENABLE_WEAPON
 			#if pinServoWeapon == pinLed
@@ -84,6 +90,7 @@ void cBookWorm::setLedOn()
 	pinMode(pinLed, OUTPUT);
 	digitalWrite(pinLed, pinLedOnState);
 	#endif
+	#endif
 }
 
 /*
@@ -94,6 +101,10 @@ parameters:	none
 */
 void cBookWorm::setLedOff()
 {
+	#ifdef HWBOARD_ESP12
+	digitalWrite(pinLed1, pinLed1OffState);
+	digitalWrite(pinLed2, pinLed2OffState);
+	#else
 	#ifdef pinLed
 		#ifdef ENABLE_WEAPON
 			#if pinServoWeapon == pinLed
@@ -117,6 +128,7 @@ void cBookWorm::setLedOff()
 			return;
 		#endif
 	digitalWrite(pinLed, pinLedOffState);
+	#endif
 	#endif
 }
 

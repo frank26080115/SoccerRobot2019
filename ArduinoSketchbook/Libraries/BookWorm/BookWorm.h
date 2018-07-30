@@ -17,18 +17,7 @@ extern "C" {
   #include "user_interface.h"
 }
 
-// pin definitions that can be utilized by other libraries
-#define pinServoLeft         2
-#define pinServoRight        0
-
-#ifdef ENABLE_WEAPON
-#define pinServoWeapon       2
-#define pinServoLeftAlt      1
-#endif
-
-#define pinLed LED_BUILTIN // WARNING: ESP-01, usage of LED will disable serial port
-#define pinLedOnState LOW
-#define pinLedOffState HIGH
+#include "hwboards.h"
 
 #define USE_CUSTOM_SERVO_LIB
 #ifdef USE_CUSTOM_SERVO_LIB
