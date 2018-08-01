@@ -8,34 +8,34 @@
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
-<layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
-<layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
-<layer number="5" name="Route5" color="4" fill="4" visible="no" active="no"/>
-<layer number="6" name="Route6" color="1" fill="8" visible="no" active="no"/>
-<layer number="7" name="Route7" color="4" fill="8" visible="no" active="no"/>
-<layer number="8" name="Route8" color="1" fill="2" visible="no" active="no"/>
-<layer number="9" name="Route9" color="4" fill="2" visible="no" active="no"/>
-<layer number="10" name="Route10" color="1" fill="7" visible="no" active="no"/>
-<layer number="11" name="Route11" color="4" fill="7" visible="no" active="no"/>
-<layer number="12" name="Route12" color="1" fill="5" visible="no" active="no"/>
-<layer number="13" name="Route13" color="4" fill="5" visible="no" active="no"/>
-<layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="yes" active="no"/>
+<layer number="3" name="Route3" color="4" fill="3" visible="yes" active="no"/>
+<layer number="4" name="Route4" color="1" fill="4" visible="yes" active="no"/>
+<layer number="5" name="Route5" color="4" fill="4" visible="yes" active="no"/>
+<layer number="6" name="Route6" color="1" fill="8" visible="yes" active="no"/>
+<layer number="7" name="Route7" color="4" fill="8" visible="yes" active="no"/>
+<layer number="8" name="Route8" color="1" fill="2" visible="yes" active="no"/>
+<layer number="9" name="Route9" color="4" fill="2" visible="yes" active="no"/>
+<layer number="10" name="Route10" color="1" fill="7" visible="yes" active="no"/>
+<layer number="11" name="Route11" color="4" fill="7" visible="yes" active="no"/>
+<layer number="12" name="Route12" color="1" fill="5" visible="yes" active="no"/>
+<layer number="13" name="Route13" color="4" fill="5" visible="yes" active="no"/>
+<layer number="14" name="Route14" color="1" fill="6" visible="yes" active="no"/>
+<layer number="15" name="Route15" color="4" fill="6" visible="yes" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -44,8 +44,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -53,16 +53,16 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
-<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
-<layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="yes" active="no"/>
+<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="yes" active="no"/>
+<layer number="56" name="wert" color="7" fill="1" visible="yes" active="no"/>
 <layer number="88" name="SimResults" color="9" fill="1" visible="no" active="yes"/>
 <layer number="89" name="SimProbes" color="9" fill="1" visible="no" active="yes"/>
 <layer number="90" name="Modules" color="5" fill="1" visible="no" active="yes"/>
@@ -119,7 +119,7 @@
 </layers>
 <schematic xreflabel="%F%N/%S.%C%R" xrefpart="/%S.%C%R">
 <libraries>
-<library name="dirtcheaprx">
+<library name="dirtcheaprx_nano">
 <packages>
 <package name="ESP12">
 <description>ESP8266 Module 12</description>
@@ -225,6 +225,10 @@
 <smd name="GND" x="7.9" y="-8.4" dx="3" dy="1.2" layer="1"/>
 <rectangle x1="-4" y1="-2" x2="2" y2="4" layer="51"/>
 <text x="-6" y="4.5" size="1.27" layer="21" ratio="10">ESP-12E</text>
+<wire x1="8.5" y1="-7.7" x2="8.5" y2="-7.1" width="0" layer="41"/>
+<wire x1="8.5" y1="-9.1" x2="8.5" y2="-10" width="0" layer="41"/>
+<wire x1="6.4" y1="-5.7" x2="6.4" y2="4.9" width="0" layer="41"/>
+<wire x1="-6.4" y1="-7.7" x2="-6.4" y2="4.9" width="0" layer="41"/>
 </package>
 <package name="1206">
 <wire x1="-2.473" y1="0.983" x2="2.473" y2="0.983" width="0.0508" layer="39"/>
@@ -485,13 +489,16 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <wire x1="0" y1="-1.651" x2="1.651" y2="0" width="0.1524" layer="51" curve="90" cap="flat"/>
 <wire x1="-2.159" y1="0" x2="0" y2="2.159" width="0.1524" layer="51" curve="-90" cap="flat"/>
 <wire x1="0" y1="-2.159" x2="2.159" y2="0" width="0.1524" layer="51" curve="90" cap="flat"/>
-<pad name="A" x="-1.27" y="0" drill="1" diameter="1.8796"/>
-<pad name="K" x="1.27" y="0" drill="1" diameter="1.8796" shape="square"/>
+<pad name="A" x="-1.27" y="0" drill="1" diameter="1.8796" stop="no"/>
+<pad name="K" x="1.27" y="0" drill="1" diameter="1.8796" shape="square" stop="no"/>
 <text x="3.175" y="0.5334" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="3.2004" y="-1.8034" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
-<wire x1="-3.175" y1="0" x2="1.905" y2="2.54" width="0.3048" layer="21" curve="-126.869898"/>
-<wire x1="-3.175" y1="0" x2="1.905" y2="-2.54" width="0.3048" layer="21" curve="126.869898"/>
-<wire x1="1.905" y1="2.54" x2="1.905" y2="-2.54" width="0.3048" layer="21"/>
+<smd name="P$1" x="-1.27" y="-1.27" dx="2.54" dy="1.778" layer="1" rot="R90" cream="no"/>
+<smd name="P$2" x="1.27" y="-1.27" dx="2.54" dy="1.778" layer="1" rot="R90" cream="no"/>
+<circle x="-1.27" y="0" radius="1.016" width="0" layer="22"/>
+<rectangle x1="0.254" y1="-1.016" x2="2.286" y2="1.016" layer="22"/>
+<rectangle x1="0.254" y1="-1.016" x2="2.286" y2="1.016" layer="29"/>
+<circle x="-1.27" y="0" radius="1.016" width="0" layer="29"/>
 </package>
 <package name="LED3MM">
 <description>&lt;B&gt;LED&lt;/B&gt;&lt;p&gt;
@@ -956,11 +963,14 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 </polygon>
 </package>
 <package name="BATT-WIRE-CONN">
-<pad name="NEG" x="0" y="-1.27" drill="1" diameter="1.9304" shape="square"/>
-<pad name="POS" x="0" y="1.27" drill="1" diameter="1.9304"/>
-<text x="0" y="-2.2225" size="1.27" layer="22" rot="MR270" align="center-left">NEG</text>
-<text x="-1.27" y="1.27" size="1.27" layer="22" rot="MR0" align="center-left">POS</text>
-<text x="-1.5875" y="0.3175" size="1.27" layer="22" rot="MR270">BATT</text>
+<pad name="NEG" x="0" y="-1.27" drill="1" diameter="1.9304" shape="square" stop="no"/>
+<pad name="POS" x="0" y="1.27" drill="1" diameter="1.9304" stop="no"/>
+<smd name="P$1" x="-1.27" y="1.27" dx="2.54" dy="1.778" layer="1" cream="no"/>
+<smd name="P$2" x="-1.27" y="-1.27" dx="2.54" dy="1.778" layer="1" cream="no"/>
+<rectangle x1="-1.0795" y1="-2.3495" x2="1.0795" y2="-0.1905" layer="29"/>
+<circle x="0" y="1.27" radius="1.0795" width="0" layer="29"/>
+<circle x="0" y="1.27" radius="1.0795" width="0" layer="22"/>
+<rectangle x1="-1.0795" y1="-2.3495" x2="1.0795" y2="-0.1905" layer="22"/>
 </package>
 <package name="SERVO">
 <pad name="GND" x="-2.54" y="0.0635" drill="1" diameter="1.778" shape="octagon"/>
@@ -1404,11 +1414,12 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <package name="P1-13">
 <description>&lt;b&gt;TEST PAD&lt;/b&gt;</description>
 <circle x="0" y="0" radius="0.762" width="0.1524" layer="51"/>
-<pad name="TP" x="0" y="0" drill="1" shape="octagon" stop="no" thermals="no"/>
+<pad name="TP" x="0" y="0" drill="0.9" shape="octagon" stop="no" thermals="no"/>
 <text x="-1.016" y="1.27" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="-1.27" y="-2.54" size="1" layer="37">&gt;TP_SIGNAL_NAME</text>
 <rectangle x1="-0.3302" y1="-0.3302" x2="0.3302" y2="0.3302" layer="51"/>
 <circle x="0" y="0" radius="0.898025" width="0" layer="30"/>
+<circle x="0" y="0" radius="0.8544" width="0" layer="22"/>
 </package>
 <package name="P1-13Y">
 <description>&lt;b&gt;TEST PAD&lt;/b&gt;</description>
@@ -1665,6 +1676,15 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <text x="-1.016" y="-1.143" size="0.0254" layer="27">&gt;VALUE</text>
 <text x="0" y="-2.54" size="1" layer="37">&gt;TP_SIGNAL_NAME</text>
 </package>
+<package name="SERVO-EDGE">
+<smd name="PWR" x="0" y="1.27" dx="2.54" dy="1.778" layer="1" rot="R90" cream="no"/>
+<smd name="GND" x="2.3495" y="1.27" dx="2.54" dy="1.651" layer="1" rot="R90" cream="no"/>
+<smd name="SIG" x="-2.54" y="1.27" dx="2.54" dy="1.778" layer="1" rot="R90" cream="no"/>
+<wire x1="-3.81" y1="2.54" x2="-3.81" y2="0" width="0.254" layer="21"/>
+<wire x1="-3.81" y1="0" x2="3.81" y2="0" width="0.254" layer="21"/>
+<wire x1="3.81" y1="0" x2="3.81" y2="2.54" width="0.254" layer="21"/>
+<wire x1="-1.5875" y1="2.54" x2="-0.9525" y2="2.54" width="0" layer="41"/>
+</package>
 <package name="ESP12S-SMD">
 <description>ESP8266 Module 12 SMD pads</description>
 <wire x1="8" y1="14" x2="8" y2="6.7" width="0.127" layer="48"/>
@@ -1707,6 +1727,10 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <smd name="GND" x="8.4" y="-8.4" dx="2" dy="1.2" layer="1"/>
 <rectangle x1="-4" y1="-2" x2="2" y2="4" layer="51"/>
 <text x="-6" y="4.5" size="1.27" layer="21" ratio="10">ESP-12S</text>
+<wire x1="-7.4" y1="-7.7" x2="-7.4" y2="4.9" width="0" layer="41"/>
+<wire x1="7.4" y1="-9.1" x2="7.4" y2="-10" width="0" layer="41"/>
+<wire x1="8.9" y1="-7.7" x2="8.9" y2="-7.1" width="0" layer="41"/>
+<wire x1="7.4" y1="-5.7" x2="7.4" y2="4.9" width="0" layer="41"/>
 </package>
 </packages>
 <symbols>
@@ -2280,6 +2304,16 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.</description>
 <connect gate="G$1" pin="GND" pad="1"/>
 <connect gate="G$1" pin="PWR" pad="2"/>
 <connect gate="G$1" pin="SIG" pad="3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-SMD-EDGE-1" package="SERVO-EDGE">
+<connects>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="PWR" pad="PWR"/>
+<connect gate="G$1" pin="SIG" pad="SIG"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -3020,43 +3054,47 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 </class>
 </classes>
 <parts>
-<part name="U1" library="dirtcheaprx" deviceset="ESP12" device="SMD"/>
-<part name="R1" library="dirtcheaprx" deviceset="RESISTOR" device="0603-RES" value="7K5Ω"/>
-<part name="R2" library="dirtcheaprx" deviceset="RESISTOR" device="0603-RES" value="1KΩ"/>
-<part name="R3" library="dirtcheaprx" deviceset="RESISTOR" device="0603-RES" value="470Ω"/>
-<part name="LED1" library="dirtcheaprx" deviceset="LED" device="5MM"/>
-<part name="BAT1" library="dirtcheaprx" deviceset="BATTERY" device="-WIRE-CONN"/>
-<part name="SUPPLY1" library="dirtcheaprx" deviceset="+6V" device=""/>
-<part name="SERVO1" library="dirtcheaprx" deviceset="SERVO" device="-1"/>
-<part name="SERVO2" library="dirtcheaprx" deviceset="SERVO" device="-1"/>
-<part name="SERVO3" library="dirtcheaprx" deviceset="SERVO" device="-1"/>
-<part name="IC1" library="dirtcheaprx" deviceset="V_REG_78XX" device="-SOT" value="MCP1700"/>
-<part name="P+1" library="dirtcheaprx" deviceset="3.3V" device=""/>
-<part name="C1" library="dirtcheaprx" deviceset="CAP" device="0603-CAP" value="100uF"/>
-<part name="SUPPLY2" library="dirtcheaprx" deviceset="+6V" device=""/>
-<part name="C2" library="dirtcheaprx" deviceset="CAP" device="0603-CAP" value="1u"/>
-<part name="GND1" library="dirtcheaprx" deviceset="GND" device=""/>
-<part name="GND2" library="dirtcheaprx" deviceset="GND" device=""/>
-<part name="P+2" library="dirtcheaprx" deviceset="3.3V" device=""/>
-<part name="GND3" library="dirtcheaprx" deviceset="GND" device=""/>
-<part name="SJ1" library="dirtcheaprx" deviceset="SOLDERJUMPER" device="NO" value=""/>
-<part name="SJ2" library="dirtcheaprx" deviceset="SOLDERJUMPER" device="NO" value=""/>
-<part name="SJ3" library="dirtcheaprx" deviceset="SOLDERJUMPER" device="NO" value=""/>
-<part name="GND4" library="dirtcheaprx" deviceset="GND" device=""/>
-<part name="GND5" library="dirtcheaprx" deviceset="GND" device=""/>
-<part name="GND6" library="dirtcheaprx" deviceset="GND" device=""/>
-<part name="GND7" library="dirtcheaprx" deviceset="GND" device=""/>
-<part name="SUPPLY3" library="dirtcheaprx" deviceset="+6V" device=""/>
-<part name="TP1" library="dirtcheaprx" deviceset="TP" device="PAD1-13"/>
-<part name="TP2" library="dirtcheaprx" deviceset="TP" device="PAD1-13"/>
-<part name="TP3" library="dirtcheaprx" deviceset="TP" device="PAD1-13"/>
-<part name="TP4" library="dirtcheaprx" deviceset="TP" device="PAD1-13"/>
-<part name="GND8" library="dirtcheaprx" deviceset="GND" device=""/>
-<part name="TP5" library="dirtcheaprx" deviceset="TP" device="PAD1-13"/>
-<part name="P+3" library="dirtcheaprx" deviceset="3.3V" device=""/>
-<part name="SUPPLY4" library="dirtcheaprx" deviceset="+6V" device=""/>
-<part name="SUPPLY5" library="dirtcheaprx" deviceset="+6V" device=""/>
-<part name="SUPPLY6" library="dirtcheaprx" deviceset="+6V" device=""/>
+<part name="U1" library="dirtcheaprx_nano" deviceset="ESP12" device="SMD"/>
+<part name="R1" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="7K5Ω"/>
+<part name="R2" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="1KΩ"/>
+<part name="R3" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="470Ω"/>
+<part name="LED" library="dirtcheaprx_nano" deviceset="LED" device="5MM"/>
+<part name="BAT1" library="dirtcheaprx_nano" deviceset="BATTERY" device="-WIRE-CONN"/>
+<part name="SUPPLY1" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
+<part name="SERVO1" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
+<part name="SERVO2" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
+<part name="SERVO3" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
+<part name="IC1" library="dirtcheaprx_nano" deviceset="V_REG_78XX" device="-SOT" value="MCP1700"/>
+<part name="P+1" library="dirtcheaprx_nano" deviceset="3.3V" device=""/>
+<part name="C1" library="dirtcheaprx_nano" deviceset="CAP" device="0603-CAP" value="100uF"/>
+<part name="SUPPLY2" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
+<part name="C2" library="dirtcheaprx_nano" deviceset="CAP" device="0603-CAP" value="1u"/>
+<part name="GND1" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="GND2" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="P+2" library="dirtcheaprx_nano" deviceset="3.3V" device=""/>
+<part name="GND3" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="SJ1" library="dirtcheaprx_nano" deviceset="SOLDERJUMPER" device="NO" value=""/>
+<part name="SJ2" library="dirtcheaprx_nano" deviceset="SOLDERJUMPER" device="NO" value=""/>
+<part name="SJ3" library="dirtcheaprx_nano" deviceset="SOLDERJUMPER" device="NO" value=""/>
+<part name="GND4" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="GND5" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="GND6" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="GND7" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="SUPPLY3" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
+<part name="TP1" library="dirtcheaprx_nano" deviceset="TP" device="PAD1-13"/>
+<part name="TP2" library="dirtcheaprx_nano" deviceset="TP" device="PAD1-13"/>
+<part name="TP3" library="dirtcheaprx_nano" deviceset="TP" device="PAD1-13"/>
+<part name="TP4" library="dirtcheaprx_nano" deviceset="TP" device="PAD1-13"/>
+<part name="GND8" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="TP5" library="dirtcheaprx_nano" deviceset="TP" device="PAD1-13"/>
+<part name="P+3" library="dirtcheaprx_nano" deviceset="3.3V" device=""/>
+<part name="SUPPLY4" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
+<part name="SUPPLY5" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
+<part name="SUPPLY6" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
+<part name="C3" library="dirtcheaprx_nano" deviceset="CAP" device="0603-CAP" value="100uF"/>
+<part name="R4" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="7K5Ω"/>
+<part name="P+4" library="dirtcheaprx_nano" deviceset="3.3V" device=""/>
+<part name="GND9" library="dirtcheaprx_nano" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -3071,7 +3109,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <instance part="R1" gate="G$1" x="58.42" y="0" rot="R90"/>
 <instance part="R2" gate="G$1" x="58.42" y="-15.24" rot="R90"/>
 <instance part="R3" gate="G$1" x="73.66" y="30.48"/>
-<instance part="LED1" gate="G$1" x="86.36" y="30.48" rot="R90"/>
+<instance part="LED" gate="G$1" x="86.36" y="30.48" rot="R90"/>
 <instance part="BAT1" gate="G$1" x="0" y="35.56"/>
 <instance part="SUPPLY1" gate="G$1" x="-10.16" y="40.64"/>
 <instance part="SERVO1" gate="G$1" x="137.16" y="-25.4" rot="R90"/>
@@ -3097,7 +3135,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <instance part="GND6" gate="1" x="119.38" y="-5.08"/>
 <instance part="GND7" gate="1" x="119.38" y="20.32"/>
 <instance part="SUPPLY3" gate="G$1" x="58.42" y="10.16"/>
-<instance part="TP1" gate="G$1" x="-15.24" y="5.08"/>
+<instance part="TP1" gate="G$1" x="-15.24" y="27.94"/>
 <instance part="TP2" gate="G$1" x="22.86" y="2.54"/>
 <instance part="TP3" gate="G$1" x="27.94" y="2.54"/>
 <instance part="TP4" gate="G$1" x="40.64" y="2.54"/>
@@ -3107,6 +3145,10 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <instance part="SUPPLY4" gate="G$1" x="106.68" y="-20.32" rot="R90"/>
 <instance part="SUPPLY5" gate="G$1" x="106.68" y="5.08" rot="R90"/>
 <instance part="SUPPLY6" gate="G$1" x="106.68" y="30.48" rot="R90"/>
+<instance part="C3" gate="G$1" x="-20.32" y="5.08" rot="R90"/>
+<instance part="R4" gate="G$1" x="-22.86" y="20.32" rot="R180"/>
+<instance part="P+4" gate="G$1" x="-30.48" y="22.86"/>
+<instance part="GND9" gate="1" x="-30.48" y="0"/>
 </instances>
 <busses>
 </busses>
@@ -3114,7 +3156,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <net name="N$1" class="0">
 <segment>
 <pinref part="R3" gate="G$1" pin="2"/>
-<pinref part="LED1" gate="G$1" pin="A"/>
+<pinref part="LED" gate="G$1" pin="A"/>
 <wire x1="83.82" y1="30.48" x2="78.74" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -3144,6 +3186,12 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <segment>
 <pinref part="TP5" gate="G$1" pin="TP"/>
 <pinref part="P+3" gate="G$1" pin="3.3V"/>
+</segment>
+<segment>
+<pinref part="R4" gate="G$1" pin="2"/>
+<pinref part="P+4" gate="G$1" pin="3.3V"/>
+<wire x1="-27.94" y1="20.32" x2="-30.48" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="-30.48" y1="20.32" x2="-30.48" y2="22.86" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="+6V" class="0">
@@ -3230,10 +3278,16 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <wire x1="119.38" y1="25.4" x2="119.38" y2="22.86" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="LED1" gate="G$1" pin="C"/>
+<pinref part="LED" gate="G$1" pin="C"/>
 <pinref part="GND8" gate="1" pin="GND"/>
 <wire x1="91.44" y1="30.48" x2="93.98" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="93.98" y1="30.48" x2="93.98" y2="27.94" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C3" gate="G$1" pin="1"/>
+<pinref part="GND9" gate="1" pin="GND"/>
+<wire x1="-25.4" y1="5.08" x2="-30.48" y2="5.08" width="0.1524" layer="91"/>
+<wire x1="-30.48" y1="5.08" x2="-30.48" y2="2.54" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="ADC" class="0">
@@ -3275,14 +3329,14 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 </net>
 <net name="SIG-RIGHT" class="0">
 <segment>
-<pinref part="SERVO1" gate="G$1" pin="SIG"/>
-<wire x1="121.92" y1="-15.24" x2="119.38" y2="-15.24" width="0.1524" layer="91"/>
-<label x="119.38" y="-15.24" size="1.27" layer="95" rot="R180" xref="yes"/>
-</segment>
-<segment>
 <pinref part="U1" gate="G$1" pin="GPIO15"/>
 <wire x1="20.32" y1="-17.78" x2="22.86" y2="-17.78" width="0.1524" layer="91"/>
 <label x="22.86" y="-17.78" size="1.27" layer="95" xref="yes"/>
+</segment>
+<segment>
+<pinref part="SERVO2" gate="G$1" pin="SIG"/>
+<wire x1="121.92" y1="10.16" x2="119.38" y2="10.16" width="0.1524" layer="91"/>
+<label x="119.38" y="10.16" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="N$8" class="0">
@@ -3290,7 +3344,15 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <pinref part="U1" gate="G$1" pin="RESET"/>
 <pinref part="TP1" gate="G$1" pin="TP"/>
 <wire x1="-12.7" y1="-2.54" x2="-15.24" y2="-2.54" width="0.1524" layer="91"/>
-<wire x1="-15.24" y1="-2.54" x2="-15.24" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="-2.54" x2="-15.24" y2="5.08" width="0.1524" layer="91"/>
+<pinref part="R4" gate="G$1" pin="1"/>
+<wire x1="-15.24" y1="5.08" x2="-15.24" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="20.32" x2="-15.24" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="-17.78" y1="20.32" x2="-15.24" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="C3" gate="G$1" pin="2"/>
+<wire x1="-17.78" y1="5.08" x2="-15.24" y2="5.08" width="0.1524" layer="91"/>
+<junction x="-15.24" y="20.32"/>
+<junction x="-15.24" y="5.08"/>
 </segment>
 </net>
 <net name="N$9" class="0">
@@ -3343,14 +3405,14 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 </net>
 <net name="SIG-WEAP" class="0">
 <segment>
-<pinref part="SERVO2" gate="G$1" pin="SIG"/>
-<wire x1="121.92" y1="10.16" x2="119.38" y2="10.16" width="0.1524" layer="91"/>
-<label x="119.38" y="10.16" size="1.27" layer="95" rot="R180" xref="yes"/>
-</segment>
-<segment>
 <pinref part="U1" gate="G$1" pin="GPIO5"/>
 <wire x1="20.32" y1="-10.16" x2="22.86" y2="-10.16" width="0.1524" layer="91"/>
 <label x="22.86" y="-10.16" size="1.27" layer="95" xref="yes"/>
+</segment>
+<segment>
+<pinref part="SERVO1" gate="G$1" pin="SIG"/>
+<wire x1="121.92" y1="-15.24" x2="119.38" y2="-15.24" width="0.1524" layer="91"/>
+<label x="119.38" y="-15.24" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 </nets>

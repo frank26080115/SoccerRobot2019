@@ -59,7 +59,7 @@ parameters:	none
 */
 void cBookWorm::setLedOn()
 {
-	#ifdef HWBOARD_ESP12
+	#if defined(HWBOARD_ESP12) || defined(HWBOARD_ESP12_NANO)
 	pinMode(pinLed1, OUTPUT);
 	pinMode(pinLed2, OUTPUT);
 	digitalWrite(pinLed1, pinLed1OnState);
@@ -101,7 +101,7 @@ parameters:	none
 */
 void cBookWorm::setLedOff()
 {
-	#ifdef HWBOARD_ESP12
+	#if defined(HWBOARD_ESP12) || defined(HWBOARD_ESP12_NANO)
 	digitalWrite(pinLed1, pinLed1OffState);
 	digitalWrite(pinLed2, pinLed2OffState);
 	#else
