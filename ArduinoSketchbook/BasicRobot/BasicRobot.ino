@@ -36,6 +36,9 @@ signed int speedY = 0;
 #ifdef ENABLE_WEAPON
 signed int speedWeap = 0;
 #endif
+#ifdef ENABLE_BATTERY_MONITOR
+uint16_t battLvl = 0;
+#endif
 
 void setup()
 {
@@ -188,5 +191,9 @@ void loop()
   else {
     BookWorm.setLedOff();
   }
+
+  #ifdef ENABLE_BATTERY_MONITOR
+  battLvl = BookWorm.readBatteryVoltageFiltered();
+  #endif
 }
 

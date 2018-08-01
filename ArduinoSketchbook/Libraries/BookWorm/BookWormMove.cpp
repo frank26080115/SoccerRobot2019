@@ -213,7 +213,7 @@ void cBookWorm::loadPinAssignments()
 	}
 	if (this->pinsHaveLoaded == false)
 	{
-		#ifndef #ifndef ALL_SAFE_DEBUG_MODE
+		#ifndef ALL_SAFE_DEBUG_MODE
 		pinMode(this->pinnumServoLeft, OUTPUT);
 		digitalWrite(this->pinnumServoLeft, LOW);
 		pinMode(this->pinnumServoRight, OUTPUT);

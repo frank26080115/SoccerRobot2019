@@ -27,6 +27,9 @@ void handleRoot()
   server.sendContent(BookWorm.SSID);
   if (BookWorm.nvm.advanced)
   {
+    #ifdef ENABLE_BATTERY_MONITOR
+    server.sendContent("<div id='batt' width='100%'>&nbsp;</div>");
+    #endif
     server.sendContent("<div id='topbar' width='100%'><table width='98%' border='1'>");
     #ifdef ENABLE_WEAPON
     server.sendContent(
@@ -218,6 +221,12 @@ void handleSetConfig() {
     else IF_HANDLE_CONFIG_ARG("weapposb",      setWeapPosB,     uint16_t)
     #endif
     else IF_HANDLE_CONFIG_ARG("lefthanded",   setLeftHanded,   bool)
+    #ifdef ENABLE_BATTERY_MONITOR
+    else IF_HANDLE_CONFIG_ARG("vdiv_r1",        setVdivR1,     uint32_t)
+    else IF_HANDLE_CONFIG_ARG("vdiv_r1",        setVdivR2,     uint32_t)
+    else IF_HANDLE_CONFIG_ARG("vdiv_filter",    setVdivFilter, uint16_t)
+    else IF_HANDLE_CONFIG_ARG("batt_warn_volt", setBatteryWarningVoltage, uint16_t)
+    #endif
     else if (argName.equalsIgnoreCase(String("ssid")))
     {
       String argVal = server.arg(i);
@@ -341,29 +350,43 @@ void serveConfigTable()
 
   // void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note)
   generateConfigItemTxt("SSID", "ssid", "text", BookWorm.SSID, (String("maxlength='") + String(BOOKWORM_SSID_SIZE) + String("'")).c_str(), "* change requires reboot");
+  server.sendContent("\n<tr><td colspan='3'>Driving Signal Config</td></tr>\n");
   generateConfigItemTxt("Drive no pulse on stop",     "servostoppednopulse", "number",  BookWorm.nvm.servoStoppedNoPulse ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
   generateConfigItemTxt("Drive pulse range",          "servomax", "number",      String(BookWorm.nvm.servoMax).c_str(), "min='0' max='1000' step='50'", "range = 1500 &plusmn; x microseconds");
   generateConfigItemTxt("Drive pulse deadzone left",  "deadzoneleft", "number",  String(BookWorm.nvm.servoDeadzoneLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateConfigItemTxt("Drive pulse deadzone right", "deadzoneright", "number", String(BookWorm.nvm.servoDeadzoneRight).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateConfigItemTxt("Drive pulse offset left",    "biasleft", "number",      String(BookWorm.nvm.servoBiasLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateConfigItemTxt("Drive pulse offset right",   "biasright", "number",     String(BookWorm.nvm.servoBiasRight).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateFlipDropdown(BookWorm.nvm.servoFlip);
+  server.sendContent("\n<tr><td colspan='3'>User Preferences</td></tr>\n");
   generateConfigItemTxt("Speed multiplier",           "speedgain", "number",     String(BookWorm.nvm.speedGain).c_str(), "min='100' max='10000' step='100'", "multiplier = x&#247;1000 , 1000 is normal");
   generateConfigItemTxt("Steering sensitivity",       "steeringsensitivity", "number", String(BookWorm.nvm.steeringSensitivity).c_str(), "min='100' max='10000' step='100'", "sensitivity = x&#247;1000 , 1000 is normal");
   generateConfigItemTxt("Steering balance",           "steeringbalance", "number",     String(BookWorm.nvm.steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
-  generateFlipDropdown(BookWorm.nvm.servoFlip);
   generateConfigItemTxt("Joystick size",              "stickradius", "number",   String(BookWorm.nvm.stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
-  generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable weapon controls and inverted drive, * change requires reboot");
+  server.sendContent("\n<tr><td colspan='3'>Advanced Features<br />weapon, left handed, inverted drive, battery, etc</td></tr>\n");
+  generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable, * change requires reboot");
   if (BookWorm.nvm.advanced)
   {
     generateConfigItemTxt("Left handed?",             "lefthanded", "number", BookWorm.nvm.leftHanded ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
     #ifdef ENABLE_WEAPON
+    server.sendContent("\n<tr><td colspan='3'>Weapon Settings</td></tr>\n");
     generateConfigItemTxt("Enabled weapon features?", "enableweapon", "number",       BookWorm.nvm.enableWeapon ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, * change requires reboot");
     generateConfigItemTxt("Weapon safe pulse",        "weappossafe", "number", String(BookWorm.nvm.weapPosSafe).c_str(), "min='0' max='1500' step='100'", "0 = no need (servo weapon), otherwise use pulse width to stop ESC");
     generateConfigItemTxt("Weapon position \"A\"",    "weapposa", "number",    String(BookWorm.nvm.weapPosA).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
     generateConfigItemTxt("Weapon position \"B\"",    "weapposb", "number",    String(BookWorm.nvm.weapPosB).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
     #endif
+    #ifdef ENABLE_BATTERY_MONITOR
+    server.sendContent("\n<tr><td colspan='3'>Battery Monitoring</td></tr>\n");
+    generateConfigItemTxt("Batt V-div R1",           "vdiv_r1", "number",        String(BookWorm.nvm.vdiv_r1).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;");
+    generateConfigItemTxt("Batt V-div R2",           "vdiv_r2", "number",        String(BookWorm.nvm.vdiv_r1).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;, use zero to disable battery reading");
+    generateConfigItemTxt("Batt read filter const.", "vdiv_filter", "number",    String(BookWorm.nvm.vdiv_filter).c_str(), "min='0' max='1000' step='50'", "out of 1000, use 1000 to disable filtering");
+    generateConfigItemTxt("Batt warning level",      "batt_warn_volt", "number", String(BookWorm.nvm.warning_voltage).c_str(), (String("min='0' max='") + String(BookWorm.calcMaxBattVoltage() + 100) + String("' step='100'")).c_str(), "in millivolts");
+    server.sendContent(String("\n<tr><td colspan='3'>Maximum readable voltage is: ") + String(BookWorm.calcMaxBattVoltage()) + String(" millivolts</td></tr>\n"));
+    #endif
+    
   }
 
+  server.sendContent("\n<tr><td colspan='3'>System Critical</td></tr>\n");
   generateConfigItemStart("Factory reset", "factoryreset");
   server.sendContent("click the button to reset all settings to factory default values</td>");
   server.sendContent("</td><td class='tbl_submit'><input type='hidden' id='factoryreset' name='factoryreset' value='true' /><input type='submit' class='btn_submit' value='Go!' height='100%' /></td></tr></form>\n");

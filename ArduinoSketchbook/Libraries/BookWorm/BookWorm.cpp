@@ -332,6 +332,12 @@ void cBookWorm::defaultValues()
 	this->nvm.enableWeapon = true;
 	#endif
 	this->nvm.leftHanded = false;
+	#ifdef ENABLE_BATTERY_MONITOR
+	this->nvm.vdiv_r1 = 7500;
+	this->nvm.vdiv_r2 = 0; // disable usage, 1000 in circuit
+	this->nvm.vdiv_filter = 50;
+	this->nvm.warning_voltage = 6000;
+	#endif
 	this->nvm.checksum = 0xABCD;
 	loadPinAssignments();
 	this->debugf("values set to defaults\r\n");

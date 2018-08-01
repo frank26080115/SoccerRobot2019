@@ -9,6 +9,7 @@
 #define BOOKWORM_BAUD 9600
 #define BOOKWORM_SSID_SIZE 31
 #define ALL_SAFE_DEBUG_MODE
+//#define ENABLE_BATTERY_MONITOR
 
 #include <Arduino.h>
 #include "WString.h"
@@ -50,6 +51,12 @@ typedef struct
 	#endif
 	bool leftHanded;   // makes the advanced controls show up on right side of the screen
 	bool advanced;     // this option enables/disables weapon controls and inverted controls
+	#ifdef ENABLE_BATTERY_MONITOR
+	uint32_t vdiv_r1;
+	uint32_t vdiv_r2;
+	uint16_t vdiv_filter;
+	uint16_t warning_voltage;
+	#endif
 	uint16_t checksum; // makes sure the contents isn't junk
 }
 bookworm_nvm_t;
@@ -100,6 +107,18 @@ public:
 	#endif
 	void setAdvanced(bool);
 
+	#ifdef ENABLE_BATTERY_MONITOR
+	double readBatteryVoltageRaw(void);
+	uint16_t readBatteryVoltageFiltered(void);
+	uint16_t readBatteryVoltageFilteredLast(void);
+	void setVdivR1(uint32_t);
+	void setVdivR2(uint32_t);
+	void setVdivFilter(uint16_t);
+	void setBatteryWarningVoltage(uint16_t);
+	bool isBatteryLowWarning(void);
+	uint16_t calcMaxBattVoltage(void);
+	#endif
+
 	void delayWhileFeeding(int);
 
 	// these are for making it easier to debug
@@ -125,6 +144,10 @@ private:
 	#endif
 	bool serialHasBegun;
 	bool pinsHaveLoaded;
+	#ifdef ENABLE_BATTERY_MONITOR
+	double batteryVoltageFiltered;
+	double adcToVoltage();
+	#endif
 };
 
 extern cBookWorm BookWorm; // declare user accessible instance
