@@ -524,8 +524,8 @@ setInterval(function(){
 		}
 		xhr.open('PUT', querystring);
 		xhr.onreadystatechange = function () {
-			if (http_request.readyState == 4) {
-				var jsonObj = JSON.parse(http_request.responseText);
+			if ((xhr.readyState == xhr.DONE || xhr.readyState === "complete") && xhr.status === 200) {
+				var jsonObj = JSON.parse(xhr.responseText);
 				handleJson(jsonObj);
 			}
 		}
