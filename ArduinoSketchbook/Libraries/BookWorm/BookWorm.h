@@ -133,6 +133,7 @@ public:
 	void saveNvm();
 	char* generateSsid(char*);
 	void setSsid(char*);
+	bool checkStartMode(void);
 	bookworm_nvm_t nvm;
 	bool robotFlip; // temporary flip, for inverted drive
 private:

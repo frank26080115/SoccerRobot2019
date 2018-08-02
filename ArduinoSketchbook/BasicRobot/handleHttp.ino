@@ -107,6 +107,8 @@ void handleRoot()
   );
 
   serverClientStop();
+
+  haveConnected();
 }
 
 /** Redirect to captive portal if we got a request for another domain. Return true in that case so the page handler do not try to handle the request again. */
@@ -198,6 +200,7 @@ void handleMove() {
   server.send(200, "application/json", response);
   #endif
   serverClientStop();
+  haveConnected();
 }
 
 void handleSetConfig() {
@@ -303,6 +306,8 @@ void handleSetConfig() {
     //ESP.restart();
     ESP.reset();
   }
+
+  haveConnected();
 }
 
 void handleConfig()
@@ -322,6 +327,8 @@ void handleConfig()
   server.sendContent("</body></html>");
 
   serverClientStop();
+
+  haveConnected();
 }
 
 void serveConfigHeader()

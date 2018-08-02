@@ -49,6 +49,14 @@ void cBookWorm::begin(void)
 		this->generateSsid(this->SSID);
 		this->setSsid(this->SSID);
 	}
+
+	if (checkStartMode() != false)
+	{
+		printf("Signal Pins Factory Reset");
+		this->defaultValues();
+		this->generateSsid(this->SSID);
+		this->setSsid(this->SSID);
+	}
 }
 
 /*
@@ -378,4 +386,84 @@ void cBookWorm::delayWhileFeeding(int x)
 		delay(1);
 		ESP.wdtFeed();
 	}
+}
+
+bool cBookWorm::checkStartMode(void)
+{
+	bool ret = true;
+	#if defined(HWBOARD_ESP12_NANO) || defined(HWBOARD_ESP12)
+	uint32_t t;
+	pinMode(pinServoLeft, OUTPUT);
+	pinMode(pinServoRight, INPUT_PULLUP);
+	digitalWrite(pinServoLeft, LOW);
+	t = micros();
+	while ((micros() - t) < 500) {
+		ESP.wdtFeed();
+	}
+	while ((micros() - t) < 1500) {
+		ESP.wdtFeed();
+		if (digitalRead(pinServoRight) != LOW) {
+			pinMode(pinServoLeft, INPUT);
+			pinMode(pinServoRight, INPUT);
+			return false;
+		}
+	}
+	pinMode(pinServoLeft, INPUT_PULLUP);
+	pinMode(pinServoRight, OUTPUT);
+	digitalWrite(pinServoRight, LOW);
+	t = micros();
+	while ((micros() - t) < 500) {
+		ESP.wdtFeed();
+	}
+	while ((micros() - t) < 1500) {
+		ESP.wdtFeed();
+		if (digitalRead(pinServoLeft) != LOW) {
+			pinMode(pinServoLeft, INPUT);
+			pinMode(pinServoRight, INPUT);
+			return false;
+		}
+	}
+	pinMode(pinServoLeft, OUTPUT);
+	pinMode(pinServoRight, INPUT);
+	digitalWrite(pinServoLeft, HIGH);
+	t = micros();
+	while ((micros() - t) < 500) {
+		ESP.wdtFeed();
+	}
+	while ((micros() - t) < 1500) {
+		ESP.wdtFeed();
+		if (digitalRead(pinServoRight) == LOW) {
+			ret = false;
+		}
+	}
+	digitalWrite(pinServoLeft, LOW);
+	if (ret == false) {
+		pinMode(pinServoLeft, INPUT);
+		pinMode(pinServoRight, INPUT);
+	}
+	pinMode(pinServoLeft, INPUT);
+	pinMode(pinServoRight, OUTPUT);
+	digitalWrite(pinServoRight, HIGH);
+	t = micros();
+	while ((micros() - t) < 500) {
+		ESP.wdtFeed();
+	}
+	while ((micros() - t) < 1500) {
+		ESP.wdtFeed();
+		if (digitalRead(pinServoLeft) != LOW) {
+			ret = false;
+		}
+	}
+	digitalWrite(pinServoRight, LOW);
+	if (ret == false) {
+		pinMode(pinServoLeft, INPUT);
+		pinMode(pinServoRight, INPUT);
+	}
+	else {
+		return true;
+	}
+	#else
+	return false;
+	#endif
+	return ret;
 }

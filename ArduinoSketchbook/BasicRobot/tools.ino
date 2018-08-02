@@ -140,4 +140,13 @@ void serveBasicHeader()
   server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
 }
 
+void haveConnected()
+{
+  #ifdef ENABLE_NOCONN_TIMEOUT_RESET
+  noconnTime = millis();
+  if (noconnTime <= 0) {
+    noconnTime = 1;
+  }
+  #endif
+}
 
