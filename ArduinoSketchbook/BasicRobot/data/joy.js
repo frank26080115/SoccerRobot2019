@@ -523,6 +523,12 @@ setInterval(function(){
 			querystring += "&weap=" + weapspeed;
 		}
 		xhr.open('PUT', querystring);
+		xhr.onreadystatechange = function () {
+			if (http_request.readyState == 4) {
+				var jsonObj = JSON.parse(http_request.responseText);
+				handleJson(jsonObj);
+			}
+		}
 		xhr.send();
 	}
 	prevX = newX;
@@ -613,6 +619,35 @@ function flip()
 		ele1.checked = false;
 		ele2.checked = false;
 	}
+}
+
+function handleJson(jsonObj)
+{
+	var divEle = document.getElementById("batt");
+	if (divEle == undefined || divEle == null) {
+		return;
+	}
+	var warn = false;
+	var battVolt = 0;
+	if (jsonObj.battWarning != undefined) {
+		if (jsonObj.battWarning == true || jsonObj.battWarning == "true") {
+			warn = true;
+		}
+	}
+	if (jsonObj.battVoltage != undefined) {
+		battVolt = jsonObj.battVoltage;
+		battVolt /= 100.0;
+		battVolt = Math.round(battVolt);
+		battVolt /= 10.0;
+	}
+	var msg;
+	if (warn == false) {
+		msg = "Batt Voltage: " + battVolt.toString() + "V";
+	}
+	else {
+		msg = "LOW BATT: " + battVolt.toString() + "V";
+	}
+	divEle.innerHTML = msg;
 }
 
 if (advancedFeatures >= 2) {

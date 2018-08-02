@@ -9,7 +9,7 @@
 #define BOOKWORM_BAUD 9600
 #define BOOKWORM_SSID_SIZE 31
 #define ALL_SAFE_DEBUG_MODE
-//#define ENABLE_BATTERY_MONITOR
+#define ENABLE_BATTERY_MONITOR
 
 #include <Arduino.h>
 #include "WString.h"
@@ -146,7 +146,7 @@ private:
 	bool pinsHaveLoaded;
 	#ifdef ENABLE_BATTERY_MONITOR
 	double batteryVoltageFiltered;
-	double adcToVoltage();
+	double adcToVoltage(uint16_t);
 	#endif
 };
 

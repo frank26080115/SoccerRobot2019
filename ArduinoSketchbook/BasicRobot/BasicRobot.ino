@@ -2,6 +2,7 @@
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
+#include <ArduinoJson.h>
 #include <EEPROM.h>
 #include <FS.h>
 #include <BookWorm.h>

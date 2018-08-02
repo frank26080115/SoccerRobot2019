@@ -178,7 +178,25 @@ void handleMove() {
     lastCommTimestamp = millis();
     moveMixedMode = (gotX && gotY);
   }
+  #ifndef ENABLE_BATTERY_MONITOR
   serveBasicHeader();
+  #else
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  char buff[20] = {'\0'};
+  if (BookWorm.isBatteryLowWarning()) {
+    snprintf(buff, sizeof(buff), "true");
+  }
+  else {
+    snprintf(buff, sizeof(buff), "false");
+  }
+  root["battWarning"] = buff;
+  snprintf(buff, sizeof(buff), "%lu", BookWorm.readBatteryVoltageFilteredLast());
+  root["battVoltage"] = buff;
+  String response;
+  root.printTo(response);
+  server.send(200, "application/json", response);
+  #endif
   serverClientStop();
 }
 
