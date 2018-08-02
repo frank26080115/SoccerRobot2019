@@ -2,8 +2,10 @@
 #define _HWBOARDS_H_
 
 // pick only one of these
-#define HWBOARD_ESP01
+//#define HWBOARD_ESP01
 #define HWBOARD_ESP12
+
+#define pinBoot 2
 
 #ifdef HWBOARD_ESP01
 	#define pinServoLeft         2

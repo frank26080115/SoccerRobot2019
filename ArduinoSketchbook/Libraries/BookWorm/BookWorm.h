@@ -10,6 +10,7 @@
 #define BOOKWORM_SSID_SIZE 31
 #define ALL_SAFE_DEBUG_MODE
 #define ENABLE_BATTERY_MONITOR
+#define ENABLE_SIGNALCROSS_RESET
 
 #include <Arduino.h>
 #include "WString.h"
@@ -133,9 +134,13 @@ public:
 	void saveNvm();
 	char* generateSsid(char*);
 	void setSsid(char*);
-	bool checkStartMode(void);
 	bookworm_nvm_t nvm;
 	bool robotFlip; // temporary flip, for inverted drive
+
+	#ifdef ENABLE_SIGNALCROSS_RESET
+	bool checkStartMode(void);
+	#endif
+
 private:
 	void loadPinAssignments();
 	int pinnumServoLeft;

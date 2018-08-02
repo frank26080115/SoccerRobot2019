@@ -7,7 +7,9 @@
 #include <FS.h>
 #include <BookWorm.h>
 
+#if defined(HWBOARD_ESP12_NANO) || defined(HWBOARD_ESP12)
 #define ENABLE_BOOT_PIN_RESET
+#endif
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 const char *softAP_password = "12345678";
@@ -43,7 +45,7 @@ signed int speedWeap = 0;
 uint16_t battLvl = 0;
 #endif
 #ifdef ENABLE_BOOT_PIN_RESET
-#define BOOT_PIN_RESET_LIMIT 100
+#define BOOT_PIN_RESET_LIMIT 5000
 uint32_t bootPinLowCnt = 0;
 #endif
 #ifdef ENABLE_NOCONN_TIMEOUT_RESET
@@ -100,7 +102,7 @@ void setup()
   BookWorm.debugf("Free RAM %u\r\n", system_get_free_heap_size());
 
   #ifdef ENABLE_BOOT_PIN_RESET
-  pinMode(2, INPUT_PULLUP);
+  pinMode(pinBoot, INPUT_PULLUP);
   #endif
 }
 
@@ -211,7 +213,7 @@ void loop()
   #endif
 
   #ifdef ENABLE_BOOT_PIN_RESET
-  if (digitalRead(2) == LOW)
+  if (digitalRead(pinBoot) == LOW)
   {
     bootPinLowCnt++;
     if (bootPinLowCnt > BOOT_PIN_RESET_LIMIT) {
@@ -232,7 +234,9 @@ void loop()
   {
     if ((now - noconnTime) > (60000 * 5))
     {
-      WiFi.softAP(BookWorm.generateSsid(BookWorm.SSID), "12345678");
+      char tmpbuf[BOOKWORM_SSID_SIZE + 1];
+      BookWorm.generateSsid(tmpbuf)
+      WiFi.softAP(tmpbuf, "12345678");
     }
   }
   #endif

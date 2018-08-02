@@ -50,6 +50,7 @@ void cBookWorm::begin(void)
 		this->setSsid(this->SSID);
 	}
 
+	#ifdef ENABLE_SIGNALCROSS_RESET
 	if (checkStartMode() != false)
 	{
 		printf("Signal Pins Factory Reset");
@@ -57,6 +58,7 @@ void cBookWorm::begin(void)
 		this->generateSsid(this->SSID);
 		this->setSsid(this->SSID);
 	}
+	#endif
 }
 
 /*
@@ -388,6 +390,7 @@ void cBookWorm::delayWhileFeeding(int x)
 	}
 }
 
+#ifdef ENABLE_SIGNALCROSS_RESET
 bool cBookWorm::checkStartMode(void)
 {
 	bool ret = true;
@@ -467,3 +470,4 @@ bool cBookWorm::checkStartMode(void)
 	#endif
 	return ret;
 }
+#endif
