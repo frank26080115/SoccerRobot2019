@@ -524,7 +524,17 @@ setInterval(function(){
 		}
 		xhr.open('PUT', querystring);
 		xhr.onreadystatechange = function () {
-			if ((xhr.readyState == xhr.DONE || xhr.readyState === "complete") && xhr.status === 200) {
+			var doneStatus = 4;
+			if (xhr.DONE != undefined) {
+				doneStatus = xhr.DONE;
+			}
+			else if (READYSTATE_COMPLETE != undefined) {
+				doneStatus = READYSTATE_COMPLETE;
+			}
+			else if (xhr.READYSTATE_COMPLETE != undefined) {
+				doneStatus = xhr.READYSTATE_COMPLETE;
+			}
+			if ((xhr.readyState == doneStatus || xhr.readyState === "complete") && xhr.status === 200) {
 				var jsonObj = JSON.parse(xhr.responseText);
 				handleJson(jsonObj);
 			}
