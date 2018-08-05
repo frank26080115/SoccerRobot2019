@@ -235,13 +235,14 @@ void handleSetConfig() {
     else IF_HANDLE_CONFIG_ARG("servoflip",     setServoFlip,    bool)
     else IF_HANDLE_CONFIG_ARG("stickradius",   setStickRadius,  uint16_t)
     else IF_HANDLE_CONFIG_ARG("advanced",      setAdvanced,     bool)
+    else IF_HANDLE_CONFIG_ARG("wifiChannel",   setWifiChannel,  uint8_t)
     #ifdef ENABLE_WEAPON
     else IF_HANDLE_CONFIG_ARG("enableweapon",  setEnableWeapon, bool)
     else IF_HANDLE_CONFIG_ARG("weappossafe",   setWeapPosSafe,  uint16_t)
     else IF_HANDLE_CONFIG_ARG("weapposa",      setWeapPosA,     uint16_t)
     else IF_HANDLE_CONFIG_ARG("weapposb",      setWeapPosB,     uint16_t)
     #endif
-    else IF_HANDLE_CONFIG_ARG("lefthanded",   setLeftHanded,   bool)
+    else IF_HANDLE_CONFIG_ARG("lefthanded",    setLeftHanded,   bool)
     #ifdef ENABLE_BATTERY_MONITOR
     else IF_HANDLE_CONFIG_ARG("vdiv_r1",        setVdivR1,     uint32_t)
     else IF_HANDLE_CONFIG_ARG("vdiv_r1",        setVdivR2,     uint32_t)
@@ -253,6 +254,36 @@ void handleSetConfig() {
       String argVal = server.arg(i);
       BookWorm.setSsid((char*)argVal.c_str());
       commit = true;
+    }
+    else if (argName.equalsIgnoreCase(String("password")))
+    {
+      String argVal = server.arg(i);
+      BookWorm.setPassword((char*)argVal.c_str());
+      commit = true;
+    }
+    else if (argName.equalsIgnoreCase(String("hexblob")))
+    {
+      String argVal = server.arg(i);
+      uint8_t errCode;
+      if (BookWorm.loadNvmHex((char*)argVal.c_str(), &errCode, false) == false)
+      {
+        server.sendContent("\n<h2>HexBlob Loading Failed! ");
+        if (errCode == 1) {
+          server.sendContent("Wrong length\n");
+        }
+        else if (errCode == 2) {
+          server.sendContent("Bad characters detected\n");
+        }
+        else if (errCode == 3) {
+          server.sendContent("Checksum is incorrect\n");
+        }
+        server.sendContent("\n</h2>\n");
+      }
+      else
+      {
+        server.sendContent("\n<h2>HexBlob Loaded Successfully, Please Reboot!</h2>\n");
+        commit = true;
+      }
     }
     else if (argName.equalsIgnoreCase(String("reboot")))
     {
@@ -275,10 +306,12 @@ void handleSetConfig() {
       }
     }
   }
+
   if (factoryreset)
   {
     BookWorm.factoryReset();
   }
+
   if (commit)
   {
     BookWorm.saveNvm();
@@ -293,8 +326,6 @@ void handleSetConfig() {
     serveConfigTable();
     serveConfigNet();
   }
-
-  serveConfigHexStr();
 
   server.sendContent("</body></html>");
   serverClientStop();
@@ -320,7 +351,6 @@ void handleConfig()
   }
 
   serveConfigHeader();
-  serveConfigHexStr();
   serveConfigNet();
   serveConfigTable();
   
@@ -339,24 +369,35 @@ void serveConfigHeader()
   server.sendContent("<script src='config.js'></script>");
   server.sendContent("<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>");
   server.sendContent("<link rel='stylesheet' type='text/css' href='config.css'>");
-  server.sendContent("</head><body><h1>Robot Config</h1>");
+  server.sendContent("</head><body><h1>Robot Config</h1>\n");
 }
 
-void serveConfigHexStr()
+void serveConfigHexStr(bool isUserOnly)
 {
   char str[3];
-  int i;
-  uint8_t* ptr = (uint8_t*)(&(BookWorm.nvm));
-  server.sendContent("\n<p>\n");
+  int i, nl;
+  uint8_t* ptr;
+  BookWorm.ensureNvmChecksums();
+  if (isUserOnly == false)
+  {
+    ptr = (uint8_t*)(&(BookWorm.nvm));
+    nl = sizeof(bookworm_nvm_t);
+  }
+  else
+  {
+    ptr = (uint8_t*)(&(BookWorm.nvm.divider1));
+    nl = BookWorm.calcUserNvmLength(true);
+  }
+  server.sendContent("\n");
   // spit out the NVM struct as a hex blob
-  for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
+  for (i = 0; i < nl; i++) {
     sprintf(str, "%02X", ptr[i]);
     server.sendContent(str);
     if (((i+1) % 16) == 0) {
-      server.sendContent("<br />");
+      server.sendContent("<br />\n");
     }
   }
-  server.sendContent("\n</p>\n");
+  server.sendContent("\n");
 }
 
 void serveConfigNet()
@@ -371,11 +412,14 @@ void serveConfigNet()
 
 void serveConfigTable()
 {
-  server.sendContent(String("\n<table border='2' width='98%'>\n"));
+  generateConfigTableHeader("WiFi Settings<br />(any changes requires reboot)", false);
 
   // void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note)
-  generateConfigItemTxt("SSID", "ssid", "text", BookWorm.SSID, (String("maxlength='") + String(BOOKWORM_SSID_SIZE) + String("'")).c_str(), "* change requires reboot");
-  server.sendContent("\n<tr><td colspan='3'>Driving Signal Config</td></tr>\n");
+  generateConfigItemTxt("SSID", "ssid", "text", BookWorm.SSID, (String("maxlength='") + String(BOOKWORM_SSID_SIZE) + String("'")).c_str(), NULL);
+  generateConfigItemTxt("Password", "password", "text", BookWorm.nvm.password, (String("minlength='8' ") + String("maxlength='") + String(BOOKWORM_PASSWORD_SIZE) + String("'")).c_str(), NULL);
+  generateConfigItemTxt("Channel", "wifichannel", "number", String(BookWorm.nvm.wifiChannel).c_str(), "min='1' max='13' step='1'", "1 to 13 only");
+
+  generateConfigTableHeader("Driving Signal Config", true);
   generateConfigItemTxt("Drive no pulse on stop",     "servostoppednopulse", "number",  BookWorm.nvm.servoStoppedNoPulse ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
   generateConfigItemTxt("Drive pulse range",          "servomax", "number",      String(BookWorm.nvm.servoMax).c_str(), "min='0' max='1000' step='50'", "range = 1500 &plusmn; x microseconds");
   generateConfigItemTxt("Drive pulse deadzone left",  "deadzoneleft", "number",  String(BookWorm.nvm.servoDeadzoneLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
@@ -383,12 +427,14 @@ void serveConfigTable()
   generateConfigItemTxt("Drive pulse offset left",    "biasleft", "number",      String(BookWorm.nvm.servoBiasLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateConfigItemTxt("Drive pulse offset right",   "biasright", "number",     String(BookWorm.nvm.servoBiasRight).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateFlipDropdown(BookWorm.nvm.servoFlip);
-  server.sendContent("\n<tr><td colspan='3'>User Preferences</td></tr>\n");
+
+  generateConfigTableHeader("User Preferences", true);
   generateConfigItemTxt("Speed multiplier",           "speedgain", "number",     String(BookWorm.nvm.speedGain).c_str(), "min='100' max='10000' step='100'", "multiplier = x&#247;1000 , 1000 is normal");
   generateConfigItemTxt("Steering sensitivity",       "steeringsensitivity", "number", String(BookWorm.nvm.steeringSensitivity).c_str(), "min='100' max='10000' step='100'", "sensitivity = x&#247;1000 , 1000 is normal");
   generateConfigItemTxt("Steering balance",           "steeringbalance", "number",     String(BookWorm.nvm.steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
   generateConfigItemTxt("Joystick size",              "stickradius", "number",   String(BookWorm.nvm.stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
-  server.sendContent("\n<tr><td colspan='3'>Advanced Features<br />weapon, left handed, inverted drive, battery, etc</td></tr>\n");
+
+  generateConfigTableHeader("Advanced Features<br />weapon, left handed, inverted drive, battery, etc", true);
   generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable, * change requires reboot");
   if (BookWorm.nvm.advanced)
   {
@@ -411,7 +457,7 @@ void serveConfigTable()
     
   }
 
-  server.sendContent("\n<tr><td colspan='3'>System Critical</td></tr>\n");
+  generateConfigTableHeader("System Critical", true);
   generateConfigItemStart("Factory reset", "factoryreset");
   server.sendContent("click the button to reset all settings to factory default values</td>");
   server.sendContent("</td><td class='tbl_submit'><input type='hidden' id='factoryreset' name='factoryreset' value='true' /><input type='submit' class='btn_submit' value='Go!' height='100%' /></td></tr></form>\n");
@@ -422,6 +468,27 @@ void serveConfigTable()
   server.sendContent("</td><td class='tbl_submit'><input type='hidden' id='reboot' name='reboot' value='true' /><input type='submit' class='btn_submit' value='REBOOT' height='100%' /></td></tr></form>\n");
   #endif
 
+  server.sendContent("</table>\n");
+
+  generateHexBlobField();
+}
+
+void generateHexBlobField()
+{
+  server.sendContent("\n<table border='2' width='98%'><tr><th>HexBlob<br />(save or load everything at once)<br />(reboot required after)</th></tr>\n");
+  server.sendContent("<tr><td>HexBlob With WiFi Config:</td></tr>");
+  server.sendContent("<tr><td>");
+  serveConfigHexStr(false);
+  server.sendContent("</td></tr>");
+  server.sendContent("<tr><td>HexBlob Without WiFi Config:</td></tr>");
+  server.sendContent("<tr><td>");
+  serveConfigHexStr(true);
+  server.sendContent("</td></tr>");
+  server.sendContent("<tr><td>&nbsp;</td></tr>");
+  server.sendContent("<tr><td>Paste Data Here:</td></tr>");
+  server.sendContent("<tr><td><form id='frm_hexblob' name='frm_hexblob' action='setconfig' method='post' onsubmit='return validateHexblob();' />\n");
+  server.sendContent("<textarea id='hexblob' name='hexblob' class='hexblob' /><br />\n");
+  server.sendContent("<input type='submit' id='btn_hexblobsubmit' name='btn_hexblobsubmit' value='Write' /></form></td></tr>");
   server.sendContent("</table>\n");
 }
 

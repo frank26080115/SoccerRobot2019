@@ -8,9 +8,11 @@
 #define BOOKWORM_DEBUG
 #define BOOKWORM_BAUD 9600
 #define BOOKWORM_SSID_SIZE 31
+#define BOOKWORM_PASSWORD_SIZE 31
 #define ALL_SAFE_DEBUG_MODE
 #define ENABLE_BATTERY_MONITOR
 #define ENABLE_SIGNALCROSS_RESET
+#define BOOKWORM_DEFAULT_PASSWORD "12345678"
 
 #include <Arduino.h>
 #include "WString.h"
@@ -31,8 +33,12 @@ extern "C" {
 #pragma pack(push, 1)
 typedef struct
 {
-	uint32_t eeprom_version;            // used in case the layout changes
+	uint32_t eeprom_version1;           // used in case the layout changes
 	char ssid[BOOKWORM_SSID_SIZE + 1];
+	char password[BOOKWORM_PASSWORD_SIZE + 1];
+	uint8_t wifiChannel;
+	uint8_t divider1;                   // used as a placeholder for pointer positioning
+	uint32_t eeprom_version2;           // used in case the layout changes
 	uint16_t servoMax;                  // maximum servo range, 500 means 1000 to 2000 microseconds
 	uint16_t servoDeadzoneLeft;         // overcomes deadzones in motor driver or continuous servos
 	uint16_t servoDeadzoneRight;        // overcomes deadzones in motor driver or continuous servos
@@ -58,7 +64,9 @@ typedef struct
 	uint16_t vdiv_filter;
 	uint16_t warning_voltage;
 	#endif
-	uint16_t checksum; // makes sure the contents isn't junk
+	uint8_t  divider2;     // used as a placeholder for pointer positioning
+	uint16_t checksumUser; // makes sure the contents after "divider1" isn't junk
+	uint16_t checksum;     // makes sure the contents isn't junk
 }
 bookworm_nvm_t;
 #pragma pack(pop)
@@ -132,8 +140,13 @@ public:
 	void factoryReset();
 	bool loadNvm();
 	void saveNvm();
+	void ensureNvmChecksums();
 	char* generateSsid(char*);
 	void setSsid(char*);
+	void setPassword(char*);
+	void setWifiChannel(uint8_t);
+	bool loadNvmHex(char* str, uint8_t* errCode, bool save);
+	uint32_t calcUserNvmLength(bool withChecksum);
 	bookworm_nvm_t nvm;
 	bool robotFlip; // temporary flip, for inverted drive
 

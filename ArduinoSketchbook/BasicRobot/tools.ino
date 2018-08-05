@@ -125,6 +125,26 @@ void generateConfigItemTxt(const char* label, const char* id, const char* type, 
   generateConfigItemEnd();
 }
 
+void generateConfigTableHeader(char* s, bool endPrev)
+{
+  if (endPrev) {
+    server.sendContent("\n</table>");
+  }
+  server.sendContent("\n<table border='2' width='98%'><tr><th colspan='3'>");
+  server.sendContent(s);
+  server.sendContent("</th></tr>\n");
+}
+
+void generateConfigTableHeader(const char* s, bool endPrev)
+{
+  generateConfigTableHeader((char*)s, endPrev);
+}
+
+void generateConfigTableHeader(String s, bool endPrev)
+{
+  generateConfigTableHeader((char*)s.c_str(), endPrev);
+}
+
 void serverClientStop()
 {
   server.sendContent(""); // solves a bug involving invalid encoding due to improper chunking

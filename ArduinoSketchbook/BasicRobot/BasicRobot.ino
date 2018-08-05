@@ -11,9 +11,6 @@
 #define ENABLE_BOOT_PIN_RESET
 #endif
 
-/* Set these to your desired softAP credentials. They are not configurable at runtime */
-const char *softAP_password = "12345678";
-
 /* hostname for mDNS. Should work at least on windows. Try http://robot.local */
 const char *myHostname = "robot";
 
@@ -61,7 +58,7 @@ void setup()
   BookWorm.printf("Configuring access point...\r\n");
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAPConfig(apIP, apIP, netMsk);
-  WiFi.softAP(BookWorm.SSID, softAP_password);
+  WiFi.softAP(BookWorm.SSID, BookWorm.nvm.password, BookWorm.nvm.wifiChannel, 0, 2);
   delay(500); // Without delay I've seen the IP address blank
   BookWorm.printf("AP IP address: %s\r\n", toStringIp(WiFi.softAPIP()).c_str());
 
@@ -76,6 +73,7 @@ void setup()
   server.on("/index.html",   handleRoot);
   server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/fwlink",       handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/connecttest.txt", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
 
   /* handlers for the XHR and configuration */
   server.on("/move",      handleMove);
@@ -236,7 +234,7 @@ void loop()
     {
       char tmpbuf[BOOKWORM_SSID_SIZE + 1];
       BookWorm.generateSsid(tmpbuf)
-      WiFi.softAP(tmpbuf, "12345678");
+      WiFi.softAP(tmpbuf, BOOKWORM_DEFAULT_PASSWORD);
     }
   }
   #endif
