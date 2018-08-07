@@ -471,6 +471,10 @@ void serveConfigTable()
   server.sendContent("</table>\n");
 
   generateHexBlobField();
+
+  server.sendContent("<hr />\n");
+  BookWorm.checkHardwareConfig((void*)&server, false);
+  server.sendContent("<hr />\n");
 }
 
 void generateHexBlobField()

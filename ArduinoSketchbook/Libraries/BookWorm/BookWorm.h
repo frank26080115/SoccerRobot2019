@@ -154,6 +154,8 @@ public:
 	bool checkStartMode(void);
 	#endif
 
+	void checkHardwareConfig(void* serverPtr, bool useSerial);
+
 private:
 	void loadPinAssignments();
 	int pinnumServoLeft;
