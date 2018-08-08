@@ -24,47 +24,50 @@ bool cBookWorm::loadNvmHex(char* str, uint8_t* errCode, bool save)
 	uint8_t* tmpbuff = (uint8_t*)malloc(sizeof(bookworm_nvm_t));
 	bookworm_nvm_t* castPtr = (bookworm_nvm_t*)tmpbuff;
 
+	debugf("NVM hexblob\r\n%s\r\n", str);
+
 	int slen = strlen(str);
 	uint16_t chksum;
 	uint32_t userLength = calcUserNvmLength(false);
-	uint32_t userLength2 = calcUserNvmLength(true);
-	int i, j, k, accum;
-	for (i = 0, j = 0, k = 0; i < slen, j < sizeof(bookworm_nvm_t); i++)
+	uint32_t userLengthWithChksum = calcUserNvmLength(true);
+	int i, j, k;
+	for (i = 0, j = 0; i < slen && j < sizeof(bookworm_nvm_t); i += 2, j++)
 	{
-		if ((k % 2) == 0) {
-			accum = 0;
-		}
-		else {
-			accum <<= 8;
+		char c[2];
+		c[0] = str[i];
+		c[1] = str[i + 1];
+		uint8_t d = 0;
+		for (k = 0; k < 2; k++)
+		{
+			d <<= 4;
+			char cc = c[k];
+			if (cc >= '0' && cc <= '9') {
+				d += cc - '0';
+			}
+			else if (cc >= 'a' && cc <= 'f') {
+				d += cc - 'a' + 0xA;
+			}
+			else if (cc >= 'A' && cc <= 'F') {
+				d += cc - 'A' + 0xA;
+			}
+			else if ((cc == ' ' || cc == '\t' || cc == '\n' || cc == '\r' || cc == '\0') && k == 0) {
+				i++;
+				k--;
+				c[0] = str[i];
+				c[1] = str[i + 1];
+				d = 0;
+			}
+			else {
+				if (errCode != NULL) { *errCode = 2; /* valid chars failed */
+					debugf("bad char %02X pos %u, j %u\r\n", c, i, j);
+				}
+				free(tmpbuff); return false;
+			}
 		}
 
-		char c = str[i];
-		if (c >= '0' && c <= '9') {
-			accum += c - '0';
-			k++;
-		}
-		else if (c >= 'a' && c <= 'f') {
-			accum += c - 'a' + 0xA;
-			k++;
-		}
-		else if (c >= 'A' && c <= 'F') {
-			accum += c - 'A' + 0xA;
-			k++;
-		}
-		else if ((c == ' ' || c == '\t' || c == '\n' || c == '\r') && (k % 2) == 0) {
-			accum = 0;
-			k = k;
-		}
-		else {
-			if (errCode != NULL) { *errCode = 2; /* valid chars failed */ }
-			free(tmpbuff); return false;
-		}
-
-		if ((k % 2) == 1) {
-			tmpbuff[j] = accum;
-			j++;
-		}
+		tmpbuff[j] = d;
 	}
+
 	if (j == sizeof(bookworm_nvm_t))
 	{
 		// wifi + user blocks
@@ -80,13 +83,18 @@ bool cBookWorm::loadNvmHex(char* str, uint8_t* errCode, bool save)
 		}
 		return true;
 	}
-	else if (j == userLength2)
+	else if (j == userLengthWithChksum)
 	{
 		// user block only
-		uint16_t* chksum2;
-		chksum = bookworm_fletcher16(tmpbuff, userLength);
-		chksum2 = (uint16_t*)(&tmpbuff[userLength + sizeof(uint8_t)]);
-		if (chksum != (*chksum2)) {
+		uint8_t* ptrUser = &(castPtr->divider1);
+		// shift to align with structure
+		uint32_t diff = ((uint32_t)ptrUser) - ((uint32_t)tmpbuff);
+		for (i = sizeof(bookworm_nvm_t) - 1; i >= diff; i--) {
+			tmpbuff[i] = tmpbuff[i - diff];
+		}
+		chksum = bookworm_fletcher16(ptrUser, userLength);
+		if (chksum != castPtr->checksumUser) {
+			debugf("bad chksum, calculated %04X, read in %04X\r\n", chksum, castPtr->checksumUser);
 			if (errCode != NULL) { *errCode = 3; /* checksum failed */ }
 			free(tmpbuff); return false;
 		}
@@ -170,15 +178,22 @@ parameters: none
 bool cBookWorm::loadNvm()
 {
 	uint8_t* ptr = (uint8_t*)&(this->nvm);
-	int i;
+	int i, sz;
 	uint16_t chksum;
 
-	this->debugf("NVM reading: ");
-	for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
-		ptr[i] = EEPROM.read(i);
-		this->debugf(" %02X", ptr[i]);
+	sz = sizeof(bookworm_nvm_t);
+	this->debugf("NVM reading (%u from 0x%08X):\r\n", sz, (uint32_t)ptr);
+	for (i = 0; i < sz; i++) {
+		uint8_t dataByte;
+		dataByte = EEPROM.read(i);
+		this->debugf(".");
+		ptr[i] = dataByte;
+		this->debugf("%02X", dataByte);
+		if (((i + 1) % 16) == 0) {
+			this->debugf("\r\n");
+		}
 	}
-	this->debugf(" done!\r\n");
+	this->debugf("\r\ndone!\r\n");
 
 	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
 	if (chksum == this->nvm.checksum && BOOKWORM_EEPROM_VERSION == this->nvm.eeprom_version1 && BOOKWORM_EEPROM_VERSION == this->nvm.eeprom_version2)
@@ -203,12 +218,12 @@ bool cBookWorm::loadNvm()
 	}
 	else
 	{
-		this->debugf("NVM load failed, \r\n\tchecksum %04X != %04X\r\n", chksum, this->nvm.checksum);
+		this->printf("NVM load failed, \r\n\tchecksum %04X != %04X\r\n", chksum, this->nvm.checksum);
 		if (BOOKWORM_EEPROM_VERSION != this->nvm.eeprom_version1) {
-			this->debugf("\tversion %04X != %04X\r\n", BOOKWORM_EEPROM_VERSION, this->nvm.eeprom_version1);
+			this->printf("\tversion %04X != %04X\r\n", BOOKWORM_EEPROM_VERSION, this->nvm.eeprom_version1);
 		}
 		if (BOOKWORM_EEPROM_VERSION != this->nvm.eeprom_version2) {
-			this->debugf("\tversion %04X != %04X\r\n", BOOKWORM_EEPROM_VERSION, this->nvm.eeprom_version2);
+			this->printf("\tversion %04X != %04X\r\n", BOOKWORM_EEPROM_VERSION, this->nvm.eeprom_version2);
 		}
 		return false;
 	}
@@ -225,10 +240,13 @@ void cBookWorm::saveNvm()
 	int i;
 	uint8_t* ptr = (uint8_t*)&(this->nvm);
 	ensureNvmChecksums();
-	this->debugf("EEPROM writing: ");
+	this->debugf("EEPROM writing:");
 	for (i = 0; i < sizeof(bookworm_nvm_t); i++) {
 		EEPROM.write(i, ptr[i]);
-		this->debugf(" %02X", ptr[i]);
+		if ((i % 16) == 0) {
+			this->debugf("\r\n");
+		}
+		this->debugf("%02X ", ptr[i]);
 	}
 	EEPROM.commit();
 	this->debugf(" done!\r\n");

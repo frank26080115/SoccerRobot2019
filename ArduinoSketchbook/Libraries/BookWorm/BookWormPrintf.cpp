@@ -37,6 +37,9 @@ int cBookWorm::printf(const char *format, ...)
 
 	va_list ap;
 	va_start(ap, format);
+
+	while (Serial.availableForWrite() < strlen(format)) { }
+
 	#ifdef PRINTF_USE_FPRINTF
 	return vfprintf(&f, format, ap);
 	#elif defined(PRINTF_USE_STRING)
@@ -78,11 +81,15 @@ int cBookWorm::debugf(const char *format, ...)
 
 	va_list ap;
 	va_start(ap, format);
+
+	while (Serial.availableForWrite() < strlen(format)) { }
+
 	#ifdef PRINTF_USE_FPRINTF
 	return vfprintf(&f, format, ap);
 	#elif defined(PRINTF_USE_STRING)
-	char* str = (char*)malloc(system_get_free_heap_size() / 8);
-	int ret = vsprintf(str, format, ap);
+	int sz = system_get_free_heap_size() / 8;
+	char* str = (char*)malloc(sz);
+	int ret = vsnprintf(str, sz - 1, format, ap);
 	int idx;
 	for (idx = 0; idx < ret; idx++) {
 		printf_putchar(str[idx], NULL);

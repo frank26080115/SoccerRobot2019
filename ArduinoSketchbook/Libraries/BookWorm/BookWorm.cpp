@@ -41,7 +41,11 @@ void cBookWorm::begin(void)
 	system_set_os_print(0);
 	#endif
 
-	EEPROM.begin(512);
+	#ifdef BOOKWORM_DEBUG
+	checkHardwareConfig(NULL, true);
+	#endif
+
+	EEPROM.begin(1024);
 	if (this->loadNvm() == false)
 	{
 		// failed to load
@@ -59,6 +63,7 @@ void cBookWorm::begin(void)
 		this->setSsid(this->SSID);
 	}
 	#endif
+	debugf("BookWorm Library Begun\r\n");
 }
 
 /*

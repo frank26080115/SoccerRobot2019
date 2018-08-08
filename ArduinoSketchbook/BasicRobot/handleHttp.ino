@@ -203,13 +203,13 @@ void handleMove() {
   haveConnected();
 }
 
-void handleSetConfig() {
+void handleConfig() {
   int i;
   bool commit = false;
   bool reboot = false;
   bool factoryreset = false;
 
-  BookWorm.debugf("call handleSetConfig\r\n");
+  BookWorm.debugf("call handleConfig\r\n");
 
   serveConfigHeader();
 
@@ -323,8 +323,8 @@ void handleSetConfig() {
   }
   else
   {
-    serveConfigTable();
     serveConfigNet();
+    serveConfigTable();
   }
 
   server.sendContent("</body></html>");
@@ -337,26 +337,6 @@ void handleSetConfig() {
     //ESP.restart();
     ESP.reset();
   }
-
-  haveConnected();
-}
-
-void handleConfig()
-{
-
-  BookWorm.printf("call handleConfig\r\n");
-
-  if (captivePortal()) { // If caprive portal redirect instead of displaying the page.
-    return;
-  }
-
-  serveConfigHeader();
-  serveConfigNet();
-  serveConfigTable();
-  
-  server.sendContent("</body></html>");
-
-  serverClientStop();
 
   haveConnected();
 }
@@ -412,6 +392,7 @@ void serveConfigNet()
 
 void serveConfigTable()
 {
+  server.sendContent("\n<h2>ONLY ONE DATA ITEM MAY BE CHANGED AT A TIME</h2>\n");
   generateConfigTableHeader("WiFi Settings<br />(any changes requires reboot)", false);
 
   // void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note)
@@ -426,6 +407,7 @@ void serveConfigTable()
   generateConfigItemTxt("Drive pulse deadzone right", "deadzoneright", "number", String(BookWorm.nvm.servoDeadzoneRight).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateConfigItemTxt("Drive pulse offset left",    "biasleft", "number",      String(BookWorm.nvm.servoBiasLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateConfigItemTxt("Drive pulse offset right",   "biasright", "number",     String(BookWorm.nvm.servoBiasRight).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateConfigTableHeader("Servo Signal Flip", true);
   generateFlipDropdown(BookWorm.nvm.servoFlip);
 
   generateConfigTableHeader("User Preferences", true);
@@ -434,7 +416,14 @@ void serveConfigTable()
   generateConfigItemTxt("Steering balance",           "steeringbalance", "number",     String(BookWorm.nvm.steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
   generateConfigItemTxt("Joystick size",              "stickradius", "number",   String(BookWorm.nvm.stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
 
-  generateConfigTableHeader("Advanced Features<br />weapon, left handed, inverted drive, battery, etc", true);
+  generateConfigTableHeader("Advanced Features<br />left handed, inverted drive, "
+  #ifdef ENABLE_WEAPON
+  "weapon, "
+  #endif
+  #ifdef ENABLE_BATTERY_MONITOR
+  "battery, "
+  #endif
+  "etc", true);
   generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable, * change requires reboot");
   if (BookWorm.nvm.advanced)
   {
@@ -490,8 +479,8 @@ void generateHexBlobField()
   server.sendContent("</td></tr>");
   server.sendContent("<tr><td>&nbsp;</td></tr>");
   server.sendContent("<tr><td>Paste Data Here:</td></tr>");
-  server.sendContent("<tr><td><form id='frm_hexblob' name='frm_hexblob' action='setconfig' method='post' onsubmit='return validateHexblob();' />\n");
-  server.sendContent("<textarea id='hexblob' name='hexblob' class='hexblob' /><br />\n");
+  server.sendContent("<tr><td><form id='frm_hexblob' name='frm_hexblob' action='config' method='post' onsubmit='return validateHexblob();' />\n");
+  server.sendContent("<textarea id='hexblob' name='hexblob' class='hexblob'></textarea><br />\n");
   server.sendContent("<input type='submit' id='btn_hexblobsubmit' name='btn_hexblobsubmit' value='Write' /></form></td></tr>");
   server.sendContent("</table>\n");
 }

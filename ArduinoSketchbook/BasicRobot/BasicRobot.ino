@@ -77,7 +77,6 @@ void setup()
 
   /* handlers for the XHR and configuration */
   server.on("/move",      handleMove);
-  server.on("/setconfig", handleSetConfig);
   server.on("/config",    handleConfig);
 
   /* handlers for files inside the SPIFFS */

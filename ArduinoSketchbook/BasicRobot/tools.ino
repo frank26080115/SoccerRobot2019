@@ -82,7 +82,7 @@ bool readServerArg(int argNum, signed int* result)
 // generates the start of a config item on the config page, the label and the form element
 void generateConfigItemStart(const char* label, const char* id)
 {
-  server.sendContent("<form action='setconfig' method='post' onsubmit='return validateform(\"");
+  server.sendContent("<form action='config' method='post' onsubmit='return validateform(\"");
   server.sendContent(id);
   server.sendContent("\")' id='form_");
   server.sendContent(id);
