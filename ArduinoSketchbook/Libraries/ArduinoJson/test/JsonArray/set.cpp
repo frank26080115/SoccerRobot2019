@@ -8,8 +8,8 @@
 using namespace Catch::Matchers;
 
 TEST_CASE("JsonArray::set()") {
-  DynamicJsonBuffer _jsonBuffer;
-  JsonArray& _array = _jsonBuffer.createArray();
+  DynamicJsonDocument doc;
+  JsonArray _array = doc.to<JsonArray>();
   _array.add(0);
 
   SECTION("int") {
@@ -41,27 +41,30 @@ TEST_CASE("JsonArray::set()") {
   }
 
   SECTION("nested array") {
-    JsonArray& arr = _jsonBuffer.createArray();
+    DynamicJsonDocument doc2;
+    JsonArray arr = doc2.to<JsonArray>();
 
     _array.set(0, arr);
 
-    REQUIRE(&arr == &_array[0].as<JsonArray&>());
-    REQUIRE(_array[0].is<JsonArray&>());
+    REQUIRE(arr == _array[0].as<JsonArray>());
+    REQUIRE(_array[0].is<JsonArray>());
     REQUIRE_FALSE(_array[0].is<int>());
   }
 
   SECTION("nested object") {
-    JsonObject& obj = _jsonBuffer.createObject();
+    DynamicJsonDocument doc2;
+    JsonObject obj = doc2.to<JsonObject>();
 
     _array.set(0, obj);
 
-    REQUIRE(&obj == &_array[0].as<JsonObject&>());
-    REQUIRE(_array[0].is<JsonObject&>());
+    REQUIRE(obj == _array[0].as<JsonObject>());
+    REQUIRE(_array[0].is<JsonObject>());
     REQUIRE_FALSE(_array[0].is<int>());
   }
 
   SECTION("array subscript") {
-    JsonArray& arr = _jsonBuffer.createArray();
+    DynamicJsonDocument doc2;
+    JsonArray arr = doc2.to<JsonArray>();
     arr.add("hello");
 
     _array.set(0, arr[0]);
@@ -70,7 +73,8 @@ TEST_CASE("JsonArray::set()") {
   }
 
   SECTION("object subscript") {
-    JsonObject& obj = _jsonBuffer.createObject();
+    DynamicJsonDocument doc2;
+    JsonObject obj = doc2.to<JsonObject>();
     obj["x"] = "hello";
 
     _array.set(0, obj["x"]);
@@ -81,18 +85,18 @@ TEST_CASE("JsonArray::set()") {
   SECTION("should not duplicate const char*") {
     _array.set(0, "world");
     const size_t expectedSize = JSON_ARRAY_SIZE(1);
-    REQUIRE(expectedSize == _jsonBuffer.size());
+    REQUIRE(expectedSize == doc.memoryUsage());
   }
 
   SECTION("should duplicate char*") {
     _array.set(0, const_cast<char*>("world"));
     const size_t expectedSize = JSON_ARRAY_SIZE(1) + 6;
-    REQUIRE(expectedSize == _jsonBuffer.size());
+    REQUIRE(expectedSize == doc.memoryUsage());
   }
 
   SECTION("should duplicate std::string") {
     _array.set(0, std::string("world"));
     const size_t expectedSize = JSON_ARRAY_SIZE(1) + 6;
-    REQUIRE(expectedSize == _jsonBuffer.size());
+    REQUIRE(expectedSize == doc.memoryUsage());
   }
 }

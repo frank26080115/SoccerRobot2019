@@ -192,9 +192,9 @@ TEST_CASE("JsonVariant::as()") {
   }
 
   SECTION("ObjectAsString") {
-    DynamicJsonBuffer buffer;
+    DynamicJsonDocument doc;
+    JsonObject obj = doc.to<JsonObject>();
 
-    JsonObject& obj = buffer.createObject();
     obj["key"] = "value";
 
     JsonVariant variant = obj;
@@ -202,9 +202,8 @@ TEST_CASE("JsonVariant::as()") {
   }
 
   SECTION("ArrayAsString") {
-    DynamicJsonBuffer buffer;
-
-    JsonArray& arr = buffer.createArray();
+    DynamicJsonDocument doc;
+    JsonArray arr = doc.to<JsonArray>();
     arr.add(4);
     arr.add(2);
 
@@ -213,20 +212,20 @@ TEST_CASE("JsonVariant::as()") {
   }
 
   SECTION("ArrayAsJsonArray") {
-    DynamicJsonBuffer buffer;
-    JsonArray& arr = buffer.createArray();
+    DynamicJsonDocument doc;
+    JsonArray arr = doc.to<JsonArray>();
 
     JsonVariant variant = arr;
-    REQUIRE(&arr == &variant.as<JsonArray&>());
-    REQUIRE(&arr == &variant.as<JsonArray>());  // <- shorthand
+    REQUIRE(arr == variant.as<JsonArray>());
+    REQUIRE(arr == variant.as<JsonArray>());  // <- shorthand
   }
 
   SECTION("ObjectAsJsonObject") {
-    DynamicJsonBuffer buffer;
-    JsonObject& arr = buffer.createObject();
+    DynamicJsonDocument doc;
+    JsonObject obj = doc.to<JsonObject>();
 
-    JsonVariant variant = arr;
-    REQUIRE(&arr == &variant.as<JsonObject&>());
-    REQUIRE(&arr == &variant.as<JsonObject>());  // <- shorthand
+    JsonVariant variant = obj;
+    REQUIRE(obj == variant.as<JsonObject>());
+    REQUIRE(obj == variant.as<JsonObject>());  // <- shorthand
   }
 }

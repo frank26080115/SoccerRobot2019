@@ -6,7 +6,6 @@
 #include <catch.hpp>
 
 TEST_CASE("JsonVariant copy") {
-  DynamicJsonBuffer _jsonBuffer;
   JsonVariant _variant1;
   JsonVariant _variant2;
 
@@ -39,11 +38,12 @@ TEST_CASE("JsonVariant copy") {
     _variant2 = _variant1;
     _variant1 = "world";
 
-    REQUIRE(std::string("hello") == _variant2.as<const char *>());
+    REQUIRE(std::string("hello") == _variant2.as<const char*>());
   }
 
   SECTION("ObjectsAreCopiedByReference") {
-    JsonObject &object = _jsonBuffer.createObject();
+    DynamicJsonDocument doc;
+    JsonObject object = doc.to<JsonObject>();
 
     _variant1 = object;
 
@@ -53,7 +53,8 @@ TEST_CASE("JsonVariant copy") {
   }
 
   SECTION("ArraysAreCopiedByReference") {
-    JsonArray &array = _jsonBuffer.createArray();
+    DynamicJsonDocument doc;
+    JsonArray array = doc.to<JsonArray>();
 
     _variant1 = array;
 

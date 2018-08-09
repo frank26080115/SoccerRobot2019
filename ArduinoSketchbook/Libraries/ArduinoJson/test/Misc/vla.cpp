@@ -17,315 +17,321 @@
 #ifndef VLA_NOT_SUPPORTED
 
 TEST_CASE("Variable Length Array") {
-  SECTION("ParseArray") {
-    int i = 8;
-    char vla[i];
-    strcpy(vla, "[42]");
-
-    StaticJsonBuffer<JSON_ARRAY_SIZE(1)> jsonBuffer;
-    JsonArray& arr = jsonBuffer.parseArray(vla);
-
-    REQUIRE(true == arr.success());
-  }
-
-  SECTION("ParseObject") {
-    int i = 16;
+  SECTION("deserializeJson()") {
+    int i = 9;
     char vla[i];
     strcpy(vla, "{\"a\":42}");
 
-    StaticJsonBuffer<JSON_OBJECT_SIZE(1)> jsonBuffer;
-    JsonObject& obj = jsonBuffer.parseObject(vla);
+    StaticJsonDocument<JSON_OBJECT_SIZE(1)> doc;
+    DeserializationError err = deserializeJson(doc, vla);
 
-    REQUIRE(true == obj.success());
+    REQUIRE(err == DeserializationError::Ok);
   }
 
-  SECTION("Parse") {
+  SECTION("deserializeMsgPack()") {
     int i = 16;
     char vla[i];
-    strcpy(vla, "42");
+    memcpy(vla, "\xDE\x00\x01\xA5Hello\xA5world", 15);
 
-    StaticJsonBuffer<1> jsonBuffer;
-    JsonVariant variant = jsonBuffer.parse(vla);
+    StaticJsonDocument<JSON_OBJECT_SIZE(1)> doc;
+    DeserializationError err = deserializeMsgPack(doc, vla);
 
-    REQUIRE(42 == variant.as<int>());
+    REQUIRE(err == DeserializationError::Ok);
   }
 
-  SECTION("JsonVariant_Constructor") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "42");
+  SECTION("JsonVariant") {
+    SECTION("constructor") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "42");
 
-    JsonVariant variant(vla);
+      JsonVariant variant(vla);
 
-    REQUIRE(42 == variant.as<int>());
-  }
+      REQUIRE(42 == variant.as<int>());
+    }
 
-  SECTION("JsonVariant_Assign") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "42");
+    SECTION("operator=") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "42");
 
-    JsonVariant variant(666);
-    variant = vla;
+      JsonVariant variant(666);
+      variant = vla;
 
-    REQUIRE(42 == variant.as<int>());
-  }
+      REQUIRE(42 == variant.as<int>());
+    }
 
 #ifndef CONFLICTS_WITH_BUILTIN_OPERATOR
-  SECTION("JsonVariant_Subscript") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
+    SECTION("operator[]") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonVariant variant = jsonBuffer.parseObject("{\"hello\":\"world\"}");
+      DynamicJsonDocument doc;
+      deserializeJson(doc, "{\"hello\":\"world\"}");
+      JsonVariant variant = doc.as<JsonVariant>();
 
-    REQUIRE(std::string("world") == variant[vla]);
-  }
+      REQUIRE(std::string("world") == variant[vla]);
+    }
 #endif
 
 #ifndef CONFLICTS_WITH_BUILTIN_OPERATOR
-  SECTION("JsonVariant_Subscript_Const") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
+    SECTION("operator[] const") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
 
-    DynamicJsonBuffer jsonBuffer;
-    const JsonVariant variant = jsonBuffer.parseObject("{\"hello\":\"world\"}");
+      DynamicJsonDocument doc;
+      deserializeJson(doc, "{\"hello\":\"world\"}");
+      const JsonVariant variant = doc.as<JsonVariant>();
 
-    REQUIRE(std::string("world") == variant[vla]);
-  }
+      REQUIRE(std::string("world") == variant[vla]);
+    }
 #endif
 
-  SECTION("JsonVariant_Equals") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
+    SECTION("operator==") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
 
-    DynamicJsonBuffer jsonBuffer;
-    const JsonVariant variant = "hello";
+      JsonVariant variant;
+      variant = "hello";
 
-    REQUIRE((vla == variant));
-    REQUIRE((variant == vla));
-    REQUIRE_FALSE((vla != variant));
-    REQUIRE_FALSE((variant != vla));
+      REQUIRE((vla == variant));
+      REQUIRE((variant == vla));
+      REQUIRE_FALSE((vla != variant));
+      REQUIRE_FALSE((variant != vla));
+    }
+
+    SECTION("operator!=") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
+
+      JsonVariant variant;
+      variant = "world";
+
+      REQUIRE((vla != variant));
+      REQUIRE((variant != vla));
+      REQUIRE_FALSE((vla == variant));
+      REQUIRE_FALSE((variant == vla));
+    }
   }
 
-  SECTION("JsonVariant_Differs") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
+  SECTION("JsonObject") {
+#ifndef CONFLICTS_WITH_BUILTIN_OPERATOR
+    SECTION("operator[]") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
 
-    DynamicJsonBuffer jsonBuffer;
-    const JsonVariant variant = "world";
+      DynamicJsonDocument doc;
+      JsonObject obj = doc.to<JsonObject>();
+      obj[vla] = "world";
 
-    REQUIRE((vla != variant));
-    REQUIRE((variant != vla));
-    REQUIRE_FALSE((vla == variant));
-    REQUIRE_FALSE((variant == vla));
-  }
+      REQUIRE(std::string("world") == obj["hello"]);
+    }
+#endif
 
 #ifndef CONFLICTS_WITH_BUILTIN_OPERATOR
-  SECTION("JsonObject_Subscript") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
+    SECTION("operator[] const") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.createObject();
-    obj[vla] = "world";
+      DynamicJsonDocument doc;
+      deserializeJson(doc, "{\"hello\":\"world\"}");
 
-    REQUIRE(std::string("world") == obj["hello"]);
-  }
+      JsonObject obj = doc.as<JsonObject>();
+      REQUIRE(std::string("world") == obj[vla]);
+    }
 #endif
 
-  SECTION("JsonObject_Subscript_Assign") {  // issue #416
-    int i = 32;
-    char vla[i];
-    strcpy(vla, "world");
+    SECTION("get()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.createObject();
-    obj["hello"] = vla;
+      DynamicJsonDocument doc;
+      deserializeJson(doc, "{\"hello\":\"world\"}");
 
-    REQUIRE(std::string("world") == obj["hello"].as<char*>());
+      JsonObject obj = doc.as<JsonObject>();
+      REQUIRE(std::string("world") == obj.get<char*>(vla));
+    }
+
+    SECTION("set() key") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
+
+      DynamicJsonDocument doc;
+      JsonObject obj = doc.to<JsonObject>();
+      obj.set(vla, "world");
+
+      REQUIRE(std::string("world") == obj["hello"]);
+    }
+
+    SECTION("set() value") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "world");
+
+      DynamicJsonDocument doc;
+      JsonObject obj = doc.to<JsonObject>();
+      obj.set("hello", vla);
+
+      REQUIRE(std::string("world") == obj["hello"]);
+    }
+
+    SECTION("set() key&value") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "world");
+
+      DynamicJsonDocument doc;
+      JsonObject obj = doc.to<JsonObject>();
+      obj.set(vla, vla);
+
+      REQUIRE(std::string("world") == obj["world"]);
+    }
+
+    SECTION("containsKey()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
+
+      DynamicJsonDocument doc;
+      deserializeJson(doc, "{\"hello\":\"world\"}");
+
+      JsonObject obj = doc.as<JsonObject>();
+      REQUIRE(true == obj.containsKey(vla));
+    }
+
+    SECTION("remove()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
+
+      DynamicJsonDocument doc;
+      deserializeJson(doc, "{\"hello\":\"world\"}");
+      JsonObject obj = doc.as<JsonObject>();
+      obj.remove(vla);
+
+      REQUIRE(0 == obj.size());
+    }
+
+    SECTION("is<T>()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
+
+      DynamicJsonDocument doc;
+      deserializeJson(doc, "{\"hello\":42}");
+      JsonObject obj = doc.as<JsonObject>();
+
+      REQUIRE(true == obj.is<int>(vla));
+    }
+
+    SECTION("createNestedArray()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
+
+      DynamicJsonDocument doc;
+      JsonObject obj = doc.to<JsonObject>();
+      obj.createNestedArray(vla);
+    }
+
+    SECTION("createNestedObject()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "hello");
+
+      DynamicJsonDocument doc;
+      JsonObject obj = doc.to<JsonObject>();
+      obj.createNestedObject(vla);
+    }
   }
 
-  SECTION("JsonObject_Subscript_Set") {
-    int i = 32;
-    char vla[i];
-    strcpy(vla, "world");
+  SECTION("JsonObjectSubscript") {
+    SECTION("operator=") {  // issue #416
+      int i = 32;
+      char vla[i];
+      strcpy(vla, "world");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.createObject();
-    obj["hello"].set(vla);
+      DynamicJsonDocument doc;
+      JsonObject obj = doc.to<JsonObject>();
+      obj["hello"] = vla;
 
-    REQUIRE(std::string("world") == obj["hello"].as<char*>());
+      REQUIRE(std::string("world") == obj["hello"].as<char*>());
+    }
+
+    SECTION("set()") {
+      int i = 32;
+      char vla[i];
+      strcpy(vla, "world");
+
+      DynamicJsonDocument doc;
+      JsonObject obj = doc.to<JsonObject>();
+      obj["hello"].set(vla);
+
+      REQUIRE(std::string("world") == obj["hello"].as<char*>());
+    }
   }
 
-#ifndef CONFLICTS_WITH_BUILTIN_OPERATOR
-  SECTION("JsonObject_Subscript_Const") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
+  SECTION("JsonArray") {
+    SECTION("add()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "world");
 
-    DynamicJsonBuffer jsonBuffer;
-    const JsonObject& obj = jsonBuffer.parseObject("{\"hello\":\"world\"}");
+      DynamicJsonDocument doc;
+      JsonArray arr = doc.to<JsonArray>();
+      arr.add(vla);
 
-    REQUIRE(std::string("world") == obj[vla]);
-  }
-#endif
+      REQUIRE(std::string("world") == arr[0]);
+    }
 
-  SECTION("JsonObject_Get") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
+    SECTION("set()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "world");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.parseObject("{\"hello\":\"world\"}");
+      DynamicJsonDocument doc;
+      JsonArray arr = doc.to<JsonArray>();
+      arr.add("hello");
+      arr.set(0, vla);
 
-    REQUIRE(std::string("world") == obj.get<char*>(vla));
-  }
-
-  SECTION("JsonObject_Set_Key") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.createObject();
-    obj.set(vla, "world");
-
-    REQUIRE(std::string("world") == obj["hello"]);
+      REQUIRE(std::string("world") == arr[0]);
+    }
   }
 
-  SECTION("JsonObject_Set_Value") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "world");
+  SECTION("JsonArraySubscript") {
+    SECTION("set()") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "world");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.createObject();
-    obj.set("hello", vla);
+      DynamicJsonDocument doc;
+      JsonArray arr = doc.to<JsonArray>();
+      arr.add("hello");
+      arr[0].set(vla);
 
-    REQUIRE(std::string("world") == obj["hello"]);
-  }
+      REQUIRE(std::string("world") == arr[0]);
+    }
 
-  SECTION("JsonObject_Set_KeyAndValue") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "world");
+    SECTION("operator=") {
+      int i = 16;
+      char vla[i];
+      strcpy(vla, "world");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.createObject();
-    obj.set(vla, vla);
+      DynamicJsonDocument doc;
+      JsonArray arr = doc.to<JsonArray>();
+      arr.add("hello");
+      arr[0] = vla;
 
-    REQUIRE(std::string("world") == obj["world"]);
-  }
-
-  SECTION("JsonObject_ContainsKey") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
-
-    DynamicJsonBuffer jsonBuffer;
-    const JsonObject& obj = jsonBuffer.parseObject("{\"hello\":\"world\"}");
-
-    REQUIRE(true == obj.containsKey(vla));
-  }
-
-  SECTION("JsonObject_Remove") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.parseObject("{\"hello\":\"world\"}");
-    obj.remove(vla);
-
-    REQUIRE(0 == obj.size());
-  }
-
-  SECTION("JsonObject_Is") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.parseObject("{\"hello\":42}");
-
-    REQUIRE(true == obj.is<int>(vla));
-  }
-
-  SECTION("JsonObject_CreateNestedArray") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.createObject();
-    obj.createNestedArray(vla);
-  }
-
-  SECTION("JsonObject_CreateNestedObject") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "hello");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& obj = jsonBuffer.createObject();
-    obj.createNestedObject(vla);
-  }
-
-  SECTION("JsonArray_Add") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "world");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& arr = jsonBuffer.createArray();
-    arr.add(vla);
-
-    REQUIRE(std::string("world") == arr[0]);
-  }
-
-  SECTION("JsonArray_Set") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "world");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& arr = jsonBuffer.createArray();
-    arr.add("hello");
-    arr.set(0, vla);
-
-    REQUIRE(std::string("world") == arr[0]);
-  }
-
-  SECTION("JsonArraySubscript_Set") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "world");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& arr = jsonBuffer.createArray();
-    arr.add("hello");
-    arr[0].set(vla);
-
-    REQUIRE(std::string("world") == arr[0]);
-  }
-
-  SECTION("JsonArraySubscript_Assign") {
-    int i = 16;
-    char vla[i];
-    strcpy(vla, "world");
-
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& arr = jsonBuffer.createArray();
-    arr.add("hello");
-    arr[0] = vla;
-
-    REQUIRE(std::string("world") == arr[0]);
+      REQUIRE(std::string("world") == arr[0]);
+    }
   }
 }
 #endif

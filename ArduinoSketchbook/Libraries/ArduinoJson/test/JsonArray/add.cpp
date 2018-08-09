@@ -6,8 +6,8 @@
 #include <catch.hpp>
 
 TEST_CASE("JsonArray::add()") {
-  DynamicJsonBuffer _jsonBuffer;
-  JsonArray& _array = _jsonBuffer.createArray();
+  DynamicJsonDocument doc;
+  JsonArray _array = doc.to<JsonArray>();
 
   SECTION("int") {
     _array.add(123);
@@ -39,28 +39,31 @@ TEST_CASE("JsonArray::add()") {
   }
 
   SECTION("nested array") {
-    JsonArray& arr = _jsonBuffer.createArray();
+    DynamicJsonDocument doc2;
+    JsonArray arr = doc2.to<JsonArray>();
 
     _array.add(arr);
 
-    REQUIRE(&arr == &_array[0].as<JsonArray&>());
-    REQUIRE(_array[0].is<JsonArray&>());
+    REQUIRE(arr == _array[0].as<JsonArray>());
+    REQUIRE(_array[0].is<JsonArray>());
     REQUIRE_FALSE(_array[0].is<int>());
   }
 
   SECTION("nested object") {
-    JsonObject& obj = _jsonBuffer.createObject();
+    DynamicJsonDocument doc2;
+    JsonObject obj = doc2.to<JsonObject>();
 
     _array.add(obj);
 
-    REQUIRE(&obj == &_array[0].as<JsonObject&>());
-    REQUIRE(_array[0].is<JsonObject&>());
+    REQUIRE(obj == _array[0].as<JsonObject>());
+    REQUIRE(_array[0].is<JsonObject>());
     REQUIRE_FALSE(_array[0].is<int>());
   }
 
   SECTION("array subscript") {
     const char* str = "hello";
-    JsonArray& arr = _jsonBuffer.createArray();
+    DynamicJsonDocument doc2;
+    JsonArray arr = doc2.to<JsonArray>();
     arr.add(str);
 
     _array.add(arr[0]);
@@ -70,7 +73,8 @@ TEST_CASE("JsonArray::add()") {
 
   SECTION("object subscript") {
     const char* str = "hello";
-    JsonObject& obj = _jsonBuffer.createObject();
+    DynamicJsonDocument doc2;
+    JsonObject obj = doc2.to<JsonObject>();
     obj["x"] = str;
 
     _array.add(obj["x"]);
@@ -81,30 +85,42 @@ TEST_CASE("JsonArray::add()") {
   SECTION("should not duplicate const char*") {
     _array.add("world");
     const size_t expectedSize = JSON_ARRAY_SIZE(1);
-    REQUIRE(expectedSize == _jsonBuffer.size());
+    REQUIRE(expectedSize == doc.memoryUsage());
   }
 
   SECTION("should duplicate char*") {
     _array.add(const_cast<char*>("world"));
     const size_t expectedSize = JSON_ARRAY_SIZE(1) + 6;
-    REQUIRE(expectedSize == _jsonBuffer.size());
+    REQUIRE(expectedSize == doc.memoryUsage());
   }
 
   SECTION("should duplicate std::string") {
     _array.add(std::string("world"));
     const size_t expectedSize = JSON_ARRAY_SIZE(1) + 6;
-    REQUIRE(expectedSize == _jsonBuffer.size());
+    REQUIRE(expectedSize == doc.memoryUsage());
   }
 
-  SECTION("should not duplicate RawJson(const char*)") {
-    _array.add(RawJson("{}"));
+  SECTION("should not duplicate serialized(const char*)") {
+    _array.add(serialized("{}"));
     const size_t expectedSize = JSON_ARRAY_SIZE(1);
-    REQUIRE(expectedSize == _jsonBuffer.size());
+    REQUIRE(expectedSize == doc.memoryUsage());
   }
 
-  SECTION("should duplicate RawJson(char*)") {
-    _array.add(RawJson(const_cast<char*>("{}")));
+  SECTION("should duplicate serialized(char*)") {
+    _array.add(serialized(const_cast<char*>("{}")));
+    const size_t expectedSize = JSON_ARRAY_SIZE(1) + 2;
+    REQUIRE(expectedSize == doc.memoryUsage());
+  }
+
+  SECTION("should duplicate serialized(std::string)") {
+    _array.add(serialized(std::string("{}")));
+    const size_t expectedSize = JSON_ARRAY_SIZE(1) + 2;
+    REQUIRE(expectedSize == doc.memoryUsage());
+  }
+
+  SECTION("should duplicate serialized(std::string)") {
+    _array.add(serialized(std::string("\0XX", 3)));
     const size_t expectedSize = JSON_ARRAY_SIZE(1) + 3;
-    REQUIRE(expectedSize == _jsonBuffer.size());
+    REQUIRE(expectedSize == doc.memoryUsage());
   }
 }

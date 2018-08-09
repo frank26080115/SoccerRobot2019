@@ -4,11 +4,14 @@
 
 #pragma once
 
-#include "StringTraits/StringTraits.hpp"
-#include "TypeTraits/EnableIf.hpp"
-#include "TypeTraits/IsVariant.hpp"
+#include "Data/IsVariant.hpp"
+#include "Polyfills/type_traits.hpp"
+#include "Strings/StringTypes.hpp"
 
 namespace ArduinoJson {
+class JsonArray;
+class JsonObject;
+
 namespace Internals {
 
 template <typename TImpl>
@@ -21,7 +24,7 @@ class JsonVariantComparisons {
   }
 
   template <typename TComparand>
-  friend typename EnableIf<!IsVariant<TComparand>::value, bool>::type
+  friend typename enable_if<!IsVariant<TComparand>::value, bool>::type
   operator==(TComparand comparand, const JsonVariantComparisons &variant) {
     return variant.equals(comparand);
   }
@@ -33,7 +36,7 @@ class JsonVariantComparisons {
   }
 
   template <typename TComparand>
-  friend typename EnableIf<!IsVariant<TComparand>::value, bool>::type
+  friend typename enable_if<!IsVariant<TComparand>::value, bool>::type
   operator!=(TComparand comparand, const JsonVariantComparisons &variant) {
     return !variant.equals(comparand);
   }
@@ -101,16 +104,14 @@ class JsonVariantComparisons {
   }
 
   template <typename TString>
-  typename EnableIf<StringTraits<TString>::has_equals, bool>::type equals(
+  typename enable_if<IsString<TString>::value, bool>::type equals(
       const TString &comparand) const {
-    const char *value = as<const char *>();
-    return StringTraits<TString>::equals(comparand, value);
+    return makeString(comparand).equals(as<const char *>());
   }
 
   template <typename TComparand>
-  typename EnableIf<!IsVariant<TComparand>::value &&
-                        !StringTraits<TComparand>::has_equals,
-                    bool>::type
+  typename enable_if<
+      !IsVariant<TComparand>::value && !IsString<TComparand>::value, bool>::type
   equals(const TComparand &comparand) const {
     return as<TComparand>() == comparand;
   }
@@ -129,8 +130,7 @@ class JsonVariantComparisons {
     if (is<JsonObject>() && right.template is<JsonObject>())
       return as<JsonObject>() == right.template as<JsonObject>();
     if (is<char *>() && right.template is<char *>())
-      return StringTraits<const char *>::equals(as<char *>(),
-                                                right.template as<char *>());
+      return makeString(as<char *>()).equals(right.template as<char *>());
 
     return false;
   }
