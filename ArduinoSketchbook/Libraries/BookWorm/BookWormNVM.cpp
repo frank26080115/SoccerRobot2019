@@ -14,6 +14,7 @@ returns:
 			1 means wrong length
 			2 means illegal char detected
 			3 means checksum failed
+			4 means version does not match
 
 parameters:
 	str, a string of hexadecimal to process
@@ -76,6 +77,10 @@ bool cBookWorm::loadNvmHex(char* str, uint8_t* errCode, bool save)
 			if (errCode != NULL) { *errCode = 3; /* checksum failed */ }
 			free(tmpbuff); return false;
 		}
+		if (calcEepromVersion() != castPtr->eeprom_version2 || calcEepromVersion() != castPtr->eeprom_version1) {
+			if (errCode != NULL) { *errCode = 4; /* version matching failed */ }
+			free(tmpbuff); return false;
+		}
 		memcpy((void*)(&(this->nvm)), (const void*)tmpbuff, sizeof(bookworm_nvm_t));
 		free(tmpbuff);
 		if (save) {
@@ -96,6 +101,10 @@ bool cBookWorm::loadNvmHex(char* str, uint8_t* errCode, bool save)
 		if (chksum != castPtr->checksumUser) {
 			debugf("bad chksum, calculated %04X, read in %04X\r\n", chksum, castPtr->checksumUser);
 			if (errCode != NULL) { *errCode = 3; /* checksum failed */ }
+			free(tmpbuff); return false;
+		}
+		if (calcEepromVersion() != castPtr->eeprom_version2) {
+			if (errCode != NULL) { *errCode = 4; /* version matching failed */ }
 			free(tmpbuff); return false;
 		}
 		memcpy(&(this->nvm.divider1), tmpbuff, userLength);
@@ -144,8 +153,8 @@ void cBookWorm::ensureNvmChecksums(void)
 	int i;
 	uint16_t chksum, chksumUser;
 	uint32_t userLength = calcUserNvmLength(false);
-	this->nvm.eeprom_version1 = BOOKWORM_EEPROM_VERSION;
-	this->nvm.eeprom_version2 = BOOKWORM_EEPROM_VERSION;
+	this->nvm.eeprom_version1 = calcEepromVersion();
+	this->nvm.eeprom_version2 = calcEepromVersion();
 	this->nvm.ssid[BOOKWORM_SSID_SIZE] = 0;
 	this->SSID[BOOKWORM_SSID_SIZE] = 0;
 	this->nvm.password[BOOKWORM_PASSWORD_SIZE] = 0;
@@ -177,17 +186,19 @@ parameters: none
 */
 bool cBookWorm::loadNvm()
 {
+	uint8_t* tmpbuff = (uint8_t*)malloc(sizeof(bookworm_nvm_t));
+	bookworm_nvm_t* castPtr = (bookworm_nvm_t*)tmpbuff;
 	uint8_t* ptr = (uint8_t*)&(this->nvm);
 	int i, sz;
 	uint16_t chksum;
 
 	sz = sizeof(bookworm_nvm_t);
-	this->debugf("NVM reading (%u from 0x%08X):\r\n", sz, (uint32_t)ptr);
+	this->debugf("NVM reading (%u):\r\n", sz);
 	for (i = 0; i < sz; i++) {
 		uint8_t dataByte;
 		dataByte = EEPROM.read(i);
 		this->debugf(".");
-		ptr[i] = dataByte;
+		tmpbuff[i] = dataByte;
 		this->debugf("%02X", dataByte);
 		if (((i + 1) % 16) == 0) {
 			this->debugf("\r\n");
@@ -196,8 +207,11 @@ bool cBookWorm::loadNvm()
 	this->debugf("\r\ndone!\r\n");
 
 	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
-	if (chksum == this->nvm.checksum && BOOKWORM_EEPROM_VERSION == this->nvm.eeprom_version1 && BOOKWORM_EEPROM_VERSION == this->nvm.eeprom_version2)
+	if (chksum == castPtr->checksum && calcEepromVersion() == castPtr->eeprom_version1 && calcEepromVersion() == castPtr->eeprom_version2)
 	{
+		memcpy((void*)ptr, (const void*)tmpbuff, sizeof(bookworm_nvm_t));
+		free(tmpbuff);
+
 		memcpy(this->SSID, this->nvm.ssid, 32);
 		this->SSID[BOOKWORM_SSID_SIZE] = 0;
 
@@ -218,13 +232,14 @@ bool cBookWorm::loadNvm()
 	}
 	else
 	{
-		this->printf("NVM load failed, \r\n\tchecksum %04X != %04X\r\n", chksum, this->nvm.checksum);
-		if (BOOKWORM_EEPROM_VERSION != this->nvm.eeprom_version1) {
-			this->printf("\tversion %04X != %04X\r\n", BOOKWORM_EEPROM_VERSION, this->nvm.eeprom_version1);
+		this->printf("NVM load failed, \r\n\tchecksum %04X != %04X\r\n", chksum, castPtr->checksum);
+		if (calcEepromVersion() != this->nvm.eeprom_version1) {
+			this->printf("\tversion %04X != %04X\r\n", calcEepromVersion(), castPtr->eeprom_version1);
 		}
-		if (BOOKWORM_EEPROM_VERSION != this->nvm.eeprom_version2) {
-			this->printf("\tversion %04X != %04X\r\n", BOOKWORM_EEPROM_VERSION, this->nvm.eeprom_version2);
+		if (calcEepromVersion() != this->nvm.eeprom_version2) {
+			this->printf("\tversion %04X != %04X\r\n", calcEepromVersion(), castPtr->eeprom_version2);
 		}
+		free(tmpbuff);
 		return false;
 	}
 }
@@ -250,4 +265,19 @@ void cBookWorm::saveNvm()
 	}
 	EEPROM.commit();
 	this->debugf(" done!\r\n");
+}
+
+uint32_t cBookWorm::calcEepromVersion()
+{
+	uint32_t x = BOOKWORM_EEPROM_VERSION;
+	uint32_t sz = sizeof(bookworm_nvm_t);
+	sz <<= 12;
+	#ifdef ENABLE_WEAPON
+	x |= 0x80000000;
+	#endif
+	#ifdef ENABLE_BATTERY_MONITOR
+	x |= 0x40000000;
+	#endif
+	x |= sz;
+	return x;
 }

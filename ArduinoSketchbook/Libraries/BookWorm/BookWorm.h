@@ -3,6 +3,10 @@
 
 #define BOOKWORM_VERSION 1
 #define BOOKWORM_EEPROM_VERSION 1
+/*
+EEPROM Version History:
+1 - Not released, use only
+*/
 
 //#define ENABLE_WEAPON
 #define BOOKWORM_DEBUG
@@ -147,6 +151,7 @@ public:
 	void setWifiChannel(uint8_t);
 	bool loadNvmHex(char* str, uint8_t* errCode, bool save);
 	uint32_t calcUserNvmLength(bool withChecksum);
+	uint32_t calcEepromVersion();
 	bookworm_nvm_t nvm;
 	bool robotFlip; // temporary flip, for inverted drive
 

@@ -277,6 +277,9 @@ void handleConfig() {
         else if (errCode == 3) {
           server.sendContent("Checksum is incorrect\n");
         }
+        else if (errCode == 4) {
+          server.sendContent("Version does not match (incompatible)\n");
+        }
         server.sendContent("\n</h2>\n");
       }
       else

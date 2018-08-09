@@ -21,7 +21,7 @@ void cBookWorm::checkHardwareConfig(void* serverPtr, bool useSerial)
 	sprintf(tmpbuff, "Code MD5: %s\r\n", ESP.getSketchMD5().c_str());
 	if (server != NULL)  { server->sendContent(tmpbuff); server->sendContent("<br />"); } if (useSerial) { Serial.print(tmpbuff); }
 
-	sprintf(tmpbuff, "BookWorm Version: %u ; EEPROM Ver %u\r\n", BOOKWORM_VERSION, BOOKWORM_EEPROM_VERSION);
+	sprintf(tmpbuff, "BookWorm Version: %u ; EEPROM Ver 0x%08X\r\n", BOOKWORM_VERSION, calcEepromVersion());
 	if (server != NULL)  { server->sendContent(tmpbuff); server->sendContent("<br />"); } if (useSerial) { Serial.print(tmpbuff); }
 
 	sprintf(tmpbuff, "Flash ID: %08X\r\n", ESP.getFlashChipId());
