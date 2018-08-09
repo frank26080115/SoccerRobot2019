@@ -189,6 +189,14 @@ bool cBookWorm::loadNvm()
 	uint8_t* tmpbuff = (uint8_t*)malloc(sizeof(bookworm_nvm_t));
 	bookworm_nvm_t* castPtr = (bookworm_nvm_t*)tmpbuff;
 	uint8_t* ptr = (uint8_t*)&(this->nvm);
+
+	/*
+	warning: writing directly into "ptr" could cause a crash
+	cause is unknown
+	workaround is to use a temporary buffer and then copying into ptr
+	using memcpy
+	*/
+
 	int i, sz;
 	uint16_t chksum;
 
