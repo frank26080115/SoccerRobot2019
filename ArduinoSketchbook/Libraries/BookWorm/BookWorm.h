@@ -122,7 +122,7 @@ public:
 	void setAdvanced(bool);
 
 	#ifdef ENABLE_BATTERY_MONITOR
-	double readBatteryVoltageRaw(void);
+	uint32_t readBatteryVoltageRaw(void);
 	uint16_t readBatteryVoltageFiltered(void);
 	uint16_t readBatteryVoltageFilteredLast(void);
 	void setVdivR1(uint32_t);
@@ -173,8 +173,8 @@ private:
 	bool serialHasBegun;
 	bool pinsHaveLoaded;
 	#ifdef ENABLE_BATTERY_MONITOR
-	double batteryVoltageFiltered;
-	double adcToVoltage(uint16_t);
+	uint32_t batteryVoltageFiltered;
+	uint32_t adcToVoltage(uint16_t);
 	#endif
 };
 

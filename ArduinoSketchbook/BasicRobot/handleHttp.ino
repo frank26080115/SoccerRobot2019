@@ -186,14 +186,25 @@ void handleMove() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   char buff[20] = {'\0'};
-  if (BookWorm.isBatteryLowWarning()) {
+  #ifndef SIMULATED_BATT_READING
+  if (BookWorm.isBatteryLowWarning() && BookWorm.nvm->vdiv_r2 > 0)
+  #else
+  if ((millis() / 3000) % 2 == 0)
+  #endif
+  {
     snprintf(buff, sizeof(buff), "true");
   }
   else {
     snprintf(buff, sizeof(buff), "false");
   }
   root["battWarning"] = buff;
-  snprintf(buff, sizeof(buff), "%u", BookWorm.nvm->vdiv_r2 > 0 ? BookWorm.readBatteryVoltageFilteredLast() : 0);
+  snprintf(buff, sizeof(buff), "%u",
+    #ifndef SIMULATED_BATT_READING
+      BookWorm.nvm->vdiv_r2 > 0 ? BookWorm.readBatteryVoltageFilteredLast() : 0
+    #else
+      millis() % 6000
+    #endif
+    );
   root["battVoltage"] = buff;
   String response;
   root.printTo(response);

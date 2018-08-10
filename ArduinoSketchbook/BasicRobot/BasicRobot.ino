@@ -11,6 +11,8 @@
 ///#define ENABLE_BOOT_PIN_RESET
 #endif
 
+#define SIMULATED_BATT_READING
+
 /* hostname for mDNS. Should work at least on windows. Try http://robot.local */
 const char *myHostname = "robot";
 
