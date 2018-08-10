@@ -7,8 +7,8 @@
 #include <catch.hpp>
 
 TEST_CASE("JsonArray::operator[]") {
-  DynamicJsonDocument doc;
-  JsonArray _array = doc.to<JsonArray>();
+  DynamicJsonBuffer _jsonBuffer;
+  JsonArray& _array = _jsonBuffer.createArray();
   _array.add(0);
 
   SECTION("int") {
@@ -52,34 +52,33 @@ TEST_CASE("JsonArray::operator[]") {
   }
 
   SECTION("nested array") {
-    DynamicJsonDocument doc2;
-    JsonArray arr = doc2.to<JsonArray>();
+    JsonArray& arr = _jsonBuffer.createArray();
 
     _array[0] = arr;
 
-    REQUIRE(arr == _array[0].as<JsonArray>());
-    REQUIRE(arr == _array[0].as<JsonArray>());  // <- short hand
-    // REQUIRE(arr == _array[0].as<const JsonArray>());
-    // REQUIRE(arr == _array[0].as<const JsonArray>());  // <- short hand
-    REQUIRE(true == _array[0].is<JsonArray>());
+    REQUIRE(&arr == &_array[0].as<JsonArray&>());
+    REQUIRE(&arr == &_array[0].as<JsonArray>());  // <- short hand
+    REQUIRE(&arr == &_array[0].as<const JsonArray&>());
+    REQUIRE(&arr == &_array[0].as<const JsonArray>());  // <- short hand
+    REQUIRE(true == _array[0].is<JsonArray&>());
     REQUIRE(false == _array[0].is<int>());
   }
 
   SECTION("nested object") {
-    DynamicJsonDocument doc2;
-    JsonObject obj = doc2.to<JsonObject>();
+    JsonObject& obj = _jsonBuffer.createObject();
 
     _array[0] = obj;
 
-    REQUIRE(obj == _array[0].as<JsonObject>());
-    REQUIRE(obj == _array[0].as<const JsonObject>());  // <- short hand
-    REQUIRE(true == _array[0].is<JsonObject>());
+    REQUIRE(&obj == &_array[0].as<JsonObject&>());
+    REQUIRE(&obj == &_array[0].as<JsonObject>());  // <- short hand
+    REQUIRE(&obj == &_array[0].as<const JsonObject&>());
+    REQUIRE(&obj == &_array[0].as<const JsonObject>());  // <- short hand
+    REQUIRE(true == _array[0].is<JsonObject&>());
     REQUIRE(false == _array[0].is<int>());
   }
 
   SECTION("array subscript") {
-    DynamicJsonDocument doc2;
-    JsonArray arr = doc2.to<JsonArray>();
+    JsonArray& arr = _jsonBuffer.createArray();
     const char* str = "hello";
 
     arr.add(str);
@@ -90,9 +89,8 @@ TEST_CASE("JsonArray::operator[]") {
   }
 
   SECTION("object subscript") {
+    JsonObject& obj = _jsonBuffer.createObject();
     const char* str = "hello";
-    DynamicJsonDocument doc2;
-    JsonObject obj = doc2.to<JsonObject>();
 
     obj["x"] = str;
 
@@ -104,18 +102,18 @@ TEST_CASE("JsonArray::operator[]") {
   SECTION("should not duplicate const char*") {
     _array[0] = "world";
     const size_t expectedSize = JSON_ARRAY_SIZE(1);
-    REQUIRE(expectedSize == doc.memoryUsage());
+    REQUIRE(expectedSize == _jsonBuffer.size());
   }
 
   SECTION("should duplicate char*") {
     _array[0] = const_cast<char*>("world");
     const size_t expectedSize = JSON_ARRAY_SIZE(1) + 6;
-    REQUIRE(expectedSize == doc.memoryUsage());
+    REQUIRE(expectedSize == _jsonBuffer.size());
   }
 
   SECTION("should duplicate std::string") {
     _array[0] = std::string("world");
     const size_t expectedSize = JSON_ARRAY_SIZE(1) + 6;
-    REQUIRE(expectedSize == doc.memoryUsage());
+    REQUIRE(expectedSize == _jsonBuffer.size());
   }
 }

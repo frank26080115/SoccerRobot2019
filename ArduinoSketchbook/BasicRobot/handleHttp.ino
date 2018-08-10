@@ -526,4 +526,3 @@ void generateFlipDropdown(uint8_t cur)
   server.sendContent("\t</select><br />* requires reboot to take effect\n");
   generateConfigItemEnd();
 }
-

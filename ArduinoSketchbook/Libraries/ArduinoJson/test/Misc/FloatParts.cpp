@@ -2,7 +2,7 @@
 // Copyright Benoit Blanchon 2014-2018
 // MIT License
 
-#include <ArduinoJson/Numbers/FloatParts.hpp>
+#include <ArduinoJson/Serialization/FloatParts.hpp>
 #include <catch.hpp>
 
 using namespace ArduinoJson::Internals;

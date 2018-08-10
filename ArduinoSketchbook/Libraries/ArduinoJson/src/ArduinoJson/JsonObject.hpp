@@ -4,82 +4,145 @@
 
 #pragma once
 
-#include "./JsonObjectData.hpp"
+#include "Data/JsonBufferAllocated.hpp"
+#include "Data/List.hpp"
+#include "Data/ReferenceType.hpp"
+#include "Data/ValueSaver.hpp"
+#include "JsonPair.hpp"
+#include "Serialization/JsonPrintable.hpp"
+#include "StringTraits/StringTraits.hpp"
+#include "TypeTraits/EnableIf.hpp"
+#include "TypeTraits/IsArray.hpp"
+#include "TypeTraits/IsFloatingPoint.hpp"
+#include "TypeTraits/IsSame.hpp"
+
+// Returns the size (in bytes) of an object with n elements.
+// Can be very handy to determine the size of a StaticJsonBuffer.
+#define JSON_OBJECT_SIZE(NUMBER_OF_ELEMENTS) \
+  (sizeof(JsonObject) + (NUMBER_OF_ELEMENTS) * sizeof(JsonObject::node_type))
 
 namespace ArduinoJson {
 
-class JsonObject {
-  friend class JsonVariant;
+// Forward declarations
+class JsonArray;
+class JsonBuffer;
+namespace Internals {
+template <typename>
+class JsonObjectSubscript;
+}
 
+// A dictionary of JsonVariant indexed by string (char*)
+//
+// The constructor is private, instances must be created via
+// JsonBuffer::createObject() or JsonBuffer::parseObject().
+// A JsonObject can be serialized to a JSON string via JsonObject::printTo().
+// It can also be deserialized from a JSON string via JsonBuffer::parseObject().
+class JsonObject : public Internals::JsonPrintable<JsonObject>,
+                   public Internals::ReferenceType,
+                   public Internals::NonCopyable,
+                   public Internals::List<JsonPair>,
+                   public Internals::JsonBufferAllocated {
  public:
-  typedef Internals::JsonObjectData::iterator iterator;
-  typedef Internals::JsonObjectData::const_iterator const_iterator;
+  // Create an empty JsonArray attached to the specified JsonBuffer.
+  // You should not use this constructor directly.
+  // Instead, use JsonBuffer::createObject() or JsonBuffer.parseObject().
+  explicit JsonObject(JsonBuffer* buffer) throw()
+      : Internals::List<JsonPair>(buffer) {}
 
-  JsonObject() : _data(0) {}
-  JsonObject(Internals::JsonObjectData* object) : _data(object) {}
-  JsonObject(Internals::JsonBuffer* buf)
-      : _data(new (buf) Internals::JsonObjectData(buf)) {}
-
-  iterator begin() {
-    if (!_data) return iterator();
-    return _data->begin();
-  }
-
-  const_iterator begin() const {
-    if (!_data) return const_iterator();
-    return _data->begin();
-  }
-
-  // Tells weither the specified key is present and associated with a value.
+  // Gets or sets the value associated with the specified key.
   //
-  // bool containsKey(TKey);
+  // JsonObjectSubscript operator[](TKey)
   // TKey = const std::string&, const String&
   template <typename TString>
-  bool containsKey(const TString& key) const {
-    return containsKey_impl<const TString&>(key);
+  Internals::JsonObjectSubscript<const TString&> operator[](
+      const TString& key) {
+    return Internals::JsonObjectSubscript<const TString&>(*this, key);
   }
   //
-  // bool containsKey(TKey);
-  // TKey = char*, const char*, char[], const char[], const FlashStringHelper*
+  // JsonObjectSubscript operator[](TKey)
+  // TKey = char*, const char*, char[], const char[N], const FlashStringHelper*
   template <typename TString>
-  bool containsKey(TString* key) const {
-    return containsKey_impl<TString*>(key);
+  Internals::JsonObjectSubscript<TString*> operator[](TString* key) {
+    return Internals::JsonObjectSubscript<TString*>(*this, key);
   }
 
-  iterator end() {
-    return iterator();
-  }
-
-  const_iterator end() const {
-    return const_iterator();
-  }
-
-  // Creates and adds a JsonArray.
+  // Gets the value associated with the specified key.
   //
-  // JsonArray createNestedArray(TKey);
+  // const JsonObjectSubscript operator[](TKey) const;
   // TKey = const std::string&, const String&
   template <typename TString>
-  JsonArray createNestedArray(const TString& key);
-  // JsonArray createNestedArray(TKey);
-  // TKey = char*, const char*, char[], const char[], const FlashStringHelper*
-  template <typename TString>
-  JsonArray createNestedArray(TString* key);
-
-  // Creates and adds a JsonObject.
-  //
-  // JsonObject createNestedObject(TKey);
-  // TKey = const std::string&, const String&
-  template <typename TString>
-  JsonObject createNestedObject(const TString& key) {
-    if (!_data) return JsonObject();
-    return createNestedObject_impl<const TString&>(key);
+  const Internals::JsonObjectSubscript<const TString&> operator[](
+      const TString& key) const {
+    return Internals::JsonObjectSubscript<const TString&>(
+        *const_cast<JsonObject*>(this), key);
   }
   //
-  // JsonObject createNestedObject(TKey);
-  // TKey = char*, const char*, char[], const char[], const FlashStringHelper*
+  // const JsonObjectSubscript operator[](TKey) const;
+  // TKey = const char*, const char[N], const FlashStringHelper*
   template <typename TString>
-  JsonObject createNestedObject(TString* key) {
-    return createNestedObject_impl<TString*>(key);
+  const Internals::JsonObjectSubscript<TString*> operator[](
+      TString* key) const {
+    return Internals::JsonObjectSubscript<TString*>(
+        *const_cast<JsonObject*>(this), key);
+  }
+
+  // Sets the specified key with the specified value.
+  //
+  // bool set(TKey, TValue);
+  // TKey = const std::string&, const String&
+  // TValue = bool, long, int, short, float, double, RawJson, JsonVariant,
+  //          std::string, String, JsonArray, JsonObject
+  template <typename TValue, typename TString>
+  bool set(const TString& key, const TValue& value) {
+    return set_impl<const TString&, const TValue&>(key, value);
+  }
+  //
+  // bool set(TKey, TValue);
+  // TKey = const std::string&, const String&
+  // TValue = char*, const char*, const FlashStringHelper*
+  template <typename TValue, typename TString>
+  bool set(const TString& key, TValue* value) {
+    return set_impl<const TString&, TValue*>(key, value);
+  }
+  //
+  // bool set(TKey, const TValue&);
+  // TKey = char*, const char*, const FlashStringHelper*
+  // TValue = bool, long, int, short, float, double, RawJson, JsonVariant,
+  //          std::string, String, JsonArray, JsonObject
+  template <typename TValue, typename TString>
+  bool set(TString* key, const TValue& value) {
+    return set_impl<TString*, const TValue&>(key, value);
+  }
+  //
+  // bool set(TKey, TValue);
+  // TKey = char*, const char*, const FlashStringHelper*
+  // TValue = char*, const char*, const FlashStringHelper*
+  template <typename TValue, typename TString>
+  bool set(TString* key, TValue* value) {
+    return set_impl<TString*, TValue*>(key, value);
+  }
+  //
+  // bool set(TKey, TValue, uint8_t decimals);
+  // TKey = const std::string&, const String&
+  // TValue = float, double
+  template <typename TValue, typename TString>
+  DEPRECATED("Second argument is not supported anymore")
+  typename Internals::EnableIf<Internals::IsFloatingPoint<TValue>::value,
+                               bool>::type
+      set(const TString& key, TValue value, uint8_t) {
+    return set_impl<const TString&, const JsonVariant&>(key,
+                                                        JsonVariant(value));
+  }
+  //
+  // bool set(TKey, TValue, uint8_t decimals);
+  // TKey = char*, const char*, const FlashStringHelper*
+  // TValue = float, double
+  template <typename TValue, typename TString>
+  DEPRECATED("Second argument is not supported anymore")
+  typename Internals::EnableIf<Internals::IsFloatingPoint<TValue>::value,
+                               bool>::type
+      set(TString* key, TValue value, uint8_t) {
+    return set_impl<TString*, const JsonVariant&>(key, JsonVariant(value));
   }
 
   // Gets the value associated with the specified key.
@@ -124,48 +187,51 @@ class JsonObject {
     return is_impl<TString*, TValue>(key);
   }
 
-  // Gets or sets the value associated with the specified key.
+  // Creates and adds a JsonArray.
   //
-  // JsonObjectSubscript operator[](TKey)
+  // JsonArray& createNestedArray(TKey);
   // TKey = const std::string&, const String&
   template <typename TString>
-  Internals::JsonObjectSubscript<const TString&> operator[](
-      const TString& key) {
-    return Internals::JsonObjectSubscript<const TString&>(*this, key);
+  JsonArray& createNestedArray(const TString& key) {
+    return createNestedArray_impl<const TString&>(key);
   }
-  //
-  // JsonObjectSubscript operator[](TKey)
-  // TKey = char*, const char*, char[], const char[N], const FlashStringHelper*
+  // JsonArray& createNestedArray(TKey);
+  // TKey = char*, const char*, char[], const char[], const FlashStringHelper*
   template <typename TString>
-  Internals::JsonObjectSubscript<TString*> operator[](TString* key) {
-    return Internals::JsonObjectSubscript<TString*>(*this, key);
+  JsonArray& createNestedArray(TString* key) {
+    return createNestedArray_impl<TString*>(key);
   }
 
-  // Gets the value associated with the specified key.
+  // Creates and adds a JsonObject.
   //
-  // const JsonObjectSubscript operator[](TKey) const;
+  // JsonObject& createNestedObject(TKey);
   // TKey = const std::string&, const String&
   template <typename TString>
-  const Internals::JsonObjectSubscript<const TString&> operator[](
-      const TString& key) const {
-    return Internals::JsonObjectSubscript<const TString&>(*this, key);
+  JsonObject& createNestedObject(const TString& key) {
+    return createNestedObject_impl<const TString&>(key);
   }
   //
-  // const JsonObjectSubscript operator[](TKey) const;
-  // TKey = const char*, const char[N], const FlashStringHelper*
+  // JsonObject& createNestedObject(TKey);
+  // TKey = char*, const char*, char[], const char[], const FlashStringHelper*
   template <typename TString>
-  const Internals::JsonObjectSubscript<TString*> operator[](
-      TString* key) const {
-    return Internals::JsonObjectSubscript<TString*>(*this, key);
+  JsonObject& createNestedObject(TString* key) {
+    return createNestedObject_impl<TString*>(key);
   }
 
-  bool operator==(const JsonObject& rhs) const {
-    return _data == rhs._data;
+  // Tells weither the specified key is present and associated with a value.
+  //
+  // bool containsKey(TKey);
+  // TKey = const std::string&, const String&
+  template <typename TString>
+  bool containsKey(const TString& key) const {
+    return findKey<const TString&>(key) != end();
   }
-
-  void remove(iterator it) {
-    if (!_data) return;
-    _data->remove(it);
+  //
+  // bool containsKey(TKey);
+  // TKey = char*, const char*, char[], const char[], const FlashStringHelper*
+  template <typename TString>
+  bool containsKey(TString* key) const {
+    return findKey<TString*>(key) != end();
   }
 
   // Removes the specified key and the associated value.
@@ -174,87 +240,34 @@ class JsonObject {
   // TKey = const std::string&, const String&
   template <typename TString>
   void remove(const TString& key) {
-    remove_impl<const TString&>(key);
+    remove(findKey<const TString&>(key));
   }
   //
   // void remove(TKey);
   // TKey = char*, const char*, char[], const char[], const FlashStringHelper*
   template <typename TString>
   void remove(TString* key) {
-    remove_impl<TString*>(key);
-  }
-
-  // Sets the specified key with the specified value.
-  //
-  // bool set(TKey, TValue);
-  // TKey = const std::string&, const String&
-  // TValue = bool, long, int, short, float, double, serialized, JsonVariant,
-  //          std::string, String, JsonArray, JsonObject
-  template <typename TValue, typename TString>
-  bool set(const TString& key, const TValue& value) {
-    return set_impl<const TString&, const TValue&>(key, value);
+    remove(findKey<TString*>(key));
   }
   //
-  // bool set(TKey, TValue);
-  // TKey = const std::string&, const String&
-  // TValue = char*, const char*, const FlashStringHelper*
-  template <typename TValue, typename TString>
-  bool set(const TString& key, TValue* value) {
-    return set_impl<const TString&, TValue*>(key, value);
-  }
-  //
-  // bool set(TKey, const TValue&);
-  // TKey = char*, const char*, const FlashStringHelper*
-  // TValue = bool, long, int, short, float, double, serialized, JsonVariant,
-  //          std::string, String, JsonArray, JsonObject
-  template <typename TValue, typename TString>
-  bool set(TString* key, const TValue& value) {
-    return set_impl<TString*, const TValue&>(key, value);
-  }
-  //
-  // bool set(TKey, TValue);
-  // TKey = char*, const char*, const FlashStringHelper*
-  // TValue = char*, const char*, const FlashStringHelper*
-  template <typename TValue, typename TString>
-  bool set(TString* key, TValue* value) {
-    return set_impl<TString*, TValue*>(key, value);
-  }
+  // void remove(iterator)
+  using Internals::List<JsonPair>::remove;
 
-  size_t size() const {
-    if (!_data) return 0;
-    return _data->size();
-  }
-
-  bool isNull() const {
-    return _data == 0;
-  }
-
-  template <typename Visitor>
-  void visit(Visitor& visitor) const {
-    if (_data)
-      visitor.acceptObject(*this);
-    else
-      return visitor.acceptNull();
+  // Returns a reference an invalid JsonObject.
+  // This object is meant to replace a NULL pointer.
+  // This is used when memory allocation or JSON parsing fail.
+  static JsonObject& invalid() {
+    static JsonObject instance(NULL);
+    return instance;
   }
 
  private:
-  template <typename TStringRef>
-  bool containsKey_impl(TStringRef key) const {
-    return findKey<TStringRef>(key) != end();
-  }
-
-  template <typename TStringRef>
-  JsonArray createNestedArray_impl(TStringRef key);
-
-  template <typename TStringRef>
-  JsonObject createNestedObject_impl(TStringRef key);
-
   // Returns the list node that matches the specified key.
   template <typename TStringRef>
   iterator findKey(TStringRef key) {
     iterator it;
     for (it = begin(); it != end(); ++it) {
-      if (Internals::makeString(key).equals(it->key)) break;
+      if (Internals::StringTraits<TStringRef>::equals(key, it->key)) break;
     }
     return it;
   }
@@ -271,6 +284,26 @@ class JsonObject {
                        : Internals::JsonVariantDefault<TValue>::get();
   }
 
+  template <typename TStringRef, typename TValueRef>
+  bool set_impl(TStringRef key, TValueRef value) {
+    // ignore null key
+    if (Internals::StringTraits<TStringRef>::is_null(key)) return false;
+
+    // search a matching key
+    iterator it = findKey<TStringRef>(key);
+    if (it == end()) {
+      // add the key
+      it = Internals::List<JsonPair>::add();
+      if (it == end()) return false;
+      bool key_ok =
+          Internals::ValueSaver<TStringRef>::save(_buffer, it->key, key);
+      if (!key_ok) return false;
+    }
+
+    // save the value
+    return Internals::ValueSaver<TValueRef>::save(_buffer, it->value, value);
+  }
+
   template <typename TStringRef, typename TValue>
   bool is_impl(TStringRef key) const {
     const_iterator it = findKey<TStringRef>(key);
@@ -278,34 +311,18 @@ class JsonObject {
   }
 
   template <typename TStringRef>
-  void remove_impl(TStringRef key) {
-    if (!_data) return;
-    _data->remove(findKey<TStringRef>(key));
-  }
+  JsonArray& createNestedArray_impl(TStringRef key);
 
-  template <typename TStringRef, typename TValueRef>
-  bool set_impl(TStringRef key, TValueRef value) {
-    if (!_data) return false;
-
-    // ignore null key
-    if (Internals::makeString(key).is_null()) return false;
-
-    // search a matching key
-    iterator it = findKey<TStringRef>(key);
-    if (it == end()) {
-      // add the key
-      it = _data->add();
-      if (it == end()) return false;
-      bool key_ok =
-          Internals::ValueSaver<TStringRef>::save(_data->_buffer, it->key, key);
-      if (!key_ok) return false;
-    }
-
-    // save the value
-    return Internals::ValueSaver<TValueRef>::save(_data->_buffer, it->value,
-                                                  value);
-  }
-
-  Internals::JsonObjectData* _data;
+  template <typename TStringRef>
+  JsonObject& createNestedObject_impl(TStringRef key);
 };
+
+namespace Internals {
+template <>
+struct JsonVariantDefault<JsonObject> {
+  static JsonObject& get() {
+    return JsonObject::invalid();
+  }
+};
+}  // namespace Internals
 }  // namespace ArduinoJson

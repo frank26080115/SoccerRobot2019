@@ -1,146 +1,11 @@
 ArduinoJson: change log
 =======================
 
-v6.2.3-beta
------------
+HEAD
+----
 
-* Fixed exception when using Flash strings as object keys (issue #784)
-
-v6.2.2-beta
------------
-
-* Fixed `invalid application of 'sizeof' to incomplete type '__FlashStringHelper'` (issue #783)
-* Fixed `char[]` not duplicated when passed to `JsonVariant::operator[]`
-
-v6.2.1-beta
------------
-
-* Fixed `JsonObject` not inserting keys of type `String` (issue #782)
-
-v6.2.0-beta
------------
-
-* Disabled lazy number deserialization (issue #772)
 * Improved float serialization when `-fsingle-precision-constant` is used
-* Renamed function `RawJson()` to `serialized()`
-* `serializeMsgPack()` now supports values marked with `serialized()`
-
-> ### BREAKING CHANGES
->
-> #### Non quoted strings
->
-> Non quoted strings are now forbidden in values, but they are still allowed in keys.
-> For example, `{key:"value"}` is accepted, but `{key:value}` is not.
->
-> #### Preformatted values
->
-> Old code:
->
-> ```c++
-> object["values"] = RawJson("[1,2,3,4]");
-> ```
-> 
-> New code:
-> 
-> ```c++
-> object["values"] = serialized("[1,2,3,4]");
-> ```
-
-v6.1.0-beta
------------
-
-* Return `JsonArray` and `JsonObject` by value instead of reference (issue #309)
-* Replaced `success()` with `isNull()`
-
-> ### BREAKING CHANGES
-> 
-> Old code:
->
-> ```c++
-> JsonObject& obj = doc.to<JsonObject>();
-> JsonArray& arr = obj.createNestedArray("key");
-> if (!arr.success()) {
->   Serial.println("Not enough memory");
->   return;
-> }
-> ```
-> 
-> New code:
-> 
-> ```c++
-> JsonObject obj = doc.to<JsonObject>();
-> JsonArray arr = obj.createNestedArray("key");
-> if (arr.isNull()) {
->   Serial.println("Not enough memory");
->   return;
-> }
-> ```
-
-v6.0.1-beta
------------
-
-* Fixed conflicts with `isnan()` and `isinf()` macros (issue #752)
-
-v6.0.0-beta
------------
-
-* Added `DynamicJsonDocument` and `StaticJsonDocument`
-* Added `deserializeJson()`
-* Added `serializeJson()` and `serializeJsonPretty()`
-* Added `measureJson()` and `measureJsonPretty()`
-* Added `serializeMsgPack()`, `deserializeMsgPack()` and `measureMsgPack()` (issue #358)
-* Added example `MsgPackParser.ino` (issue #358)
-* Added support for non zero-terminated strings (issue #704)
-* Removed `JsonBuffer::parseArray()`, `parseObject()` and `parse()`
-* Removed `JsonBuffer::createArray()` and `createObject()`
-* Removed `printTo()` and `prettyPrintTo()`
-* Removed `measureLength()` and `measurePrettyLength()`
-* Removed all deprecated features
-
-> ### BREAKING CHANGES
-> 
-> #### Deserialization
-> 
-> Old code:
-> 
-> ```c++
-> DynamicJsonBuffer jb;
-> JsonObject& obj = jb.parseObject(json);
-> if (obj.success()) {
-> 
-> }
-> ```
-> 
-> New code:
-> 
-> ```c++
-> DynamicJsonDocument doc;
-> DeserializationError error = deserializeJson(doc, json);
-> if (error) {
-> 
-> }
-> JsonObject& obj = doc.as<JsonObject>();
-> ```
-> 
-> #### Serialization
-> 
-> Old code:
-> 
-> ```c++
-> DynamicJsonBuffer jb;
-> JsonObject& obj = jb.createObject();
-> obj["key"] = "value";
-> obj.printTo(Serial);
-> ```
-> 
-> New code:
-> 
-> ```c++
-> DynamicJsonDocument obj;
-> JsonObject& obj = doc.to<JsonObject>();
-> obj["key"] = "value";
-> serializeJson(doc, Serial);
-> ```
+* Fixed `JsonVariant::is<int>()` that returned true for empty strings
 
 v5.13.2
 -------
@@ -561,3 +426,52 @@ However, you should not see this as an invitation to use the `String` class.
 The `String` class is **bad** because it uses dynamic memory allocation.
 Compared to static allocation, it compiles to a bigger, slower program, and is less predictable.
 You certainly don't want that in an embedded environment!
+
+v4.6
+----
+
+* Fixed segmentation fault in `DynamicJsonBuffer` when memory allocation fails (issue #92)
+
+v4.5
+----
+
+* Fixed buffer overflow when input contains a backslash followed by a terminator (issue #81)
+
+**Upgrading is recommended** since previous versions contain a potential security risk.
+
+Special thanks to [Giancarlo Canales Barreto](https://github.com/gcanalesb) for finding this nasty bug.
+
+v4.4
+----
+
+* Added `JsonArray::measureLength()` and `JsonObject::measureLength()` (issue #75)
+
+v4.3
+----
+
+* Added `JsonArray::removeAt()` to remove an element of an array (issue #58)
+* Fixed stack-overflow in `DynamicJsonBuffer` when parsing huge JSON files (issue #65)
+* Fixed wrong return value of `parseArray()` and `parseObject()` when allocation fails (issue #68)
+
+v4.2
+----
+
+* Switched back to old library layout (issues #39, #43 and #45)
+* Removed global new operator overload (issue #40, #45 and #46)
+* Added an example with EthernetServer
+
+v4.1
+----
+
+* Added DynamicJsonBuffer (issue #19)
+
+v4.0
+----
+
+* Unified parser and generator API (issue #23)
+* Updated library layout, now requires Arduino 1.0.6 or newer
+
+> ### BREAKING CHANGES :warning:
+>
+> API changed significantly since v3, see [Migrating code to the new API](https://arduinojson.org/doc/migration/).
+

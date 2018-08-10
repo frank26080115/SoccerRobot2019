@@ -29,26 +29,26 @@ TEST_CASE("JsonVariant undefined") {
   }
 
   SECTION("AsArrayReturnInvalid") {
-    REQUIRE(JsonArray() == variant.as<JsonArray>());
+    REQUIRE(JsonArray::invalid() == variant.as<JsonArray&>());
   }
 
   SECTION("AsConstArrayReturnInvalid") {
-    REQUIRE(JsonArray() == variant.as<const JsonArray>());
+    REQUIRE(JsonArray::invalid() == variant.as<const JsonArray&>());
   }
 
   SECTION("AsObjectReturnInvalid") {
-    REQUIRE(JsonObject() == variant.as<JsonObject>());
+    REQUIRE(JsonObject::invalid() == variant.as<JsonObject&>());
   }
 
   SECTION("AsConstObjectReturnInvalid") {
-    REQUIRE(JsonObject() == variant.as<const JsonObject>());
+    REQUIRE(JsonObject::invalid() == variant.as<const JsonObject&>());
   }
 
   SECTION("AsArrayWrapperReturnInvalid") {
-    REQUIRE(JsonArray() == variant.as<JsonArray>());
+    REQUIRE(JsonArray::invalid() == variant.as<JsonArray>());
   }
 
   SECTION("AsObjectWrapperReturnInvalid") {
-    REQUIRE(JsonObject() == variant.as<JsonObject>());
+    REQUIRE(JsonObject::invalid() == variant.as<JsonObject>());
   }
 }

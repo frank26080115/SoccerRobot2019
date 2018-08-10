@@ -3,15 +3,16 @@
 # MIT License
 
 add_executable(JsonObjectTests 
+	basics.cpp
 	containsKey.cpp
 	get.cpp
 	invalid.cpp
-	isNull.cpp
 	iterator.cpp
+	prettyPrintTo.cpp
+	printTo.cpp
 	remove.cpp
 	set.cpp
 	size.cpp
-	std_string.cpp
 	subscript.cpp
 )
 

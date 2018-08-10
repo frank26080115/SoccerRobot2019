@@ -112,9 +112,8 @@ TEST_CASE("JsonVariant comparisons") {
   }
 
   SECTION("StringLiteral") {
-    DynamicJsonDocument doc;
-    deserializeJson(doc, "\"hello\"");
-    JsonVariant variant = doc.as<JsonVariant>();
+    DynamicJsonBuffer jsonBuffer;
+    JsonVariant variant = jsonBuffer.parse("\"hello\"");
 
     REQUIRE(variant == variant);
     REQUIRE_FALSE(variant != variant);
@@ -139,7 +138,8 @@ TEST_CASE("JsonVariant comparisons") {
   }
 
   SECTION("String") {
-    JsonVariant variant = "hello";
+    DynamicJsonBuffer jsonBuffer;
+    JsonVariant variant = jsonBuffer.parse("\"hello\"");
 
     REQUIRE(variant == variant);
     REQUIRE_FALSE(variant != variant);
@@ -212,10 +212,9 @@ TEST_CASE("JsonVariant comparisons") {
   }
 
   SECTION("ArrayInVariant") {
-    DynamicJsonDocument doc1;
-    JsonArray array1 = doc1.to<JsonArray>();
-    DynamicJsonDocument doc2;
-    JsonArray array2 = doc2.to<JsonArray>();
+    DynamicJsonBuffer jsonBuffer;
+    JsonArray& array1 = jsonBuffer.createArray();
+    JsonArray& array2 = jsonBuffer.createArray();
 
     JsonVariant variant1 = array1;
     JsonVariant variant2 = array1;
@@ -229,10 +228,9 @@ TEST_CASE("JsonVariant comparisons") {
   }
 
   SECTION("ObjectInVariant") {
-    DynamicJsonDocument doc1;
-    JsonObject obj1 = doc1.to<JsonObject>();
-    DynamicJsonDocument doc2;
-    JsonObject obj2 = doc2.to<JsonObject>();
+    DynamicJsonBuffer jsonBuffer;
+    JsonObject& obj1 = jsonBuffer.createObject();
+    JsonObject& obj2 = jsonBuffer.createObject();
 
     JsonVariant variant1 = obj1;
     JsonVariant variant2 = obj1;
@@ -246,13 +244,14 @@ TEST_CASE("JsonVariant comparisons") {
   }
 
   SECTION("VariantsOfDifferentTypes") {
-    DynamicJsonDocument doc1;
-    JsonObject obj = doc1.to<JsonObject>();
-
-    DynamicJsonDocument doc2;
-    JsonArray arr = doc2.to<JsonArray>();
+    DynamicJsonBuffer jsonBuffer;
     JsonVariant variants[] = {
-        true, 42, 666.667, "hello", arr, obj,
+        true,
+        42,
+        666.667,
+        "hello",
+        jsonBuffer.createArray(),
+        jsonBuffer.createObject(),
     };
     size_t n = sizeof(variants) / sizeof(variants[0]);
 

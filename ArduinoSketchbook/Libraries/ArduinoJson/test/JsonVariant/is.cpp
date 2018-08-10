@@ -7,9 +7,9 @@
 
 void checkIsArray(JsonVariant var) {
   REQUIRE(var.is<JsonArray>());
-  REQUIRE(var.is<JsonArray>());
+  REQUIRE(var.is<JsonArray&>());
   REQUIRE(var.is<const JsonArray>());
-  REQUIRE(var.is<const JsonArray>());
+  REQUIRE(var.is<const JsonArray&>());
 
   REQUIRE_FALSE(var.is<bool>());
   REQUIRE_FALSE(var.is<double>());
@@ -69,10 +69,10 @@ void checkIsString(JsonVariant var) {
 }
 
 TEST_CASE("JsonVariant::is()") {
+  DynamicJsonBuffer jsonBuffer;
+
   SECTION("JsonArray") {
-    DynamicJsonDocument doc;
-    JsonArray array = doc.to<JsonArray>();
-    checkIsArray(array);
+    checkIsArray(jsonBuffer.createArray());
   }
 
   SECTION("bool") {
@@ -94,5 +94,22 @@ TEST_CASE("JsonVariant::is()") {
 
   SECTION("string") {
     checkIsString("42");
+  }
+
+  SECTION("unparsed bool") {
+    checkIsBool(RawJson("true"));
+    checkIsBool(RawJson("false"));
+  }
+
+  SECTION("unparsed int") {
+    checkIsInteger(RawJson("42"));
+  }
+
+  SECTION("unparsed float") {
+    checkIsFloat(RawJson("4.2e-10"));
+  }
+
+  SECTION("unparsed null") {
+    checkIsString(RawJson("null"));
   }
 }

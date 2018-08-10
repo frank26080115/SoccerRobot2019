@@ -122,9 +122,9 @@ TEST_CASE("JsonVariant set()/get()") {
 #endif
 
   SECTION("CanStoreObject") {
-    DynamicJsonDocument doc;
-    JsonObject object = doc.to<JsonObject>();
+    DynamicJsonBuffer jsonBuffer;
+    JsonObject &object = jsonBuffer.createObject();
 
-    checkValue<JsonObject>(object);
+    checkReference(object);
   }
 }
