@@ -19,7 +19,7 @@ static int printf_putchar(char c, FILE *fp)
 int cBookWorm::printf(const char *format, ...)
 {
 	#if defined(ENABLE_WEAPON) && (pinServoWeapon == pinServoLeft || pinServoWeapon == pinServoRight)
-	if (this->nvm.enableWeapon != false)
+	if (this->nvm->enableWeapon != false)
 	{
 		return 0;
 	}
@@ -63,7 +63,7 @@ int cBookWorm::debugf(const char *format, ...)
 	#endif
 
 	#if defined(ENABLE_WEAPON) && (pinServoWeapon == pinServoLeft || pinServoWeapon == pinServoRight)
-	if (this->nvm.enableWeapon != false)
+	if (this->nvm->enableWeapon != false)
 	{
 		return 0;
 	}

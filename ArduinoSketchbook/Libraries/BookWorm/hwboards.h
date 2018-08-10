@@ -29,12 +29,12 @@
 	#define pinServoWeapon       5
 	#endif
 
-	#define pinLed1  LED_BUILTIN // should be 2
+	#define pinLed1 2
 	#define pinLed2 4
 	#define pinLed1OnState LOW
 	#define pinLed1OffState HIGH
-	#define pinLed2OnState LOW
-	#define pinLed2OffState HIGH
+	#define pinLed2OnState HIGH
+	#define pinLed2OffState LOW
 #endif
 
 #ifdef HWBOARD_ESP12_NANO
@@ -45,12 +45,12 @@
 	#define pinServoWeapon       5
 	#endif
 
-	#define pinLed1  LED_BUILTIN // should be 2
+	#define pinLed1 2
 	#define pinLed2 4
 	#define pinLed1OnState LOW
 	#define pinLed1OffState HIGH
-	#define pinLed2OnState LOW
-	#define pinLed2OffState HIGH
+	#define pinLed2OnState HIGH
+	#define pinLed2OffState LOW
 #endif
 
 #endif

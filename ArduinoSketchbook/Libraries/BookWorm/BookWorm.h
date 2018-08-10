@@ -8,14 +8,15 @@ EEPROM Version History:
 1 - Not released, use only
 */
 
-#define ENABLE_WEAPON
+//#define ENABLE_WEAPON
 #define BOOKWORM_DEBUG
 #define BOOKWORM_BAUD 9600
 #define BOOKWORM_SSID_SIZE 31
 #define BOOKWORM_PASSWORD_SIZE 31
-#define ALL_SAFE_DEBUG_MODE
-#define ENABLE_BATTERY_MONITOR
+//#define ALL_SAFE_DEBUG_MODE
+//#define ENABLE_BATTERY_MONITOR
 #define ENABLE_SIGNALCROSS_RESET
+#define ENABLE_CONFIG_WIFICHANNEL
 #define BOOKWORM_DEFAULT_PASSWORD "12345678"
 
 #include <Arduino.h>
@@ -152,7 +153,7 @@ public:
 	bool loadNvmHex(char* str, uint8_t* errCode, bool save);
 	uint32_t calcUserNvmLength(bool withChecksum);
 	uint32_t calcEepromVersion();
-	bookworm_nvm_t nvm;
+	bookworm_nvm_t* nvm;
 	bool robotFlip; // temporary flip, for inverted drive
 
 	#ifdef ENABLE_SIGNALCROSS_RESET

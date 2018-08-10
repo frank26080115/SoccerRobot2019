@@ -8,7 +8,7 @@
 #include <BookWorm.h>
 
 #if defined(HWBOARD_ESP12_NANO) || defined(HWBOARD_ESP12)
-#define ENABLE_BOOT_PIN_RESET
+///#define ENABLE_BOOT_PIN_RESET
 #endif
 
 /* hostname for mDNS. Should work at least on windows. Try http://robot.local */
@@ -57,8 +57,22 @@ void setup()
   BookWorm.printf("\r\n");
   BookWorm.printf("Configuring access point...\r\n");
   /* You can remove the password parameter if you want the AP to be open. */
-  WiFi.softAPConfig(apIP, apIP, netMsk);
-  WiFi.softAP(BookWorm.SSID, BookWorm.nvm.password, BookWorm.nvm.wifiChannel, 0, 2);
+  if (WiFi.softAPConfig(apIP, apIP, netMsk) == false) {
+    BookWorm.printf("SoftAPConfig Failed!\r\n");
+  }
+  BookWorm.printf("SSID: %s\r\n", BookWorm.SSID);
+  BookWorm.printf("Password: %s\r\n", BookWorm.nvm->password);
+  #ifdef ENABLE_CONFIG_WIFICHANNEL
+  BookWorm.printf("WiFi Channel: %u\r\n", BookWorm.nvm->wifiChannel);
+  #endif
+  if (WiFi.softAP(BookWorm.SSID, BookWorm.nvm->password
+      #ifdef ENABLE_CONFIG_WIFICHANNEL
+      , BookWorm.nvm->wifiChannel, 0, 2
+      #endif
+      ) == false)
+      {
+        BookWorm.printf("SoftAP Failed to Start!\r\n");
+      }
   delay(500); // Without delay I've seen the IP address blank
   BookWorm.printf("AP IP address: %s\r\n", toStringIp(WiFi.softAPIP()).c_str());
 
@@ -125,8 +139,6 @@ void loop()
           // Add service to MDNS-SD
           MDNS.addService("http", "tcp", 80);
         }
-      } else if (s == WL_NO_SSID_AVAIL) {
-        WiFi.disconnect();
       }
     }
   }
@@ -153,8 +165,8 @@ void loop()
     speedY = 0;
 
     #ifdef ENABLE_WEAPON
-    if (BookWorm.nvm.weapPosSafe > 0) {
-      speedWeap = BookWorm.nvm.weapPosSafe;
+    if (BookWorm.nvm->weapPosSafe > 0) {
+      speedWeap = BookWorm.nvm->weapPosSafe;
     }
     else {
       speedWeap = 0;
@@ -180,6 +192,10 @@ void loop()
   {
     ledOn = true;
   }
+  else
+  {
+    // blank
+  }
 
   if (moveMixedMode == false)
   {
@@ -192,7 +208,7 @@ void loop()
 
   // spin/move the weapon if needed
   #ifdef ENABLE_WEAPON
-  if (BookWorm.nvm.advanced && BookWorm.nvm.enableWeapon) {
+  if (BookWorm.nvm->advanced && BookWorm.nvm->enableWeapon) {
     BookWorm.spinWeapon(speedWeap);
   }
   #endif
@@ -227,6 +243,7 @@ void loop()
   #endif
 
   #ifdef ENABLE_NOCONN_TIMEOUT_RESET
+  #error TODO not implemented yet
   if (now > noconnTime)
   {
     if ((now - noconnTime) > (60000 * 5))

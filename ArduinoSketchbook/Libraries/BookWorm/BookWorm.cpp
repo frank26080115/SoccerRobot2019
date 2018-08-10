@@ -21,7 +21,8 @@ Servo servoWeap; // not directly user accessible but accessible through library
 
 cBookWorm::cBookWorm(void)
 {
-	memset(&(this->nvm), 0, sizeof(bookworm_nvm_t));
+	this->nvm = (bookworm_nvm_t*)malloc(sizeof(bookworm_nvm_t));
+	memset((void*)this->nvm, 0, sizeof(bookworm_nvm_t));
 	this->serialHasBegun = false;
 	this->pinsHaveLoaded = false;
 }
@@ -184,7 +185,7 @@ char* cBookWorm::generateSsid(char* buff)
 	i += sprintf(&(buff[i]), "%02x", macbuf[3]);
 	i += sprintf(&(buff[i]), "%02x", macbuf[4]);
 	i += sprintf(&(buff[i]), "%02x", macbuf[5]);
-	sprintf(this->nvm.password, BOOKWORM_DEFAULT_PASSWORD);
+	sprintf(this->nvm->password, BOOKWORM_DEFAULT_PASSWORD);
 	return buff;
 }
 
@@ -205,7 +206,7 @@ void cBookWorm::setSsid(char* str)
 		if (((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z') || (d >= '0' && d <= '9') || d == 0) == false) {
 			d = '-';
 		}
-		this->nvm.ssid[i] = d;
+		this->nvm->ssid[i] = d;
 		this->SSID[i] = d;
 		if (d == 0) { // stop at null terminator
 			break;
@@ -214,11 +215,11 @@ void cBookWorm::setSsid(char* str)
 
 	if (strlen(this->SSID) <= 0) { // why is the length zero? autogenerate the default SSID and try again
 		this->generateSsid(this->SSID);
-		strcpy(this->nvm.ssid, this->SSID);
+		strcpy(this->nvm->ssid, this->SSID);
 	}
 
 	// safety null-terminate
-	this->nvm.ssid[BOOKWORM_SSID_SIZE] = 0;
+	this->nvm->ssid[BOOKWORM_SSID_SIZE] = 0;
 	this->SSID[BOOKWORM_SSID_SIZE] = 0;
 
 	this->debugf("set SSID: %s\r\n", this->SSID);
@@ -249,14 +250,14 @@ void cBookWorm::setPassword(char* str)
 	}
 
 	if (failed == false) {
-		strcpy(this->nvm.password, str);
+		strcpy(this->nvm->password, str);
 	}
 	else {
 		this->printf("password validation failed: %s\r\n", str);
-		sprintf(this->nvm.password, BOOKWORM_DEFAULT_PASSWORD);
+		sprintf(this->nvm->password, BOOKWORM_DEFAULT_PASSWORD);
 	}
 
-	this->debugf("set password: %s\r\n", this->nvm.password);
+	this->debugf("set password: %s\r\n", this->nvm->password);
 }
 
 /*
@@ -268,7 +269,7 @@ parameters: boolean, if advanced features should be shown on the right side of t
 */
 void cBookWorm::setLeftHanded(bool x)
 {
-	this->nvm.leftHanded = x;
+	this->nvm->leftHanded = x;
 }
 
 /*
@@ -280,7 +281,7 @@ parameters: boolean, if advanced features should be enabled
 */
 void cBookWorm::setAdvanced(bool x)
 {
-	this->nvm.advanced = x;
+	this->nvm->advanced = x;
 }
 
 /*
@@ -292,7 +293,7 @@ parameters: desired WiFi channel to use (1 to 13)
 */
 void cBookWorm::setWifiChannel(uint8_t x)
 {
-	this->nvm.wifiChannel = x < 1 ? 1 : (x > 13 ? 13 : x);
+	this->nvm->wifiChannel = x < 1 ? 1 : (x > 13 ? 13 : x);
 }
 
 /*
@@ -304,38 +305,38 @@ parameters: none
 */
 void cBookWorm::defaultValues()
 {
-	this->nvm.eeprom_version1 = BOOKWORM_EEPROM_VERSION;
-	this->nvm.eeprom_version2 = BOOKWORM_EEPROM_VERSION;
-	this->nvm.divider1 = 0;
-	this->nvm.divider2 = 0;
-	sprintf(this->nvm.password, BOOKWORM_DEFAULT_PASSWORD);
-	this->nvm.wifiChannel = 1;
-	this->nvm.advanced = true;
-	this->nvm.servoMax = 500;
-	this->nvm.servoDeadzoneLeft = 0;
-	this->nvm.servoDeadzoneRight = 0;
-	this->nvm.servoBiasLeft = 0;
-	this->nvm.servoBiasRight = 0;
-	this->nvm.speedGain = 1000;
-	this->nvm.steeringSensitivity = 500;
-	this->nvm.steeringBalance = 0;
-	this->nvm.servoFlip = 0;
-	this->nvm.servoStoppedNoPulse = true;
-	this->nvm.stickRadius = 100;
+	this->nvm->eeprom_version1 = BOOKWORM_EEPROM_VERSION;
+	this->nvm->eeprom_version2 = BOOKWORM_EEPROM_VERSION;
+	this->nvm->divider1 = 0;
+	this->nvm->divider2 = 0;
+	sprintf(this->nvm->password, BOOKWORM_DEFAULT_PASSWORD);
+	this->nvm->wifiChannel = 8;
+	this->nvm->advanced = true;
+	this->nvm->servoMax = 500;
+	this->nvm->servoDeadzoneLeft = 0;
+	this->nvm->servoDeadzoneRight = 0;
+	this->nvm->servoBiasLeft = 0;
+	this->nvm->servoBiasRight = 0;
+	this->nvm->speedGain = 1000;
+	this->nvm->steeringSensitivity = 500;
+	this->nvm->steeringBalance = 0;
+	this->nvm->servoFlip = 0;
+	this->nvm->servoStoppedNoPulse = true;
+	this->nvm->stickRadius = 100;
 	#ifdef ENABLE_WEAPON
-	this->nvm.weapPosSafe = 1000;
-	this->nvm.weapPosA = 1500;
-	this->nvm.weapPosB = 2000;
-	this->nvm.enableWeapon = true;
+	this->nvm->weapPosSafe = 1000;
+	this->nvm->weapPosA = 1500;
+	this->nvm->weapPosB = 2000;
+	this->nvm->enableWeapon = true;
 	#endif
-	this->nvm.leftHanded = false;
+	this->nvm->leftHanded = false;
 	#ifdef ENABLE_BATTERY_MONITOR
-	this->nvm.vdiv_r1 = 7500;
-	this->nvm.vdiv_r2 = 0; // disable usage, 1000 in circuit
-	this->nvm.vdiv_filter = 50;
-	this->nvm.warning_voltage = 6000;
+	this->nvm->vdiv_r1 = 7500;
+	this->nvm->vdiv_r2 = 0; // disable usage, 1000 in circuit
+	this->nvm->vdiv_filter = 50;
+	this->nvm->warning_voltage = 6000;
 	#endif
-	this->nvm.checksum = 0xABCD;
+	this->nvm->checksum = 0xABCD;
 	loadPinAssignments();
 	this->debugf("values set to defaults\r\n");
 }

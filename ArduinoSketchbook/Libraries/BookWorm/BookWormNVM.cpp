@@ -81,7 +81,7 @@ bool cBookWorm::loadNvmHex(char* str, uint8_t* errCode, bool save)
 			if (errCode != NULL) { *errCode = 4; /* version matching failed */ }
 			free(tmpbuff); return false;
 		}
-		memcpy((void*)(&(this->nvm)), (const void*)tmpbuff, sizeof(bookworm_nvm_t));
+		memcpy((void*)(this->nvm), (const void*)tmpbuff, sizeof(bookworm_nvm_t));
 		free(tmpbuff);
 		if (save) {
 			saveNvm();
@@ -107,7 +107,7 @@ bool cBookWorm::loadNvmHex(char* str, uint8_t* errCode, bool save)
 			if (errCode != NULL) { *errCode = 4; /* version matching failed */ }
 			free(tmpbuff); return false;
 		}
-		memcpy(&(this->nvm.divider1), tmpbuff, userLength);
+		memcpy(&(this->nvm->divider1), tmpbuff, userLength);
 		free(tmpbuff);
 		if (save) {
 			saveNvm();
@@ -129,8 +129,8 @@ parameter: boolean, whether or not to include the checksum in the size calculati
 */
 uint32_t cBookWorm::calcUserNvmLength(bool withChecksum)
 {
-	uint8_t* ptrUser = (uint8_t*)&(this->nvm.divider1);
-	uint8_t* ptrUserEnd = (uint8_t*)&(this->nvm.divider2);
+	uint8_t* ptrUser = (uint8_t*)&(this->nvm->divider1);
+	uint8_t* ptrUserEnd = (uint8_t*)&(this->nvm->divider2);
 	uint32_t userLength = (uint32_t)ptrUserEnd;
 	userLength -= (uint32_t)ptrUser;
 	if (withChecksum) {
@@ -148,20 +148,20 @@ parameter: none
 */
 void cBookWorm::ensureNvmChecksums(void)
 {
-	uint8_t* ptr = (uint8_t*)&(this->nvm);
-	uint8_t* ptrUser = (uint8_t*)&(this->nvm.divider1);
+	uint8_t* ptr = (uint8_t*)this->nvm;
+	uint8_t* ptrUser = (uint8_t*)&(this->nvm->divider1);
 	int i;
 	uint16_t chksum, chksumUser;
 	uint32_t userLength = calcUserNvmLength(false);
-	this->nvm.eeprom_version1 = calcEepromVersion();
-	this->nvm.eeprom_version2 = calcEepromVersion();
-	this->nvm.ssid[BOOKWORM_SSID_SIZE] = 0;
+	this->nvm->eeprom_version1 = calcEepromVersion();
+	this->nvm->eeprom_version2 = calcEepromVersion();
+	this->nvm->ssid[BOOKWORM_SSID_SIZE] = 0;
 	this->SSID[BOOKWORM_SSID_SIZE] = 0;
-	this->nvm.password[BOOKWORM_PASSWORD_SIZE] = 0;
+	this->nvm->password[BOOKWORM_PASSWORD_SIZE] = 0;
 	chksumUser = bookworm_fletcher16(ptrUser, userLength);
-	this->nvm.checksumUser = chksumUser;
+	this->nvm->checksumUser = chksumUser;
 	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
-	this->nvm.checksum = chksum;
+	this->nvm->checksum = chksum;
 }
 
 /*
@@ -188,7 +188,7 @@ bool cBookWorm::loadNvm()
 {
 	uint8_t* tmpbuff = (uint8_t*)malloc(sizeof(bookworm_nvm_t));
 	bookworm_nvm_t* castPtr = (bookworm_nvm_t*)tmpbuff;
-	uint8_t* ptr = (uint8_t*)&(this->nvm);
+	uint8_t* ptr = (uint8_t*)this->nvm;
 
 	/*
 	warning: writing directly into "ptr" could cause a crash
@@ -220,15 +220,15 @@ bool cBookWorm::loadNvm()
 		memcpy((void*)ptr, (const void*)tmpbuff, sizeof(bookworm_nvm_t));
 		free(tmpbuff);
 
-		memcpy(this->SSID, this->nvm.ssid, 32);
+		memcpy(this->SSID, this->nvm->ssid, 32);
 		this->SSID[BOOKWORM_SSID_SIZE] = 0;
 
-		setWifiChannel(this->nvm.wifiChannel); // this does a range check
+		setWifiChannel(this->nvm->wifiChannel); // this does a range check
 
 		loadPinAssignments();
 
 		#if defined(ENABLE_WEAPON) && (pinServoWeapon == pinServoLeft || pinServoWeapon == pinServoRight)
-		if (this->nvm.enableWeapon == false) {
+		if (this->nvm->enableWeapon == false) {
 			Serial.begin(BOOKWORM_BAUD);
 			this->serialHasBegun = true;
 		}
@@ -241,10 +241,10 @@ bool cBookWorm::loadNvm()
 	else
 	{
 		this->printf("NVM load failed, \r\n\tchecksum %04X != %04X\r\n", chksum, castPtr->checksum);
-		if (calcEepromVersion() != this->nvm.eeprom_version1) {
+		if (calcEepromVersion() != this->nvm->eeprom_version1) {
 			this->printf("\tversion %04X != %04X\r\n", calcEepromVersion(), castPtr->eeprom_version1);
 		}
-		if (calcEepromVersion() != this->nvm.eeprom_version2) {
+		if (calcEepromVersion() != this->nvm->eeprom_version2) {
 			this->printf("\tversion %04X != %04X\r\n", calcEepromVersion(), castPtr->eeprom_version2);
 		}
 		free(tmpbuff);
@@ -261,7 +261,7 @@ parameters: none
 void cBookWorm::saveNvm()
 {
 	int i;
-	uint8_t* ptr = (uint8_t*)&(this->nvm);
+	uint8_t* ptr = (uint8_t*)this->nvm;
 	ensureNvmChecksums();
 	this->debugf("EEPROM writing:");
 	for (i = 0; i < sizeof(bookworm_nvm_t); i++) {

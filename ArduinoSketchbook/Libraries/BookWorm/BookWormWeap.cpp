@@ -13,7 +13,7 @@ extern Servo servoWeap;
 
 void cBookWorm::spinWeapon(uint16_t x)
 {
-	if (this->nvm.enableWeapon == false) {
+	if (this->nvm->enableWeapon == false) {
 		servoWeap.detach();
 		return;
 	}
@@ -46,36 +46,36 @@ void cBookWorm::positionWeapon(uint8_t pos)
 {
 	if (pos == 1)
 	{
-		this->spinWeapon(this->nvm.weapPosA);
+		this->spinWeapon(this->nvm->weapPosA);
 	}
 	else if (pos == 2)
 	{
-		this->spinWeapon(this->nvm.weapPosB);
+		this->spinWeapon(this->nvm->weapPosB);
 	}
 	else
 	{
-		this->spinWeapon(this->nvm.weapPosSafe);
+		this->spinWeapon(this->nvm->weapPosSafe);
 	}
 }
 
 void cBookWorm::setWeapPosSafe(uint16_t x)
 {
-	this->nvm.weapPosSafe = x;
+	this->nvm->weapPosSafe = x;
 }
 
 void cBookWorm::setWeapPosA(uint16_t x)
 {
-	this->nvm.weapPosA = x;
+	this->nvm->weapPosA = x;
 }
 
 void cBookWorm::setWeapPosB(uint16_t x)
 {
-	this->nvm.weapPosB = x;
+	this->nvm->weapPosB = x;
 }
 
 void cBookWorm::setEnableWeapon(bool x)
 {
-	this->nvm.enableWeapon = x;
+	this->nvm->enableWeapon = x;
 }
 
 #endif

@@ -26,11 +26,11 @@ extern ContinuousServo servoRight;
 
 void cBookWorm::move(signed int left, signed int right)
 {
-	if ((this->nvm.servoFlip & 0x01) != 0)
+	if ((this->nvm->servoFlip & 0x01) != 0)
 	{
 		right *= -1;
 	}
-	if ((this->nvm.servoFlip & 0x02) != 0)
+	if ((this->nvm->servoFlip & 0x02) != 0)
 	{
 		left *= -1;
 	}
@@ -51,19 +51,19 @@ void cBookWorm::moveLeftServo(signed int x)
 
 	if (x > 0) {
 		ticks += x;
-		ticks += this->nvm.servoDeadzoneLeft;
+		ticks += this->nvm->servoDeadzoneLeft;
 		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward |= (1 << 1);
 		#endif
 	}
 	else if (x <= 0) {
 		ticks += x;
-		ticks -= this->nvm.servoDeadzoneLeft;
+		ticks -= this->nvm->servoDeadzoneLeft;
 		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward &= ~(1 << 1);
 		#endif
 	}
-	if (x == 0 && this->nvm.servoStoppedNoPulse != false)
+	if (x == 0 && this->nvm->servoStoppedNoPulse != false)
 	{
 		servoLeft.detach();
 	}
@@ -73,14 +73,14 @@ void cBookWorm::moveLeftServo(signed int x)
 		servoLeft.attach(this->pinnumServoLeft);
 		#endif
 	}
-	if (this->nvm.steeringBalance > 0)
+	if (this->nvm->steeringBalance > 0)
 	{
-		ticks *= this->nvm.steeringBalance;
+		ticks *= this->nvm->steeringBalance;
 		ticks /= 1000;
 	}
-	ticks *= this->nvm.speedGain;
+	ticks *= this->nvm->speedGain;
 	ticks /= 1000;
-	ticks += this->nvm.servoBiasLeft;
+	ticks += this->nvm->servoBiasLeft;
 
 	#ifndef ALL_SAFE_DEBUG_MODE
 	servoLeft.write(ticks);
@@ -94,19 +94,19 @@ void cBookWorm::moveRightServo(signed int x)
 	x *= -1; // flip
 	if (x > 0) {
 		ticks += x;
-		ticks += this->nvm.servoDeadzoneRight;
+		ticks += this->nvm->servoDeadzoneRight;
 		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward |= (1 << 0);
 		#endif
 	}
 	else if (x <= 0) {
 		ticks += x;
-		ticks -= this->nvm.servoDeadzoneRight;
+		ticks -= this->nvm->servoDeadzoneRight;
 		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward &= ~(1 << 0);
 		#endif
 	}
-	if (x == 0 && this->nvm.servoStoppedNoPulse != false)
+	if (x == 0 && this->nvm->servoStoppedNoPulse != false)
 	{
 		servoRight.detach();
 	}
@@ -116,14 +116,14 @@ void cBookWorm::moveRightServo(signed int x)
 		servoRight.attach(this->pinnumServoRight);
 		#endif
 	}
-	if (this->nvm.steeringBalance < 0)
+	if (this->nvm->steeringBalance < 0)
 	{
-		ticks *= -this->nvm.steeringBalance;
+		ticks *= -this->nvm->steeringBalance;
 		ticks /= 1000;
 	}
-	ticks *= this->nvm.speedGain;
+	ticks *= this->nvm->speedGain;
 	ticks /= 1000;
-	ticks += this->nvm.servoBiasRight;
+	ticks += this->nvm->servoBiasRight;
 
 	#ifndef ALL_SAFE_DEBUG_MODE
 	servoRight.write(ticks);
@@ -144,11 +144,11 @@ void cBookWorm::calcMix(int32_t throttle, int32_t steer, int32_t * left, int32_t
 	double leftd, rightd;
 	double outputScale, maxTicks, maxRadius;
 
-	maxTicks = this->nvm.servoMax;
-	maxRadius = this->nvm.stickRadius;
+	maxTicks = this->nvm->servoMax;
+	maxRadius = this->nvm->stickRadius;
 	outputScale = maxTicks / maxRadius;
 
-	steer *= this->nvm.steeringSensitivity;
+	steer *= this->nvm->steeringSensitivity;
 	steer /= 1000;
 
 	throttled = throttle;
@@ -185,7 +185,7 @@ void cBookWorm::loadPinAssignments()
 	this->pinnumServoLeft = pinServoLeft;
 	this->pinnumServoRight = pinServoRight;
 	#ifdef ENABLE_WEAPON
-	if (this->nvm.enableWeapon)
+	if (this->nvm->enableWeapon)
 	{
 		#if pinServoWeapon == pinServoLeft || pinServoWeapon == pinServoRight
 			#ifdef pinServoLeftAlt
@@ -205,7 +205,7 @@ void cBookWorm::loadPinAssignments()
 		}
 	}
 	#endif
-	if ((this->nvm.servoFlip & 0x04) != 0) // need to swap left and right
+	if ((this->nvm->servoFlip & 0x04) != 0) // need to swap left and right
 	{
 		tmp = this->pinnumServoLeft;
 		this->pinnumServoLeft = this->pinnumServoRight;
@@ -225,57 +225,57 @@ void cBookWorm::loadPinAssignments()
 
 void cBookWorm::setServoDeadzoneLeft(unsigned int x)
 {
-	this->nvm.servoDeadzoneLeft = x;
+	this->nvm->servoDeadzoneLeft = x;
 }
 
 void cBookWorm::setServoDeadzoneRight(unsigned int x)
 {
-	this->nvm.servoDeadzoneRight = x;
+	this->nvm->servoDeadzoneRight = x;
 }
 
 void cBookWorm::setServoBiasLeft(signed int x)
 {
-	this->nvm.servoBiasLeft = x;
+	this->nvm->servoBiasLeft = x;
 }
 
 void cBookWorm::setServoBiasRight(signed int x)
 {
-	this->nvm.servoBiasRight = x;
+	this->nvm->servoBiasRight = x;
 }
 
 void cBookWorm::setServoStoppedNoPulse(bool x)
 {
-	this->nvm.servoStoppedNoPulse = x;
+	this->nvm->servoStoppedNoPulse = x;
 }
 
 void cBookWorm::setServoMax(unsigned int x)
 {
-	this->nvm.servoMax = x;
+	this->nvm->servoMax = x;
 }
 
 void cBookWorm::setSpeedGain(signed int x)
 {
-	this->nvm.speedGain = x;
+	this->nvm->speedGain = x;
 }
 
 void cBookWorm::setSteeringSensitivity(signed int x)
 {
-	this->nvm.steeringSensitivity = x;
+	this->nvm->steeringSensitivity = x;
 }
 
 void cBookWorm::setSteeringBalance(signed int x)
 {
-	this->nvm.steeringBalance = x;
+	this->nvm->steeringBalance = x;
 }
 
 void cBookWorm::setStickRadius(uint16_t x)
 {
-	this->nvm.stickRadius = x;
+	this->nvm->stickRadius = x;
 }
 
 void cBookWorm::setServoFlip(uint8_t x)
 {
-	this->nvm.servoFlip = x;
+	this->nvm->servoFlip = x;
 }
 
 void cBookWorm::setRobotFlip(bool x)

@@ -25,7 +25,7 @@ void handleRoot()
     "Touch the screen and move<br />Robot SSID: "
   );
   server.sendContent(BookWorm.SSID);
-  if (BookWorm.nvm.advanced)
+  if (BookWorm.nvm->advanced)
   {
     #ifdef ENABLE_BATTERY_MONITOR
     server.sendContent("<div id='batt' width='100%'>&nbsp;</div>");
@@ -41,7 +41,7 @@ void handleRoot()
       "<td width='50%'>"
     );
     #ifdef ENABLE_WEAPON
-    if (BookWorm.nvm.enableWeapon) {
+    if (BookWorm.nvm->enableWeapon) {
       server.sendContent("<input type='button' value='Pos B' onclick='weapsetposb()' />");
     }
     else {
@@ -54,20 +54,20 @@ void handleRoot()
     server.sendContent("</table></div>");
   }
   server.sendContent("</div>");
-  if (BookWorm.nvm.advanced)
+  if (BookWorm.nvm->advanced)
   {
     server.sendContent("<div id='sidebar' ");
-    if (BookWorm.nvm.leftHanded) {
+    if (BookWorm.nvm->leftHanded) {
       server.sendContent(" class='rightside' ");
     }
     server.sendContent("><table border='1'>");
     #ifdef ENABLE_WEAPON
-    if (BookWorm.nvm.enableWeapon) {
+    if (BookWorm.nvm->enableWeapon) {
       server.sendContent("<tr><td><input type='button' value='Weapon Safe' onclick='weapsetpossafe()' /></td></tr><tr><td><input type='button' value='Pos A' onclick='weapsetposa()' /></td></tr>");
     }
     #endif
     #ifdef ENABLE_WEAPON
-    if (BookWorm.nvm.enableWeapon) {
+    if (BookWorm.nvm->enableWeapon) {
       server.sendContent("<tr><td><input type='button' value='Pos B' onclick='weapsetposb()' /></td></tr>");
     }
     #endif
@@ -75,9 +75,9 @@ void handleRoot()
     server.sendContent("</table></div>");
   }
   server.sendContent("<script>\n");
-  server.sendContent("var desiredStickRadius = "); server.sendContent(String(BookWorm.nvm.stickRadius)); server.sendContent(";\n");
+  server.sendContent("var desiredStickRadius = "); server.sendContent(String(BookWorm.nvm->stickRadius)); server.sendContent(";\n");
   server.sendContent("var advancedFeatures = ");
-  if (BookWorm.nvm.advanced) {
+  if (BookWorm.nvm->advanced) {
      server.sendContent("1");
   }
   else {
@@ -86,16 +86,16 @@ void handleRoot()
   server.sendContent(";\n");
   #ifdef ENABLE_WEAPON
   server.sendContent("var weapPosSafe = ");
-  if (BookWorm.nvm.advanced) {
-    server.sendContent(String(BookWorm.nvm.weapPosSafe));
+  if (BookWorm.nvm->advanced) {
+    server.sendContent(String(BookWorm.nvm->weapPosSafe));
   }
   else {
     server.sendContent("0");
   }
   server.sendContent(";\n");
-  server.sendContent("var weapPosA = "); server.sendContent(String(BookWorm.nvm.weapPosA)); server.sendContent(";\n");
-  server.sendContent("var weapPosB = "); server.sendContent(String(BookWorm.nvm.weapPosB)); server.sendContent(";\n");
-  if (BookWorm.nvm.advanced && BookWorm.nvm.enableWeapon) {
+  server.sendContent("var weapPosA = "); server.sendContent(String(BookWorm.nvm->weapPosA)); server.sendContent(";\n");
+  server.sendContent("var weapPosB = "); server.sendContent(String(BookWorm.nvm->weapPosB)); server.sendContent(";\n");
+  if (BookWorm.nvm->advanced && BookWorm.nvm->enableWeapon) {
     server.sendContent("advancedFeatures += 1;\n");
   }
   #endif
@@ -368,7 +368,7 @@ void serveConfigHexStr(bool isUserOnly)
   }
   else
   {
-    ptr = (uint8_t*)(&(BookWorm.nvm.divider1));
+    ptr = (uint8_t*)(&(BookWorm.nvm->divider1));
     nl = BookWorm.calcUserNvmLength(true);
   }
   server.sendContent("\n");
@@ -400,24 +400,26 @@ void serveConfigTable()
 
   // void generateConfigItemTxt(const char* label, const char* id, const char* type, const char* value, const char* other, const char* note)
   generateConfigItemTxt("SSID", "ssid", "text", BookWorm.SSID, (String("maxlength='") + String(BOOKWORM_SSID_SIZE) + String("'")).c_str(), NULL);
-  generateConfigItemTxt("Password", "password", "text", BookWorm.nvm.password, (String("minlength='8' ") + String("maxlength='") + String(BOOKWORM_PASSWORD_SIZE) + String("'")).c_str(), NULL);
-  generateConfigItemTxt("Channel", "wifichannel", "number", String(BookWorm.nvm.wifiChannel).c_str(), "min='1' max='13' step='1'", "1 to 13 only");
+  generateConfigItemTxt("Password", "password", "text", BookWorm.nvm->password, (String("minlength='8' ") + String("maxlength='") + String(BOOKWORM_PASSWORD_SIZE) + String("'")).c_str(), NULL);
+  #ifdef ENABLE_CONFIG_WIFICHANNEL
+  generateConfigItemTxt("Channel", "wifichannel", "number", String(BookWorm.nvm->wifiChannel).c_str(), "min='1' max='13' step='1'", "1 to 13 only");
+  #endif
 
   generateConfigTableHeader("Driving Signal Config", true);
-  generateConfigItemTxt("Drive no pulse on stop",     "servostoppednopulse", "number",  BookWorm.nvm.servoStoppedNoPulse ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
-  generateConfigItemTxt("Drive pulse range",          "servomax", "number",      String(BookWorm.nvm.servoMax).c_str(), "min='0' max='1000' step='50'", "range = 1500 &plusmn; x microseconds");
-  generateConfigItemTxt("Drive pulse deadzone left",  "deadzoneleft", "number",  String(BookWorm.nvm.servoDeadzoneLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
-  generateConfigItemTxt("Drive pulse deadzone right", "deadzoneright", "number", String(BookWorm.nvm.servoDeadzoneRight).c_str(), "min='0' max='500' step='1'", "microseconds");
-  generateConfigItemTxt("Drive pulse offset left",    "biasleft", "number",      String(BookWorm.nvm.servoBiasLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
-  generateConfigItemTxt("Drive pulse offset right",   "biasright", "number",     String(BookWorm.nvm.servoBiasRight).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateConfigItemTxt("Drive no pulse on stop",     "servostoppednopulse", "number",  BookWorm.nvm->servoStoppedNoPulse ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
+  generateConfigItemTxt("Drive pulse range",          "servomax", "number",      String(BookWorm.nvm->servoMax).c_str(), "min='0' max='1000' step='50'", "range = 1500 &plusmn; x microseconds");
+  generateConfigItemTxt("Drive pulse deadzone left",  "deadzoneleft", "number",  String(BookWorm.nvm->servoDeadzoneLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateConfigItemTxt("Drive pulse deadzone right", "deadzoneright", "number", String(BookWorm.nvm->servoDeadzoneRight).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateConfigItemTxt("Drive pulse offset left",    "biasleft", "number",      String(BookWorm.nvm->servoBiasLeft).c_str(), "min='0' max='500' step='1'", "microseconds");
+  generateConfigItemTxt("Drive pulse offset right",   "biasright", "number",     String(BookWorm.nvm->servoBiasRight).c_str(), "min='0' max='500' step='1'", "microseconds");
   generateConfigTableHeader("Servo Signal Flip", true);
-  generateFlipDropdown(BookWorm.nvm.servoFlip);
+  generateFlipDropdown(BookWorm.nvm->servoFlip);
 
   generateConfigTableHeader("User Preferences", true);
-  generateConfigItemTxt("Speed multiplier",           "speedgain", "number",     String(BookWorm.nvm.speedGain).c_str(), "min='100' max='10000' step='100'", "multiplier = x&#247;1000 , 1000 is normal");
-  generateConfigItemTxt("Steering sensitivity",       "steeringsensitivity", "number", String(BookWorm.nvm.steeringSensitivity).c_str(), "min='100' max='10000' step='100'", "sensitivity = x&#247;1000 , 1000 is normal");
-  generateConfigItemTxt("Steering balance",           "steeringbalance", "number",     String(BookWorm.nvm.steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
-  generateConfigItemTxt("Joystick size",              "stickradius", "number",   String(BookWorm.nvm.stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
+  generateConfigItemTxt("Speed multiplier",           "speedgain", "number",     String(BookWorm.nvm->speedGain).c_str(), "min='100' max='10000' step='100'", "multiplier = x&#247;1000 , 1000 is normal");
+  generateConfigItemTxt("Steering sensitivity",       "steeringsensitivity", "number", String(BookWorm.nvm->steeringSensitivity).c_str(), "min='100' max='10000' step='100'", "sensitivity = x&#247;1000 , 1000 is normal");
+  generateConfigItemTxt("Steering balance",           "steeringbalance", "number",     String(BookWorm.nvm->steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
+  generateConfigItemTxt("Joystick size",              "stickradius", "number",   String(BookWorm.nvm->stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
 
   generateConfigTableHeader("Advanced Features<br />left handed, inverted drive, "
   #ifdef ENABLE_WEAPON
@@ -427,23 +429,23 @@ void serveConfigTable()
   "battery, "
   #endif
   "etc", true);
-  generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm.advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable, * change requires reboot");
-  if (BookWorm.nvm.advanced)
+  generateConfigItemTxt("Enabled advanced features?", "advanced", "number",             BookWorm.nvm->advanced ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, true means enable, * change requires reboot");
+  if (BookWorm.nvm->advanced)
   {
-    generateConfigItemTxt("Left handed?",             "lefthanded", "number", BookWorm.nvm.leftHanded ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
+    generateConfigItemTxt("Left handed?",             "lefthanded", "number", BookWorm.nvm->leftHanded ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true");
     #ifdef ENABLE_WEAPON
     server.sendContent("\n<tr><td colspan='3'>Weapon Settings</td></tr>\n");
-    generateConfigItemTxt("Enabled weapon features?", "enableweapon", "number",       BookWorm.nvm.enableWeapon ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, * change requires reboot");
-    generateConfigItemTxt("Weapon safe pulse",        "weappossafe", "number", String(BookWorm.nvm.weapPosSafe).c_str(), "min='0' max='1500' step='100'", "0 = no need (servo weapon), otherwise use pulse width to stop ESC");
-    generateConfigItemTxt("Weapon position \"A\"",    "weapposa", "number",    String(BookWorm.nvm.weapPosA).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
-    generateConfigItemTxt("Weapon position \"B\"",    "weapposb", "number",    String(BookWorm.nvm.weapPosB).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
+    generateConfigItemTxt("Enabled weapon features?", "enableweapon", "number",       BookWorm.nvm->enableWeapon ? "1" : "0", "min='0' max='1' step='1'", "0 = false, 1 = true, * change requires reboot");
+    generateConfigItemTxt("Weapon safe pulse",        "weappossafe", "number", String(BookWorm.nvm->weapPosSafe).c_str(), "min='0' max='1500' step='100'", "0 = no need (servo weapon), otherwise use pulse width to stop ESC");
+    generateConfigItemTxt("Weapon position \"A\"",    "weapposa", "number",    String(BookWorm.nvm->weapPosA).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
+    generateConfigItemTxt("Weapon position \"B\"",    "weapposb", "number",    String(BookWorm.nvm->weapPosB).c_str(), "min='500' max='2500' step='100'", "pulse width in microseconds");
     #endif
     #ifdef ENABLE_BATTERY_MONITOR
     server.sendContent("\n<tr><td colspan='3'>Battery Monitoring</td></tr>\n");
-    generateConfigItemTxt("Batt V-div R1",           "vdiv_r1", "number",        String(BookWorm.nvm.vdiv_r1).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;");
-    generateConfigItemTxt("Batt V-div R2",           "vdiv_r2", "number",        String(BookWorm.nvm.vdiv_r1).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;, use zero to disable battery reading");
-    generateConfigItemTxt("Batt read filter const.", "vdiv_filter", "number",    String(BookWorm.nvm.vdiv_filter).c_str(), "min='0' max='1000' step='50'", "out of 1000, use 1000 to disable filtering");
-    generateConfigItemTxt("Batt warning level",      "batt_warn_volt", "number", String(BookWorm.nvm.warning_voltage).c_str(), (String("min='0' max='") + String(BookWorm.calcMaxBattVoltage() + 100) + String("' step='100'")).c_str(), "in millivolts");
+    generateConfigItemTxt("Batt V-div R1",           "vdiv_r1", "number",        String(BookWorm.nvm->vdiv_r1).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;");
+    generateConfigItemTxt("Batt V-div R2",           "vdiv_r2", "number",        String(BookWorm.nvm->vdiv_r1).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;, use zero to disable battery reading");
+    generateConfigItemTxt("Batt read filter const.", "vdiv_filter", "number",    String(BookWorm.nvm->vdiv_filter).c_str(), "min='0' max='1000' step='50'", "out of 1000, use 1000 to disable filtering");
+    generateConfigItemTxt("Batt warning level",      "batt_warn_volt", "number", String(BookWorm.nvm->warning_voltage).c_str(), (String("min='0' max='") + String(BookWorm.calcMaxBattVoltage() + 100) + String("' step='100'")).c_str(), "in millivolts");
     server.sendContent(String("\n<tr><td colspan='3'>Maximum readable voltage is: ") + String(BookWorm.calcMaxBattVoltage()) + String(" millivolts</td></tr>\n"));
     #endif
     

@@ -8,8 +8,8 @@
 double cBookWorm::adcToVoltage(uint16_t x)
 {
 	double y = analogRead(A0);
-	double denom = this->nvm.vdiv_r1 + this->nvm.vdiv_r2;
-	double numer = this->nvm.vdiv_r2;
+	double denom = this->nvm->vdiv_r1 + this->nvm->vdiv_r2;
+	double numer = this->nvm->vdiv_r2;
 	y = (denom * y) / (numer * 1023.0d);
 	y *= 1000.d; // to millivolts
 	return x;
@@ -28,8 +28,8 @@ uint16_t cBookWorm::readBatteryVoltageFiltered(void)
 		this->batteryVoltageFiltered = x;
 		return (uint16_t)lround(x);
 	}
-	double filter_old = 1000 - this->nvm.vdiv_filter;
-	double filter_new = this->nvm.vdiv_filter;
+	double filter_old = 1000 - this->nvm->vdiv_filter;
+	double filter_new = this->nvm->vdiv_filter;
 	y *= filter_old;
 	x *= filter_new;
 	y /= 1000.0d;
@@ -46,7 +46,7 @@ uint16_t cBookWorm::readBatteryVoltageFilteredLast(void)
 bool cBookWorm::isBatteryLowWarning(void)
 {
 	uint16_t x = (uint16_t)lround(this->batteryVoltageFiltered);
-	return (x < this->nvm.warning_voltage);
+	return (x < this->nvm->warning_voltage);
 }
 
 uint16_t cBookWorm::calcMaxBattVoltage(void)
@@ -56,12 +56,12 @@ uint16_t cBookWorm::calcMaxBattVoltage(void)
 
 void cBookWorm::setVdivR1(uint32_t x)
 {
-	this->nvm.vdiv_r1 = x;
+	this->nvm->vdiv_r1 = x;
 }
 
 void cBookWorm::setVdivR2(uint32_t x)
 {
-	this->nvm.vdiv_r2 = x;
+	this->nvm->vdiv_r2 = x;
 }
 
 void cBookWorm::setVdivFilter(uint16_t x)
@@ -69,12 +69,12 @@ void cBookWorm::setVdivFilter(uint16_t x)
 	if (x > 1000) {
 		x = 1000;
 	}
-	this->nvm.vdiv_filter = x;
+	this->nvm->vdiv_filter = x;
 }
 
 void cBookWorm::setBatteryWarningVoltage(uint16_t x)
 {
-	this->nvm.warning_voltage = x;
+	this->nvm->warning_voltage = x;
 }
 
 #endif
