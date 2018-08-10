@@ -186,6 +186,7 @@ char* cBookWorm::generateSsid(char* buff)
 	i += sprintf(&(buff[i]), "%02x", macbuf[4]);
 	i += sprintf(&(buff[i]), "%02x", macbuf[5]);
 	sprintf(this->nvm->password, BOOKWORM_DEFAULT_PASSWORD);
+	strcpy(this->wifiPassword, this->nvm->password);
 	return buff;
 }
 
@@ -243,6 +244,9 @@ void cBookWorm::setPassword(char* str)
 	}
 	for (i = 0; i < BOOKWORM_PASSWORD_SIZE && failed == false; i++) { // for all chars
 		char d = str[i];
+		if (d == 0) {
+			break;
+		}
 		// input sanitation, non-alphanum chars are turned into hyphens
 		if (d < 32 || d > 126) {
 			failed = true;
@@ -251,10 +255,12 @@ void cBookWorm::setPassword(char* str)
 
 	if (failed == false) {
 		strcpy(this->nvm->password, str);
+		strcpy(this->wifiPassword, str);
 	}
 	else {
 		this->printf("password validation failed: %s\r\n", str);
 		sprintf(this->nvm->password, BOOKWORM_DEFAULT_PASSWORD);
+		strcpy(this->wifiPassword, this->nvm->password);
 	}
 
 	this->debugf("set password: %s\r\n", this->nvm->password);
@@ -310,6 +316,7 @@ void cBookWorm::defaultValues()
 	this->nvm->divider1 = 0;
 	this->nvm->divider2 = 0;
 	sprintf(this->nvm->password, BOOKWORM_DEFAULT_PASSWORD);
+	memcpy(this->wifiPassword, this->nvm->password, BOOKWORM_PASSWORD_SIZE + 1);
 	this->nvm->wifiChannel = 8;
 	this->nvm->advanced = true;
 	this->nvm->servoMax = 500;

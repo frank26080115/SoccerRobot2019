@@ -7,9 +7,12 @@
 
 double cBookWorm::adcToVoltage(uint16_t x)
 {
-	double y = analogRead(A0);
+	double y = x;
 	double denom = this->nvm->vdiv_r1 + this->nvm->vdiv_r2;
 	double numer = this->nvm->vdiv_r2;
+	if (numer == 0) {
+		numer = 1.0;
+	}
 	y = (denom * y) / (numer * 1023.0d);
 	y *= 1000.d; // to millivolts
 	return x;

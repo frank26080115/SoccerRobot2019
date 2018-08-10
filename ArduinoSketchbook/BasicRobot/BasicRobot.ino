@@ -61,11 +61,11 @@ void setup()
     BookWorm.printf("SoftAPConfig Failed!\r\n");
   }
   BookWorm.printf("SSID: %s\r\n", BookWorm.SSID);
-  BookWorm.printf("Password: %s\r\n", BookWorm.nvm->password);
+  BookWorm.printf("Password: %s\r\n", BookWorm.wifiPassword);
   #ifdef ENABLE_CONFIG_WIFICHANNEL
   BookWorm.printf("WiFi Channel: %u\r\n", BookWorm.nvm->wifiChannel);
   #endif
-  if (WiFi.softAP(BookWorm.SSID, BookWorm.nvm->password
+  if (WiFi.softAP(BookWorm.SSID, BookWorm.wifiPassword
       #ifdef ENABLE_CONFIG_WIFICHANNEL
       , BookWorm.nvm->wifiChannel, 0, 2
       #endif
@@ -222,7 +222,9 @@ void loop()
   }
 
   #ifdef ENABLE_BATTERY_MONITOR
-  battLvl = BookWorm.readBatteryVoltageFiltered();
+  if (BookWorm.nvm->vdiv_r2 > 0) {
+    battLvl = BookWorm.readBatteryVoltageFiltered();
+  }
   #endif
 
   #ifdef ENABLE_BOOT_PIN_RESET

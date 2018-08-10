@@ -8,13 +8,13 @@ EEPROM Version History:
 1 - Not released, use only
 */
 
-//#define ENABLE_WEAPON
+#define ENABLE_WEAPON
 #define BOOKWORM_DEBUG
 #define BOOKWORM_BAUD 9600
 #define BOOKWORM_SSID_SIZE 31
 #define BOOKWORM_PASSWORD_SIZE 31
 //#define ALL_SAFE_DEBUG_MODE
-//#define ENABLE_BATTERY_MONITOR
+#define ENABLE_BATTERY_MONITOR
 #define ENABLE_SIGNALCROSS_RESET
 #define ENABLE_CONFIG_WIFICHANNEL
 #define BOOKWORM_DEFAULT_PASSWORD "12345678"
@@ -139,7 +139,8 @@ public:
 	int printf(const char *format, ...);
 	int debugf(const char *format, ...);
 
-	char SSID[32];
+	char SSID[BOOKWORM_SSID_SIZE + 1];
+	char wifiPassword[BOOKWORM_PASSWORD_SIZE + 1];
 
 	void defaultValues();
 	void factoryReset();

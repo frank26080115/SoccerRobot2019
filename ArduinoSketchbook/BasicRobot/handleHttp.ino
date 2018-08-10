@@ -193,7 +193,7 @@ void handleMove() {
     snprintf(buff, sizeof(buff), "false");
   }
   root["battWarning"] = buff;
-  snprintf(buff, sizeof(buff), "%lu", BookWorm.readBatteryVoltageFilteredLast());
+  snprintf(buff, sizeof(buff), "%u", BookWorm.nvm->vdiv_r2 > 0 ? BookWorm.readBatteryVoltageFilteredLast() : 0);
   root["battVoltage"] = buff;
   String response;
   root.printTo(response);
