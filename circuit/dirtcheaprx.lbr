@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -1868,10 +1868,10 @@ For COM-09806 in the SparkFun catalog&lt;br&gt;</description>
 <wire x1="-2.54" y1="-0.508" x2="-2.54" y2="-1.27" width="0.2032" layer="51"/>
 <wire x1="-2.54" y1="0.508" x2="-2.159" y2="-0.381" width="0.2032" layer="51"/>
 <circle x="0" y="0" radius="1.778" width="0.2032" layer="21"/>
-<pad name="1" x="-3.2512" y="2.2606" drill="1" diameter="1.8796" shape="long"/>
-<pad name="2" x="3.2512" y="2.2606" drill="1" diameter="1.8796" shape="long"/>
-<pad name="3" x="-3.2512" y="-2.2606" drill="1" diameter="1.8796" shape="long"/>
-<pad name="4" x="3.2512" y="-2.2606" drill="1" diameter="1.8796" shape="long"/>
+<pad name="1" x="-3.2512" y="2.2606" drill="1.2" diameter="1.8796" shape="long"/>
+<pad name="2" x="3.2512" y="2.2606" drill="1.2" diameter="1.8796" shape="long"/>
+<pad name="3" x="-3.2512" y="-2.2606" drill="1.2" diameter="1.8796" shape="long"/>
+<pad name="4" x="3.2512" y="-2.2606" drill="1.2" diameter="1.8796" shape="long"/>
 <text x="-2.54" y="3.81" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <wire x1="-0.635" y1="2.54" x2="-0.635" y2="1.27" width="0.127" layer="22"/>
 <wire x1="-0.635" y1="-2.54" x2="-0.635" y2="-1.27" width="0.127" layer="22"/>
@@ -3244,6 +3244,158 @@ ROBOT-2019-R1</text>
 <rectangle x1="-4" y1="-2" x2="2" y2="4" layer="51"/>
 <text x="-6" y="4.5" size="1.27" layer="21" ratio="10">ESP-12S</text>
 </package>
+<package name="DIRTCHEAPRX_MINI_PROGPINS">
+<wire x1="0" y1="0" x2="0" y2="27" width="0.127" layer="21"/>
+<wire x1="0" y1="27" x2="25.4" y2="27" width="0.127" layer="21"/>
+<wire x1="25.4" y1="27" x2="25.4" y2="0" width="0.127" layer="21"/>
+<wire x1="25.4" y1="0" x2="0" y2="0" width="0.127" layer="21"/>
+<pad name="GND" x="3.87" y="25.5" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="RST" x="5.1" y="20.6" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="+3V3" x="7.6" y="20.6" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="RX" x="18.26" y="20.6" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="TX" x="20.8" y="20.6" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="LEFT-GND" x="1.27" y="1.57" drill="1.2" diameter="2.2" shape="octagon"/>
+<pad name="BOOT" x="23.8" y="11.6" drill="1.2" diameter="2.2" shape="octagon"/>
+<pad name="LED-GND" x="23.8" y="25.47" drill="1.2" diameter="2.2" shape="octagon"/>
+<pad name="RIGHT-GND" x="19.05" y="1.57" drill="1.2" diameter="2.2" shape="octagon"/>
+<pad name="VBAT" x="1.33" y="25.5" drill="1.2" diameter="2" shape="octagon"/>
+<hole x="-1.5" y="21" drill="3"/>
+<hole x="7.5" y="29" drill="3"/>
+<hole x="20" y="29" drill="3"/>
+<hole x="26.9" y="21.5" drill="3"/>
+<hole x="-1.5" y="6" drill="3"/>
+<hole x="5.5" y="-1.5" drill="3"/>
+<hole x="23" y="-1.5" drill="3"/>
+<hole x="26.9" y="5" drill="3"/>
+<circle x="-1.5" y="21" radius="3.3" width="0.127" layer="21"/>
+<circle x="-1.5" y="6" radius="3.3" width="0.127" layer="21"/>
+<circle x="5.5" y="-1.5" radius="3.3" width="0.127" layer="21"/>
+<circle x="23" y="-1.5" radius="3.3" width="0.127" layer="21"/>
+<circle x="26.9" y="5" radius="3.3" width="0.127" layer="21"/>
+<circle x="26.9" y="21.5" radius="3.3" width="0.127" layer="21"/>
+<circle x="20" y="29" radius="3.3" width="0.127" layer="21"/>
+<circle x="7.5" y="29" radius="3.3" width="0.127" layer="21"/>
+</package>
+<package name="DIRTCHEAPRX_NANO_PROGPINS">
+<wire x1="0" y1="0" x2="0" y2="24.4" width="0.127" layer="22"/>
+<wire x1="0" y1="24.4" x2="19.6" y2="24.4" width="0.127" layer="22"/>
+<wire x1="19.6" y1="24.4" x2="19.6" y2="0" width="0.127" layer="22"/>
+<wire x1="19.6" y1="0" x2="0" y2="0" width="0.127" layer="22"/>
+<pad name="LED-GND" x="1.33" y="21.4" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="GND" x="15.73" y="21.4" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="VBAT" x="18.27" y="21.4" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="TX" x="1.7" y="18" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="RX" x="4.24" y="18" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="+3V3" x="14.9" y="18" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="RST" x="17.4" y="18" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="BOOT" x="4.4" y="8.6" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="RIGHT-SIG" x="1.46" y="1" drill="1.2" diameter="2" shape="octagon"/>
+<pad name="LEFT-GND" x="18.14" y="1" drill="1.2" diameter="2" shape="octagon"/>
+<hole x="6" y="-1.5" drill="3"/>
+<hole x="13.5" y="-1.5" drill="3"/>
+<hole x="-1.5" y="5" drill="3"/>
+<hole x="21.1" y="5" drill="3"/>
+<hole x="-1.5" y="14.5" drill="3"/>
+<hole x="21.1" y="14.5" drill="3"/>
+<hole x="15.5" y="26.4" drill="3"/>
+<hole x="4" y="26.4" drill="3"/>
+<circle x="4" y="26.4" radius="3.3" width="0.127" layer="21"/>
+<circle x="15.5" y="26.4" radius="3.3" width="0.127" layer="21"/>
+<circle x="-1.5" y="14.5" radius="3.3" width="0.127" layer="21"/>
+<circle x="-1.5" y="5" radius="3.3" width="0.127" layer="21"/>
+<circle x="21.1" y="5" radius="3.3" width="0.127" layer="21"/>
+<circle x="6" y="-1.5" radius="3.3" width="0.127" layer="21"/>
+<circle x="13.5" y="-1.5" radius="3.3" width="0.127" layer="21"/>
+<circle x="21.1" y="14.5" radius="3.3" width="0.127" layer="21"/>
+</package>
+<package name="TEENSY3.1_ALL">
+<pad name="GND@1" x="-7.62" y="16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D0" x="-7.62" y="13.97" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D1" x="-7.62" y="11.43" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D2" x="-7.62" y="8.89" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D3" x="-7.62" y="6.35" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D4" x="-7.62" y="3.81" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D5" x="-7.62" y="1.27" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D6" x="-7.62" y="-1.27" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D7" x="-7.62" y="-3.81" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D8" x="-7.62" y="-6.35" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D9" x="-7.62" y="-8.89" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D10" x="-7.62" y="-11.43" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D11" x="-7.62" y="-13.97" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D12" x="-7.62" y="-16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="VBAT" x="-5.08" y="-16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="3.3V@2" x="-2.54" y="-16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="GND@2" x="0" y="-16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="PROGRAM" x="2.54" y="-16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="A14/DAC" x="5.08" y="-16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D13/LED" x="7.62" y="-16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D14/A0" x="7.62" y="-13.97" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D15/A1" x="7.62" y="-11.43" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D16/A2" x="7.62" y="-8.89" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D17/A3" x="7.62" y="-6.35" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D18/A4" x="7.62" y="-3.81" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D19/A5" x="7.62" y="-1.27" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D20/A6" x="7.62" y="1.27" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D21/A7" x="7.62" y="3.81" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D22/A8" x="7.62" y="6.35" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="D23/A9" x="7.62" y="8.89" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="3.3V@1" x="7.62" y="11.43" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="AGND" x="7.62" y="13.97" drill="0.9" diameter="1.778" shape="octagon"/>
+<pad name="VIN" x="7.62" y="16.51" drill="0.9" diameter="1.778" shape="octagon"/>
+<wire x1="-8.89" y1="-17.78" x2="8.89" y2="-17.78" width="0.127" layer="21"/>
+<wire x1="8.89" y1="-17.78" x2="8.89" y2="17.78" width="0.127" layer="21"/>
+<wire x1="8.89" y1="17.78" x2="2.54" y2="17.78" width="0.127" layer="21"/>
+<wire x1="2.54" y1="17.78" x2="-2.54" y2="17.78" width="0.127" layer="21"/>
+<wire x1="-2.54" y1="17.78" x2="-8.89" y2="17.78" width="0.127" layer="21"/>
+<wire x1="-8.89" y1="17.78" x2="-8.89" y2="-17.78" width="0.127" layer="21"/>
+<wire x1="-2.54" y1="17.78" x2="-2.54" y2="12.7" width="0.127" layer="21"/>
+<wire x1="-2.54" y1="12.7" x2="2.54" y2="12.7" width="0.127" layer="21"/>
+<wire x1="2.54" y1="12.7" x2="2.54" y2="17.78" width="0.127" layer="21"/>
+</package>
+<package name="TEENSY_3.0-3.2&amp;LC_DIL">
+<pad name="GND" x="-7.62" y="16.51" drill="0.9"/>
+<pad name="0" x="-7.62" y="13.97" drill="0.9652"/>
+<pad name="1" x="-7.62" y="11.43" drill="0.9652"/>
+<pad name="2" x="-7.62" y="8.89" drill="0.9652"/>
+<pad name="3" x="-7.62" y="6.35" drill="0.9652"/>
+<pad name="4" x="-7.62" y="3.81" drill="0.9652"/>
+<pad name="5" x="-7.62" y="1.27" drill="0.9652"/>
+<pad name="6" x="-7.62" y="-1.27" drill="0.9652"/>
+<pad name="7" x="-7.62" y="-3.81" drill="0.9652"/>
+<pad name="8" x="-7.62" y="-6.35" drill="0.9652"/>
+<pad name="9" x="-7.62" y="-8.89" drill="0.9652"/>
+<pad name="10" x="-7.62" y="-11.43" drill="0.9652"/>
+<pad name="11" x="-7.62" y="-13.97" drill="0.9652"/>
+<pad name="12" x="-7.62" y="-16.51" drill="0.9652"/>
+<pad name="13" x="7.62" y="-16.51" drill="0.9652"/>
+<pad name="14/A0" x="7.62" y="-13.97" drill="0.9652"/>
+<pad name="15/A1" x="7.62" y="-11.43" drill="0.9652"/>
+<pad name="16/A2" x="7.62" y="-8.89" drill="0.9652"/>
+<pad name="17/A3" x="7.62" y="-6.35" drill="0.9652"/>
+<pad name="18/A4" x="7.62" y="-3.81" drill="0.9652"/>
+<pad name="19/A5" x="7.62" y="-1.27" drill="0.9652"/>
+<pad name="20/A6" x="7.62" y="1.27" drill="0.9652"/>
+<pad name="21/A7" x="7.62" y="3.81" drill="0.9652"/>
+<pad name="22/A8" x="7.62" y="6.35" drill="0.9652"/>
+<pad name="23/A9" x="7.62" y="8.89" drill="0.9652"/>
+<pad name="3.3V" x="7.62" y="11.43" drill="0.9652"/>
+<pad name="AGND" x="7.62" y="13.97" drill="0.9652"/>
+<pad name="VIN" x="7.62" y="16.51" drill="0.9652"/>
+<wire x1="-8.89" y1="17.78" x2="8.89" y2="17.78" width="0.127" layer="51"/>
+<wire x1="8.89" y1="17.78" x2="8.89" y2="-17.78" width="0.127" layer="51"/>
+<wire x1="8.89" y1="-17.78" x2="-8.89" y2="-17.78" width="0.127" layer="51"/>
+<wire x1="-8.89" y1="-17.78" x2="-8.89" y2="17.78" width="0.127" layer="51"/>
+<wire x1="-1.27" y1="16.51" x2="1.27" y2="16.51" width="0.2032" layer="21"/>
+<wire x1="1.27" y1="16.51" x2="1.27" y2="17.78" width="0.2032" layer="21"/>
+<wire x1="1.27" y1="17.78" x2="8.89" y2="17.78" width="0.2032" layer="21"/>
+<wire x1="8.89" y1="17.78" x2="8.89" y2="-17.78" width="0.2032" layer="21"/>
+<wire x1="8.89" y1="-17.78" x2="-8.89" y2="-17.78" width="0.2032" layer="21"/>
+<wire x1="-8.89" y1="-17.78" x2="-8.89" y2="17.78" width="0.2032" layer="21"/>
+<wire x1="-8.89" y1="17.78" x2="-1.27" y2="17.78" width="0.2032" layer="21"/>
+<wire x1="-1.27" y1="17.78" x2="-1.27" y2="16.51" width="0.2032" layer="21"/>
+<text x="-3.81" y="13.97" size="1.27" layer="25" font="vector">&gt;NAME</text>
+<text x="-3.81" y="-13.97" size="1.27" layer="27" font="vector">&gt;VALUE</text>
+</package>
 </packages>
 <symbols>
 <symbol name="5V">
@@ -3746,6 +3898,100 @@ by Frank Zhao</text>
 <pin name="TX" x="15.24" y="7.62" visible="pin" length="middle" rot="R180"/>
 <text x="-12.7" y="10.16" size="1.778" layer="95">&gt;Name</text>
 <text x="-12.7" y="-15.24" size="1.778" layer="96">&gt;Value</text>
+</symbol>
+<symbol name="DIRTCHEAPRX-PROG-MINI">
+<wire x1="0" y1="0" x2="0" y2="22.86" width="0.254" layer="94"/>
+<wire x1="0" y1="22.86" x2="27.94" y2="22.86" width="0.254" layer="94"/>
+<wire x1="27.94" y1="22.86" x2="27.94" y2="0" width="0.254" layer="94"/>
+<wire x1="27.94" y1="0" x2="0" y2="0" width="0.254" layer="94"/>
+<pin name="GND" x="-5.08" y="2.54" length="middle"/>
+<pin name="LED-GND" x="-5.08" y="5.08" length="middle"/>
+<pin name="LEFT-GND" x="-5.08" y="7.62" length="middle"/>
+<pin name="RIGHT-?" x="-5.08" y="12.7" length="middle"/>
+<pin name="VBAT" x="-5.08" y="20.32" length="middle"/>
+<pin name="+3V3" x="-5.08" y="17.78" length="middle"/>
+<pin name="RX" x="33.02" y="20.32" length="middle" rot="R180"/>
+<pin name="TX" x="33.02" y="17.78" length="middle" rot="R180"/>
+<pin name="BOOT" x="33.02" y="10.16" length="middle" rot="R180"/>
+<pin name="RST" x="33.02" y="5.08" length="middle" rot="R180"/>
+</symbol>
+<symbol name="TEENSY3.1_FRONT">
+<pin name="D0" x="-22.86" y="25.4" length="middle"/>
+<pin name="D1" x="-22.86" y="22.86" length="middle"/>
+<pin name="D2" x="-22.86" y="20.32" length="middle"/>
+<pin name="D3" x="-22.86" y="17.78" length="middle"/>
+<pin name="D4" x="-22.86" y="15.24" length="middle"/>
+<pin name="D5" x="-22.86" y="12.7" length="middle"/>
+<pin name="D10" x="-22.86" y="-12.7" length="middle"/>
+<pin name="D11" x="-22.86" y="-16.51" length="middle"/>
+<pin name="D12" x="-22.86" y="-20.32" length="middle"/>
+<pin name="D6" x="-22.86" y="10.16" length="middle"/>
+<pin name="D7" x="-22.86" y="7.62" length="middle"/>
+<pin name="D8" x="-22.86" y="5.08" length="middle"/>
+<pin name="D9" x="-22.86" y="-8.89" length="middle"/>
+<pin name="D13/LED" x="17.78" y="-20.32" length="middle" rot="R180"/>
+<pin name="D15/A1" x="17.78" y="-12.7" length="middle" rot="R180"/>
+<pin name="D14/A0" x="17.78" y="-16.51" length="middle" rot="R180"/>
+<pin name="D16/A2" x="17.78" y="-8.89" length="middle" rot="R180"/>
+<pin name="D17/A3" x="17.78" y="-5.08" length="middle" rot="R180"/>
+<pin name="D18/A4" x="17.78" y="-1.27" length="middle" rot="R180"/>
+<pin name="D19/A5" x="17.78" y="2.54" length="middle" rot="R180"/>
+<pin name="D20/A6" x="17.78" y="6.35" length="middle" rot="R180"/>
+<pin name="D21/A7" x="17.78" y="10.16" length="middle" rot="R180"/>
+<pin name="D22/A8" x="17.78" y="13.97" length="middle" rot="R180"/>
+<pin name="D23/A9" x="17.78" y="17.78" length="middle" rot="R180"/>
+<pin name="VBAT" x="-22.86" y="33.02" length="middle"/>
+<pin name="GND" x="-22.86" y="43.18" length="middle"/>
+<pin name="VIN" x="-22.86" y="40.64" length="middle"/>
+<pin name="AGND" x="-22.86" y="38.1" length="middle"/>
+<pin name="3.3V" x="-22.86" y="35.56" length="middle"/>
+<text x="-10.16" y="25.4" size="1.016" layer="94">RX1</text>
+<text x="-10.16" y="21.59" size="1.016" layer="94">TX1</text>
+<text x="-10.16" y="-8.89" size="1.016" layer="94">RX2</text>
+<text x="-10.16" y="-12.7" size="1.016" layer="94">TX2</text>
+<text x="-10.16" y="-1.27" size="1.016" layer="94">RX3</text>
+<text x="-10.16" y="-3.81" size="1.016" layer="94">TX3</text>
+<wire x1="-20.32" y1="-25.4" x2="15.24" y2="-25.4" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-25.4" x2="15.24" y2="45.72" width="0.254" layer="94"/>
+<wire x1="15.24" y1="45.72" x2="-20.32" y2="45.72" width="0.254" layer="94"/>
+<wire x1="-20.32" y1="45.72" x2="-20.32" y2="-25.4" width="0.254" layer="94"/>
+<text x="2.54" y="41.91" size="1.4224" layer="94">TEENSY 3.1</text>
+</symbol>
+<symbol name="TEENSY_3.0_DIL">
+<wire x1="-17.78" y1="-35.56" x2="17.78" y2="-35.56" width="0.254" layer="94"/>
+<wire x1="17.78" y1="-35.56" x2="17.78" y2="33.02" width="0.254" layer="94"/>
+<wire x1="17.78" y1="33.02" x2="-17.78" y2="33.02" width="0.254" layer="94"/>
+<wire x1="-17.78" y1="33.02" x2="-17.78" y2="-35.56" width="0.254" layer="94"/>
+<pin name="12/MISO" x="-22.86" y="-2.54" length="middle"/>
+<pin name="11/MOSI" x="-22.86" y="0" length="middle"/>
+<pin name="10/TX2/PWM" x="-22.86" y="2.54" length="middle"/>
+<pin name="9/RX2/PWM" x="-22.86" y="5.08" length="middle"/>
+<pin name="8/TX3" x="-22.86" y="7.62" length="middle"/>
+<pin name="7/RX3" x="-22.86" y="10.16" length="middle"/>
+<pin name="6/PWM" x="-22.86" y="12.7" length="middle"/>
+<pin name="5/PWM" x="-22.86" y="15.24" length="middle"/>
+<pin name="4/PWM" x="-22.86" y="17.78" length="middle"/>
+<pin name="3/PWM" x="-22.86" y="20.32" length="middle"/>
+<pin name="2" x="-22.86" y="22.86" length="middle"/>
+<pin name="1/TX1/T" x="-22.86" y="25.4" length="middle"/>
+<pin name="0/RX1/T" x="-22.86" y="27.94" length="middle"/>
+<pin name="GND" x="22.86" y="20.32" length="middle" direction="pwr" rot="R180"/>
+<pin name="VIN" x="22.86" y="27.94" length="middle" direction="pwr" rot="R180"/>
+<pin name="AGND" x="22.86" y="5.08" length="middle" direction="pwr" rot="R180"/>
+<pin name="3.3V" x="22.86" y="25.4" length="middle" direction="pwr" rot="R180"/>
+<pin name="23/A9/T/PWM" x="-22.86" y="-30.48" length="middle"/>
+<pin name="22/A8/T/PWM" x="-22.86" y="-27.94" length="middle"/>
+<pin name="21/A7/PWM" x="-22.86" y="-25.4" length="middle"/>
+<pin name="20/A6/PWM" x="-22.86" y="-22.86" length="middle"/>
+<pin name="19/A5/T/SCL" x="-22.86" y="-20.32" length="middle"/>
+<pin name="18/A4/T/SDA" x="-22.86" y="-17.78" length="middle"/>
+<pin name="17/A3/T" x="-22.86" y="-15.24" length="middle"/>
+<pin name="16/A2/T" x="-22.86" y="-12.7" length="middle"/>
+<pin name="15/A1/T" x="-22.86" y="-10.16" length="middle"/>
+<pin name="14/A0" x="-22.86" y="-7.62" length="middle"/>
+<pin name="13/SCK/LED" x="-22.86" y="-5.08" length="middle"/>
+<text x="-5.588" y="34.29" size="1.27" layer="95" font="vector" ratio="15">&gt;NAME</text>
+<text x="-2.794" y="-38.1" size="1.27" layer="96" font="vector" ratio="15">&gt;VALUE</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -6460,6 +6706,90 @@ These are standard SMD and PTH capacitors. Normally 10uF, 47uF, and 100uF in ele
 <connect gate="G$1" pin="RX" pad="RXD0"/>
 <connect gate="G$1" pin="TX" pad="TXD0"/>
 <connect gate="G$1" pin="VCC" pad="VCC"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="DIRTCHEAPRX-PROG">
+<gates>
+<gate name="G$1" symbol="DIRTCHEAPRX-PROG-MINI" x="0" y="0"/>
+</gates>
+<devices>
+<device name="-MINI" package="DIRTCHEAPRX_MINI_PROGPINS">
+<connects>
+<connect gate="G$1" pin="+3V3" pad="+3V3"/>
+<connect gate="G$1" pin="BOOT" pad="BOOT"/>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="LED-GND" pad="LED-GND"/>
+<connect gate="G$1" pin="LEFT-GND" pad="LEFT-GND"/>
+<connect gate="G$1" pin="RIGHT-?" pad="RIGHT-GND"/>
+<connect gate="G$1" pin="RST" pad="RST"/>
+<connect gate="G$1" pin="RX" pad="RX"/>
+<connect gate="G$1" pin="TX" pad="TX"/>
+<connect gate="G$1" pin="VBAT" pad="VBAT"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-NANO" package="DIRTCHEAPRX_NANO_PROGPINS">
+<connects>
+<connect gate="G$1" pin="+3V3" pad="+3V3"/>
+<connect gate="G$1" pin="BOOT" pad="BOOT"/>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="LED-GND" pad="LED-GND"/>
+<connect gate="G$1" pin="LEFT-GND" pad="LEFT-GND"/>
+<connect gate="G$1" pin="RIGHT-?" pad="RIGHT-SIG"/>
+<connect gate="G$1" pin="RST" pad="RST"/>
+<connect gate="G$1" pin="RX" pad="RX"/>
+<connect gate="G$1" pin="TX" pad="TX"/>
+<connect gate="G$1" pin="VBAT" pad="VBAT"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="TEENSY_3.0_DIL">
+<description>TEENSY 3.0 in a classic breadboard layout - pins between the two outer rows.</description>
+<gates>
+<gate name="G$1" symbol="TEENSY_3.0_DIL" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="TEENSY_3.0-3.2&amp;LC_DIL">
+<connects>
+<connect gate="G$1" pin="0/RX1/T" pad="0"/>
+<connect gate="G$1" pin="1/TX1/T" pad="1"/>
+<connect gate="G$1" pin="10/TX2/PWM" pad="10"/>
+<connect gate="G$1" pin="11/MOSI" pad="11"/>
+<connect gate="G$1" pin="12/MISO" pad="12"/>
+<connect gate="G$1" pin="13/SCK/LED" pad="13"/>
+<connect gate="G$1" pin="14/A0" pad="14/A0"/>
+<connect gate="G$1" pin="15/A1/T" pad="15/A1"/>
+<connect gate="G$1" pin="16/A2/T" pad="16/A2"/>
+<connect gate="G$1" pin="17/A3/T" pad="17/A3"/>
+<connect gate="G$1" pin="18/A4/T/SDA" pad="18/A4"/>
+<connect gate="G$1" pin="19/A5/T/SCL" pad="19/A5"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="20/A6/PWM" pad="20/A6"/>
+<connect gate="G$1" pin="21/A7/PWM" pad="21/A7"/>
+<connect gate="G$1" pin="22/A8/T/PWM" pad="22/A8"/>
+<connect gate="G$1" pin="23/A9/T/PWM" pad="23/A9"/>
+<connect gate="G$1" pin="3.3V" pad="3.3V"/>
+<connect gate="G$1" pin="3/PWM" pad="3"/>
+<connect gate="G$1" pin="4/PWM" pad="4"/>
+<connect gate="G$1" pin="5/PWM" pad="5"/>
+<connect gate="G$1" pin="6/PWM" pad="6"/>
+<connect gate="G$1" pin="7/RX3" pad="7"/>
+<connect gate="G$1" pin="8/TX3" pad="8"/>
+<connect gate="G$1" pin="9/RX2/PWM" pad="9"/>
+<connect gate="G$1" pin="AGND" pad="AGND"/>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="VIN" pad="VIN"/>
 </connects>
 <technologies>
 <technology name=""/>
