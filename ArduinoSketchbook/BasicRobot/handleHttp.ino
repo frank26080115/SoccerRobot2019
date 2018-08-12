@@ -245,7 +245,7 @@ void handleConfig() {
     else IF_HANDLE_CONFIG_ARG("steeringsensitivity", setSteeringSensitivity, unsigned int)
     else IF_HANDLE_CONFIG_ARG("steeringbalance",     setSteeringBalance,     signed int)
     else IF_HANDLE_CONFIG_ARG("servostoppednopulse", setServoStoppedNoPulse, bool)
-    else IF_HANDLE_CONFIG_ARG("servoflip",     setServoFlip,    bool)
+    else IF_HANDLE_CONFIG_ARG("servoflip",     setServoFlip,    uint8_t)
     else IF_HANDLE_CONFIG_ARG("stickradius",   setStickRadius,  uint16_t)
     else IF_HANDLE_CONFIG_ARG("advanced",      setAdvanced,     bool)
     else IF_HANDLE_CONFIG_ARG("wifiChannel",   setWifiChannel,  uint8_t)
