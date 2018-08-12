@@ -76,6 +76,9 @@ void cBookWorm::moveLeftServo(signed int x)
 	}
 	if (x == 0 && this->nvm->servoStoppedNoPulse != false)
 	{
+		if (servoLeft.attached()) {
+			servoLeft.write(SERVO_CENTER_TICKS + this->nvm->servoBiasLeft);
+		}
 		servoLeft.detach();
 	}
 	else if (x != 0 && servoLeft.attached() == false)
@@ -89,13 +92,21 @@ void cBookWorm::moveLeftServo(signed int x)
 	}
 	ticks += this->nvm->servoBiasLeft;
 
-	#ifdef ENABLE_SERVO_DEBUG
-	dbgLeftTicks = ticks;
-	#endif
-
-	#ifndef ALL_SAFE_DEBUG_MODE
-	servoLeft.write(ticks);
-	#endif
+	if (servoLeft.attached())
+	{
+		#ifdef ENABLE_SERVO_DEBUG
+		dbgLeftTicks = ticks;
+		#endif
+		#ifndef ALL_SAFE_DEBUG_MODE
+		servoLeft.write(ticks);
+		#endif
+	}
+	else
+	{
+		#ifdef ENABLE_SERVO_DEBUG
+		dbgLeftTicks = 0;
+		#endif
+	}
 }
 
 void cBookWorm::moveRightServo(signed int x)
@@ -131,6 +142,9 @@ void cBookWorm::moveRightServo(signed int x)
 	}
 	if (x == 0 && this->nvm->servoStoppedNoPulse != false)
 	{
+		if (servoRight.attached()) {
+			servoRight.write(SERVO_CENTER_TICKS + this->nvm->servoBiasRight);
+		}
 		servoRight.detach();
 	}
 	else if (x != 0 && servoRight.attached() == false)
@@ -144,13 +158,21 @@ void cBookWorm::moveRightServo(signed int x)
 	}
 	ticks += this->nvm->servoBiasRight;
 
-	#ifdef ENABLE_SERVO_DEBUG
-	dbgRightTicks = ticks;
-	#endif
-
-	#ifndef ALL_SAFE_DEBUG_MODE
-	servoRight.write(ticks);
-	#endif
+	if (servoRight.attached())
+	{
+		#ifdef ENABLE_SERVO_DEBUG
+		dbgRightTicks = ticks;
+		#endif
+		#ifndef ALL_SAFE_DEBUG_MODE
+		servoRight.write(ticks);
+		#endif
+	}
+	else
+	{
+		#ifdef ENABLE_SERVO_DEBUG
+		dbgRightTicks = 0;
+		#endif
+	}
 }
 
 void cBookWorm::moveMixed(signed int throttle, signed int steer)
