@@ -72,6 +72,9 @@ void cBookWorm::moveLeftServo(signed int x)
 		#ifndef ALL_SAFE_DEBUG_MODE
 		servoLeft.attach(this->pinnumServoLeft);
 		#endif
+		#ifdef ENABLE_SERVO_DEBUG
+		dbgLeftPin = this->pinnumServoLeft;
+		#endif
 	}
 	if (this->nvm->steeringBalance > 0)
 	{
@@ -81,6 +84,10 @@ void cBookWorm::moveLeftServo(signed int x)
 	ticks *= this->nvm->speedGain;
 	ticks /= 1000;
 	ticks += this->nvm->servoBiasLeft;
+
+	#ifdef ENABLE_SERVO_DEBUG
+	dbgLeftTicks = ticks;
+	#endif
 
 	#ifndef ALL_SAFE_DEBUG_MODE
 	servoLeft.write(ticks);
@@ -115,6 +122,9 @@ void cBookWorm::moveRightServo(signed int x)
 		#ifndef ALL_SAFE_DEBUG_MODE
 		servoRight.attach(this->pinnumServoRight);
 		#endif
+		#ifdef ENABLE_SERVO_DEBUG
+		dbgRightPin = this->pinnumServoRight;
+		#endif
 	}
 	if (this->nvm->steeringBalance < 0)
 	{
@@ -125,6 +135,10 @@ void cBookWorm::moveRightServo(signed int x)
 	ticks /= 1000;
 	ticks += this->nvm->servoBiasRight;
 
+	#ifdef ENABLE_SERVO_DEBUG
+	dbgRightTicks = ticks;
+	#endif
+
 	#ifndef ALL_SAFE_DEBUG_MODE
 	servoRight.write(ticks);
 	#endif
@@ -133,6 +147,10 @@ void cBookWorm::moveRightServo(signed int x)
 void cBookWorm::moveMixed(signed int throttle, signed int steer)
 {
 	int32_t left, right;
+	#ifdef ENABLE_SERVO_DEBUG
+	dbgDriveX = steer;
+	dbgDriveY = throttle;
+	#endif
 	calcMix(throttle, steer, &left, &right);
 	move(left, right);
 }

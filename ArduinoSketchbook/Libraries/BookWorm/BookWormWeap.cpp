@@ -30,6 +30,9 @@ void cBookWorm::spinWeapon(uint16_t x)
 			servoWeap.attach(pinnumServoWeapon);
 			#endif
 		}
+		#ifdef ENABLE_SERVO_DEBUG
+		dbgWeaponTicks = x;
+		#endif
 		#ifndef ALL_SAFE_DEBUG_MODE
 		servoWeap.write(x);
 		#endif
@@ -38,6 +41,9 @@ void cBookWorm::spinWeapon(uint16_t x)
 	{
 		#ifndef ALL_SAFE_DEBUG_MODE
 		servoWeap.detach();
+		#endif
+		#ifdef ENABLE_SERVO_DEBUG
+		dbgWeaponTicks = 0;
 		#endif
 	}
 }

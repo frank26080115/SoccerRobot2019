@@ -10,11 +10,12 @@ EEPROM Version History:
 
 #define ENABLE_WEAPON
 #define BOOKWORM_DEBUG
+#define ENABLE_SERVO_DEBUG
 #define BOOKWORM_BAUD 9600
 #define BOOKWORM_SSID_SIZE 31
 #define BOOKWORM_PASSWORD_SIZE 31
-//#define ALL_SAFE_DEBUG_MODE
-#define ENABLE_BATTERY_MONITOR
+#define ALL_SAFE_DEBUG_MODE
+//#define ENABLE_BATTERY_MONITOR
 #define ENABLE_SIGNALCROSS_RESET
 #define ENABLE_CONFIG_WIFICHANNEL
 #define BOOKWORM_DEFAULT_PASSWORD "12345678"
@@ -105,6 +106,14 @@ public:
 	void setServoFlip(uint8_t);
 	void setStickRadius(uint16_t);
 	void setLeftHanded(bool);
+	#ifdef ENABLE_SERVO_DEBUG
+	int32_t dbgDriveX;
+	int32_t dbgDriveY;
+	uint16_t dbgLeftTicks;
+	uint8_t dbgLeftPin;
+	uint16_t dbgRightTicks;
+	uint8_t dbgRightPin;
+	#endif
 
 	// temporary flip, for inverted drive
 	void setRobotFlip(bool);
@@ -118,6 +127,9 @@ public:
 	void setWeapPosA(uint16_t);
 	void setWeapPosB(uint16_t);
 	void setEnableWeapon(bool);
+	#ifdef ENABLE_SERVO_DEBUG
+	uint16_t dbgWeaponTicks;
+	#endif
 	#endif
 	void setAdvanced(bool);
 

@@ -11,7 +11,7 @@
 ///#define ENABLE_BOOT_PIN_RESET
 #endif
 
-//#define SIMULATED_BATT_READING
+#define SIMULATED_BATT_READING
 
 /* hostname for mDNS. Should work at least on windows. Try http://robot.local */
 const char *myHostname = "robot";
@@ -42,6 +42,7 @@ signed int speedWeap = 0;
 #endif
 #ifdef ENABLE_BATTERY_MONITOR
 uint16_t battLvl = 0;
+uint32_t battTime = 0;
 #endif
 #ifdef ENABLE_BOOT_PIN_RESET
 #define BOOT_PIN_RESET_LIMIT 5000
@@ -51,12 +52,19 @@ uint32_t bootPinLowCnt = 0;
 uint32_t noconnTime = 0;
 #endif
 
+#ifdef ENABLE_SERVO_DEBUG
+uint32_t last_servo_dbg = 0;
+#endif
+
 void setup()
 {
   delay(1000);
   BookWorm.begin();
   SPIFFS.begin();
   BookWorm.printf("\r\n");
+  if (SPIFFS.exists("joy.js") == false) {
+    BookWorm.printf("SPI FLASH FILESYSTEM ERROR: FILE \"joy.js\" MISSING\r\n");
+  }
   BookWorm.printf("Configuring access point...\r\n");
   /* You can remove the password parameter if you want the AP to be open. */
   if (WiFi.softAPConfig(apIP, apIP, netMsk) == false) {
@@ -87,7 +95,8 @@ void setup()
   server.on("/",             handleRoot);
   server.on("/index.htm",    handleRoot);
   server.on("/index.html",   handleRoot);
-  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handleZ
+  server.on("/generate204",  handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/fwlink",       handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/connecttest.txt", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
 
@@ -224,9 +233,15 @@ void loop()
   }
 
   #ifdef ENABLE_BATTERY_MONITOR
-  if (BookWorm.nvm->vdiv_r2 > 0 && BookWorm.calcMaxBattVoltage() > 0 && lastCommTimestamp > 0) {
-    battLvl = BookWorm.readBatteryVoltageFiltered();
+  #ifndef SIMULATED_BATT_READING
+  if (BookWorm.nvm->vdiv_r2 > 0 && BookWorm.calcMaxBattVoltage() > 0 && lastCommTimestamp > 0)
+  {
+    if ((BookWorm.nvm->vdiv_filter > 0 && BookWorm.nvm->vdiv_filter < 1000) || (now - battTime) > 1000) {
+      battLvl = BookWorm.readBatteryVoltageFiltered();
+      battTime = now;
+    }
   }
+  #endif
   #endif
 
   #ifdef ENABLE_BOOT_PIN_RESET
@@ -256,6 +271,20 @@ void loop()
       BookWorm.generateSsid(tmpbuf)
       WiFi.softAP(tmpbuf, BOOKWORM_DEFAULT_PASSWORD);
     }
+  }
+  #endif
+
+  #ifdef ENABLE_SERVO_DEBUG
+  if ((now - last_servo_dbg) > 500) {
+    BookWorm.printf("Tr=%d , ", BookWorm.dbgDriveY);
+    BookWorm.printf("St=%d , ", BookWorm.dbgDriveX);
+    BookWorm.printf("L[%u]=%u , ", BookWorm.dbgLeftPin, BookWorm.dbgLeftTicks);
+    BookWorm.printf("R[%u]=%u , ", BookWorm.dbgRightPin, BookWorm.dbgRightTicks);
+    #ifdef ENABLE_WEAPON
+    BookWorm.printf("W=%u , ", BookWorm.dbgWeaponTicks);
+    #endif
+    BookWorm.printf("\r\n");
+    last_servo_dbg = now;
   }
   #endif
 }
