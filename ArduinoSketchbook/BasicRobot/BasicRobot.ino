@@ -62,7 +62,7 @@ void setup()
   BookWorm.begin();
   SPIFFS.begin();
   BookWorm.printf("\r\n");
-  if (SPIFFS.exists("joy.js") == false) {
+  if (SPIFFS.exists("joy.js") == false && SPIFFS.exists("/joy.js") == false) {
     BookWorm.printf("SPI FLASH FILESYSTEM ERROR: FILE \"joy.js\" MISSING\r\n");
   }
   BookWorm.printf("Configuring access point...\r\n");
