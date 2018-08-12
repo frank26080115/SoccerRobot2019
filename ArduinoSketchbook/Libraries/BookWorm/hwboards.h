@@ -26,11 +26,11 @@
 	#define pinServoRight        15
 
 	#ifdef ENABLE_WEAPON
-	#define pinServoWeapon       5
+	#define pinServoWeapon       4
 	#endif
 
 	#define pinLed1 2
-	#define pinLed2 4
+	#define pinLed2 5
 	#define pinLed1OnState LOW
 	#define pinLed1OffState HIGH
 	#define pinLed2OnState HIGH
@@ -42,11 +42,11 @@
 	#define pinServoRight        15
 
 	#ifdef ENABLE_WEAPON
-	#define pinServoWeapon       5
+	#define pinServoWeapon       4
 	#endif
 
 	#define pinLed1 2
-	#define pinLed2 4
+	#define pinLed2 5
 	#define pinLed1OnState LOW
 	#define pinLed1OffState HIGH
 	#define pinLed2OnState HIGH
