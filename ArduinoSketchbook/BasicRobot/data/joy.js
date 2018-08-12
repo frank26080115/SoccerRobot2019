@@ -266,8 +266,23 @@ VirtualJoystick.prototype._onMouseMove	= function(event)
 
 VirtualJoystick.prototype._onTouchStart	= function(event)
 {
-	// if there is already a touch inprogress do nothing
-	if( this._touchIdx !== null )	return;
+	// if there is already a touch inprogress
+	if( this._touchIdx !== null )
+	{
+		var touchList = event.changedTouches;
+		var i;
+		for (i = 0; i < touchList.length ; i++ )
+		{
+			if (this._touchIdx != touchList[i].identifier)
+			{
+				var possibleTouch = event.changedTouches[i];
+				var pX = possibleTouch.pageX;
+				var pY = possibleTouch.pageY;
+				onMultiTouch(pX, pY);
+			}
+		}
+		return; // do nothing
+	}
 
 	// notify event for validation
 	var isValid	= this.dispatchEvent('touchStartValidation', event);
@@ -319,7 +334,8 @@ VirtualJoystick.prototype._onTouchMove	= function(event)
 
 	// try to find our touch event
 	var touchList	= event.changedTouches;
-	for(var i = 0; i < touchList.length && touchList[i].identifier !== this._touchIdx; i++ );
+	var i;
+	for (i = 0; i < touchList.length && touchList[i].identifier !== this._touchIdx; i++ );
 	// if touch event with the proper identifier isnt found, do nothing
 	if( i === touchList.length)	return;
 	var touch	= touchList[i];
@@ -539,7 +555,12 @@ setInterval(function(){
 				handleJson(jsonObj);
 			}
 		}
-		xhr.send();
+		if (window.location.protocol != "file:") {
+			xhr.send();
+		}
+		else {
+			console.log("xhr: " + querystring);
+		}
 	}
 	prevX = newX;
 	prevY = newY;
@@ -590,6 +611,38 @@ function changeToPortrait()
 window.addEventListener('orientationchange', doOnOrientationChange);
 window.addEventListener("resize", doOnResize);
 doOnResize();
+
+function onMultiTouch(x, y)
+{
+	var inputElements = document.getElementsByTagName("input");
+	var i;
+	for (i = 0; i < inputElements.length; i++)
+	{
+		var ele = inputElements[i];
+		var box = ele.getBoundingClientRect();
+		if (x > box.left && x < box.right && ((box.bottom < box.top && y > box.bottom && y < box.top) || (box.bottom > box.top && y < box.bottom && y > box.top)))
+		{
+			ele.onclick.apply(ele);
+			return;
+		}
+	}
+}
+
+function attachMultiTouchEventsToButtons()
+{
+	var inputElements = document.getElementsByTagName("input");
+	var i;
+	for (i = 0; i < inputElements.length; i++)
+	{
+		var ele = inputElements[i];
+		ele.addEventListener( 'touchstart' , function() {
+			if (joystick._pressed === true) {
+				this.preventDefault();
+				this.onclick.apply(this);
+			}
+		});
+	}
+}
 
 function weapsetpossafe()
 {
@@ -663,3 +716,5 @@ function handleJson(jsonObj)
 if (advancedFeatures >= 2) {
 	weapsetpossafe();
 }
+
+attachMultiTouchEventsToButtons();
