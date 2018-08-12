@@ -131,6 +131,7 @@ public:
 	void setBatteryWarningVoltage(uint16_t);
 	bool isBatteryLowWarning(void);
 	uint16_t calcMaxBattVoltage(void);
+	uint32_t adcToVoltage(uint16_t);
 	#endif
 
 	void delayWhileFeeding(int);
@@ -174,7 +175,6 @@ private:
 	bool pinsHaveLoaded;
 	#ifdef ENABLE_BATTERY_MONITOR
 	uint32_t batteryVoltageFiltered;
-	uint32_t adcToVoltage(uint16_t);
 	#endif
 };
 

@@ -214,7 +214,7 @@ bool cBookWorm::loadNvm()
 	}
 	this->debugf("\r\ndone!\r\n");
 
-	chksum = bookworm_fletcher16(ptr, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
+	chksum = bookworm_fletcher16(tmpbuff, sizeof(bookworm_nvm_t) - sizeof(uint16_t));
 	if (chksum == castPtr->checksum && calcEepromVersion() == castPtr->eeprom_version1 && calcEepromVersion() == castPtr->eeprom_version2)
 	{
 		memcpy((void*)ptr, (const void*)tmpbuff, sizeof(bookworm_nvm_t));

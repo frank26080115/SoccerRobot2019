@@ -256,7 +256,7 @@ void handleConfig() {
     else IF_HANDLE_CONFIG_ARG("lefthanded",    setLeftHanded,   bool)
     #ifdef ENABLE_BATTERY_MONITOR
     else IF_HANDLE_CONFIG_ARG("vdiv_r1",        setVdivR1,     uint32_t)
-    else IF_HANDLE_CONFIG_ARG("vdiv_r1",        setVdivR2,     uint32_t)
+    else IF_HANDLE_CONFIG_ARG("vdiv_r2",        setVdivR2,     uint32_t)
     else IF_HANDLE_CONFIG_ARG("vdiv_filter",    setVdivFilter, uint16_t)
     else IF_HANDLE_CONFIG_ARG("batt_warn_volt", setBatteryWarningVoltage, uint16_t)
     #endif
@@ -454,7 +454,7 @@ void serveConfigTable()
     #ifdef ENABLE_BATTERY_MONITOR
     server.sendContent("\n<tr><td colspan='3'>Battery Monitoring</td></tr>\n");
     generateConfigItemTxt("Batt V-div R1",           "vdiv_r1", "number",        String(BookWorm.nvm->vdiv_r1).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;");
-    generateConfigItemTxt("Batt V-div R2",           "vdiv_r2", "number",        String(BookWorm.nvm->vdiv_r1).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;, use zero to disable battery reading");
+    generateConfigItemTxt("Batt V-div R2",           "vdiv_r2", "number",        String(BookWorm.nvm->vdiv_r2).c_str(), "min='0' max='1000000' step='1000'", "in &#8486;, use zero to disable battery reading");
     generateConfigItemTxt("Batt read filter const.", "vdiv_filter", "number",    String(BookWorm.nvm->vdiv_filter).c_str(), "min='0' max='1000' step='50'", "out of 1000, use 1000 to disable filtering");
     generateConfigItemTxt("Batt warning level",      "batt_warn_volt", "number", String(BookWorm.nvm->warning_voltage).c_str(), (String("min='0' max='") + String(BookWorm.calcMaxBattVoltage() + 100) + String("' step='100'")).c_str(), "in millivolts");
     server.sendContent(String("\n<tr><td colspan='3'>Maximum readable voltage is: ") + String(BookWorm.calcMaxBattVoltage()) + String(" millivolts</td></tr>\n"));

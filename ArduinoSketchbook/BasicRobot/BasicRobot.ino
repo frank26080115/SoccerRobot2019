@@ -11,7 +11,7 @@
 ///#define ENABLE_BOOT_PIN_RESET
 #endif
 
-#define SIMULATED_BATT_READING
+//#define SIMULATED_BATT_READING
 
 /* hostname for mDNS. Should work at least on windows. Try http://robot.local */
 const char *myHostname = "robot";
@@ -224,7 +224,7 @@ void loop()
   }
 
   #ifdef ENABLE_BATTERY_MONITOR
-  if (BookWorm.nvm->vdiv_r2 > 0) {
+  if (BookWorm.nvm->vdiv_r2 > 0 && BookWorm.calcMaxBattVoltage() > 0 && lastCommTimestamp > 0) {
     battLvl = BookWorm.readBatteryVoltageFiltered();
   }
   #endif

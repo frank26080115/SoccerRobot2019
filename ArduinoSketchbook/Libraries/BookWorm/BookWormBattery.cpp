@@ -16,17 +16,27 @@ uint32_t cBookWorm::adcToVoltage(uint16_t x)
 	*/
 	uint32_t numer;
 	uint32_t denom;
+	uint32_t adc = x;
+	uint32_t r1 = nvm->vdiv_r1;
+	uint32_t r2 = nvm->vdiv_r2;
+	bool isHuge = false;
 
-	if (nvm->vdiv_r2 <= 0) {
+	if (r2 <= 0) {
 		return 0;
 	}
 
-	numer = nvm->vdiv_r1 + nvm->vdiv_r2;
-	numer *= x;
+	numer = r1 + r2;
+	numer *= adc;
+	if (numer >= 1000000) {
+		numer /= 1023;
+		isHuge = true;
+	}
 	numer *= 1000;
 
-	denom = nvm->vdiv_r2;
-	denom *= 1023;
+	denom = r2;
+	if (isHuge == false) {
+		denom *= 1023;
+	}
 
 	return numer / denom;
 }
@@ -82,7 +92,7 @@ void cBookWorm::setVdivR2(uint32_t x)
 
 void cBookWorm::setVdivFilter(uint16_t x)
 {
-	if (x > 1000) {
+	if (x > 1000 || x == 0) {
 		x = 1000;
 	}
 	this->nvm->vdiv_filter = x;
