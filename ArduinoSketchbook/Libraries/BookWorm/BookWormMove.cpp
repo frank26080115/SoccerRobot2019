@@ -49,6 +49,15 @@ void cBookWorm::moveLeftServo(signed int x)
 {
 	int32_t ticks = SERVO_CENTER_TICKS;
 
+	x *= this->nvm->speedGain;
+	x /= 1000;
+
+	if (this->nvm->steeringBalance > 0)
+	{
+		x *= this->nvm->steeringBalance;
+		x /= 1000;
+	}
+
 	if (x > 0) {
 		ticks += x;
 		ticks += this->nvm->servoDeadzoneLeft;
@@ -58,7 +67,9 @@ void cBookWorm::moveLeftServo(signed int x)
 	}
 	else if (x <= 0) {
 		ticks += x;
-		ticks -= this->nvm->servoDeadzoneLeft;
+		if (x < 0) {
+			ticks -= this->nvm->servoDeadzoneLeft;
+		}
 		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward &= ~(1 << 1);
 		#endif
@@ -76,13 +87,6 @@ void cBookWorm::moveLeftServo(signed int x)
 		dbgLeftPin = this->pinnumServoLeft;
 		#endif
 	}
-	if (this->nvm->steeringBalance > 0)
-	{
-		ticks *= this->nvm->steeringBalance;
-		ticks /= 1000;
-	}
-	ticks *= this->nvm->speedGain;
-	ticks /= 1000;
 	ticks += this->nvm->servoBiasLeft;
 
 	#ifdef ENABLE_SERVO_DEBUG
@@ -99,6 +103,16 @@ void cBookWorm::moveRightServo(signed int x)
 	int32_t ticks = SERVO_CENTER_TICKS;
 
 	x *= -1; // flip
+
+	x *= this->nvm->speedGain;
+	x /= 1000;
+
+	if (this->nvm->steeringBalance < 0)
+	{
+		x *= -this->nvm->steeringBalance;
+		x /= 1000;
+	}
+
 	if (x > 0) {
 		ticks += x;
 		ticks += this->nvm->servoDeadzoneRight;
@@ -108,7 +122,9 @@ void cBookWorm::moveRightServo(signed int x)
 	}
 	else if (x <= 0) {
 		ticks += x;
-		ticks -= this->nvm->servoDeadzoneRight;
+		if (x < 0) {
+			ticks -= this->nvm->servoDeadzoneRight;
+		}
 		#ifdef USE_CUSTOM_SERVO_LIB
 		ContinuousServo_BothForward &= ~(1 << 0);
 		#endif
@@ -126,13 +142,6 @@ void cBookWorm::moveRightServo(signed int x)
 		dbgRightPin = this->pinnumServoRight;
 		#endif
 	}
-	if (this->nvm->steeringBalance < 0)
-	{
-		ticks *= -this->nvm->steeringBalance;
-		ticks /= 1000;
-	}
-	ticks *= this->nvm->speedGain;
-	ticks /= 1000;
 	ticks += this->nvm->servoBiasRight;
 
 	#ifdef ENABLE_SERVO_DEBUG

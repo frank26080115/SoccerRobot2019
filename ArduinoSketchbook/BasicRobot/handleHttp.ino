@@ -124,7 +124,9 @@ boolean captivePortal() {
 }
 
 void handleMove() {
+  #ifndef ENABLE_SERVO_DEBUG
   BookWorm.debugf("call handleMove\r\n");
+  #endif
   int i;
   bool gotLeft = false;
   bool gotRight = false;
@@ -427,10 +429,10 @@ void serveConfigTable()
   generateFlipDropdown(BookWorm.nvm->servoFlip);
 
   generateConfigTableHeader("User Preferences", true);
-  generateConfigItemTxt("Speed multiplier",           "speedgain", "number",     String(BookWorm.nvm->speedGain).c_str(), "min='100' max='10000' step='100'", "multiplier = x&#247;1000 , 1000 is normal");
+  generateConfigItemTxt("Speed multiplier",           "speedgain", "number",           String(BookWorm.nvm->speedGain).c_str(), "min='100' max='10000' step='100'", "multiplier = x&#247;1000 , 1000 is normal");
   generateConfigItemTxt("Steering sensitivity",       "steeringsensitivity", "number", String(BookWorm.nvm->steeringSensitivity).c_str(), "min='100' max='10000' step='100'", "sensitivity = x&#247;1000 , 1000 is normal");
-  generateConfigItemTxt("Steering balance",           "steeringbalance", "number",     String(BookWorm.nvm->steeringBalance).c_str(), "min='100' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
-  generateConfigItemTxt("Joystick size",              "stickradius", "number",   String(BookWorm.nvm->stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
+  generateConfigItemTxt("Steering balance",           "steeringbalance", "text",       String(BookWorm.nvm->steeringBalance).c_str(), "min='-10000' max='10000' step='100'", "balance = x&#247;1000 , positive means apply to left, negative means apply to right");
+  generateConfigItemTxt("Joystick size",              "stickradius", "number",         String(BookWorm.nvm->stickRadius).c_str(), "min='50' max='1000' step='10'", NULL);
 
   generateConfigTableHeader("Advanced Features<br />left handed, inverted drive, "
   #ifdef ENABLE_WEAPON

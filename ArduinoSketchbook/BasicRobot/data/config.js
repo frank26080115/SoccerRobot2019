@@ -65,6 +65,30 @@ function validateform(fieldId)
 						return false
 					}
 				}
+				else if (ele.id == "steeringbalance")
+				{
+					if (txt.match(/^-{0,1}\d+$/)) {
+						var v = parseInt(txt, 10);
+						if (v < -10000 || v > 10000) {
+							alert("Steering Balance Too Big");
+							return false;
+						}
+						else if (v > -100 || v < 100) {
+							alert("Steering Balance Too Small");
+							return false;
+						}
+						return true;
+					}
+					else if(txt.match(/^\d+\.\d+$/)) {
+						alert("Steering Balance cannot contain a decimal, sorry");
+						return false;
+					}
+					else {
+						alert("Steering Balance is NOT A VALID NUMBER");
+						return false;
+					}
+					return false;
+				}
 				else if (txt.length > 0)
 				{
 					return true;
