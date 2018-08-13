@@ -132,8 +132,8 @@
 <pad name="GPIO15" x="6.9" y="-6.2" drill="0.7" shape="offset"/>
 <pad name="GPIO2" x="6.9" y="-4.2" drill="0.7" shape="offset"/>
 <pad name="GPIO0" x="6.9" y="-2.2" drill="0.7" shape="offset"/>
-<pad name="GPIO5" x="6.9" y="-0.2" drill="0.7" shape="offset"/>
-<pad name="GPIO4" x="6.9" y="1.8" drill="0.7" shape="offset"/>
+<pad name="GPIO4" x="6.9" y="-0.2" drill="0.7" shape="offset"/>
+<pad name="GPIO5" x="6.9" y="1.8" drill="0.7" shape="offset"/>
 <pad name="RX" x="6.9" y="3.8" drill="0.7" shape="offset"/>
 <pad name="TX" x="6.9" y="5.8" drill="0.7" shape="offset"/>
 <pad name="VCC" x="-7.1" y="-8.2" drill="0.7" shape="offset" rot="R180"/>
@@ -217,8 +217,8 @@
 <smd name="VCC" x="-7.9" y="-8.4" dx="3" dy="1.2" layer="1"/>
 <smd name="TXD0" x="7.9" y="5.6" dx="3" dy="1.2" layer="1"/>
 <smd name="RXD0" x="7.9" y="3.6" dx="3" dy="1.2" layer="1"/>
-<smd name="GPIO4" x="7.9" y="1.6" dx="3" dy="1.2" layer="1"/>
-<smd name="GPIO5" x="7.9" y="-0.4" dx="3" dy="1.2" layer="1"/>
+<smd name="GPIO5" x="7.9" y="1.6" dx="3" dy="1.2" layer="1"/>
+<smd name="GPIO4" x="7.9" y="-0.4" dx="3" dy="1.2" layer="1"/>
 <smd name="GPIO0" x="7.9" y="-2.4" dx="3" dy="1.2" layer="1"/>
 <smd name="GPIO2" x="7.9" y="-4.4" dx="3" dy="1.2" layer="1"/>
 <smd name="GPIO15" x="7.9" y="-6.4" dx="3" dy="1.2" layer="1"/>
@@ -1719,8 +1719,8 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <smd name="VCC" x="-8.4" y="-8.4" dx="2" dy="1.2" layer="1"/>
 <smd name="TXD0" x="8.4" y="5.6" dx="2" dy="1.2" layer="1"/>
 <smd name="RXD0" x="8.4" y="3.6" dx="2" dy="1.2" layer="1"/>
-<smd name="GPIO4" x="8.4" y="1.6" dx="2" dy="1.2" layer="1"/>
-<smd name="GPIO5" x="8.4" y="-0.4" dx="2" dy="1.2" layer="1"/>
+<smd name="GPIO5" x="8.4" y="1.6" dx="2" dy="1.2" layer="1"/>
+<smd name="GPIO4" x="8.4" y="-0.4" dx="2" dy="1.2" layer="1"/>
 <smd name="GPIO0" x="8.4" y="-2.4" dx="2" dy="1.2" layer="1"/>
 <smd name="GPIO2" x="8.4" y="-4.4" dx="2" dy="1.2" layer="1"/>
 <smd name="GPIO15" x="8.4" y="-6.4" dx="2" dy="1.2" layer="1"/>
@@ -1751,8 +1751,8 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <pin name="GPIO15" x="15.24" y="-7.62" visible="pin" length="middle" rot="R180"/>
 <pin name="GPIO2" x="15.24" y="-5.08" visible="pin" length="middle" rot="R180"/>
 <pin name="GPIO0" x="15.24" y="-2.54" visible="pin" length="middle" rot="R180"/>
-<pin name="GPIO5" x="15.24" y="0" visible="pin" length="middle" rot="R180"/>
-<pin name="GPIO4" x="15.24" y="2.54" visible="pin" length="middle" rot="R180"/>
+<pin name="GPIO4" x="15.24" y="0" visible="pin" length="middle" rot="R180"/>
+<pin name="GPIO5" x="15.24" y="2.54" visible="pin" length="middle" rot="R180"/>
 <pin name="RX" x="15.24" y="5.08" visible="pin" length="middle" rot="R180"/>
 <pin name="TX" x="15.24" y="7.62" visible="pin" length="middle" rot="R180"/>
 <text x="-12.7" y="10.16" size="1.778" layer="95">&gt;Name</text>
@@ -3395,7 +3395,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 </net>
 <net name="LED" class="0">
 <segment>
-<pinref part="U1" gate="G$1" pin="GPIO4"/>
+<pinref part="U1" gate="G$1" pin="GPIO5"/>
 <wire x1="20.32" y1="-7.62" x2="22.86" y2="-7.62" width="0.1524" layer="91"/>
 <label x="22.86" y="-7.62" size="1.27" layer="95" xref="yes"/>
 </segment>
@@ -3419,7 +3419,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 </net>
 <net name="SIG-WEAP" class="0">
 <segment>
-<pinref part="U1" gate="G$1" pin="GPIO5"/>
+<pinref part="U1" gate="G$1" pin="GPIO4"/>
 <wire x1="20.32" y1="-10.16" x2="22.86" y2="-10.16" width="0.1524" layer="91"/>
 <label x="22.86" y="-10.16" size="1.27" layer="95" xref="yes"/>
 </segment>
