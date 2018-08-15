@@ -74,6 +74,7 @@ void handleRoot()
     server.sendContent("<tr><td><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip2' onclick='flip()' /></td></tr>");
     server.sendContent("</table></div>");
   }
+  server.sendContent("<div id='standby'><input type='button' value='Start Robot' onclick='startrobot()' /></div>");
   server.sendContent("<script>\n");
   server.sendContent("var desiredStickRadius = "); server.sendContent(String(BookWorm.nvm->stickRadius)); server.sendContent(";\n");
   server.sendContent("var advancedFeatures = ");
@@ -142,7 +143,7 @@ void handleMove() {
       continue;
     }
 
-#define IF_HANDLE_MOVE_ARG(__argName, __varName, __typeCast, __flagName)   if (argName.equalsIgnoreCase(String(__argName))) { if (readServerArg(i, &v)) { (__varName) = (__typeCast)v; (__flagName) = true; } }
+#define IF_HANDLE_MOVE_ARG(__argName, __varName, __typeCast, __flagName)   if (argName.equalsIgnoreCase(String(__argName))) { if (readServerArg(i, &v)) { (__varName) = (__typeCast)v; (__flagName) = true; standbyRobot = false; } }
 
          IF_HANDLE_MOVE_ARG("left",  speedLeft,  signed int, gotLeft)
     else IF_HANDLE_MOVE_ARG("right", speedRight, signed int, gotRight)
@@ -164,6 +165,16 @@ void handleMove() {
       else
       {
         BookWorm.setRobotFlip(false);
+      }
+    }
+    else if (argName.equalsIgnoreCase(String("standby")))
+    {
+      String argVal = server.arg(i);
+      if (argVal.equalsIgnoreCase(String("true")) || argVal.equalsIgnoreCase(String("yes"))) {
+        standbyRobot = true;
+      }
+      else if (readServerArg(i, &v)) {
+        standbyRobot = (v != 0);
       }
     }
   }

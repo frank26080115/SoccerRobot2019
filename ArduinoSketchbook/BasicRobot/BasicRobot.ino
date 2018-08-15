@@ -37,6 +37,7 @@ signed int speedLeft = 0;
 signed int speedRight = 0;
 signed int speedX = 0;
 signed int speedY = 0;
+bool standbyRobot = false;
 #ifdef ENABLE_WEAPON
 signed int speedWeap = 0;
 #endif
@@ -167,7 +168,7 @@ void loop()
   now10 %= 10;
   bool ledOn = false;
 
-  if ((now - lastCommTimestamp) > 1000) // check for timeout
+  if ((now - lastCommTimestamp) > 1000 || standbyRobot) // check for timeout
   {
     // if timeout, stop the robot
     speedLeft = 0;
@@ -225,7 +226,7 @@ void loop()
   #endif
 
   // blink the LED
-  if (ledOn) {
+  if (ledOn && standbyRobot == false) {
     BookWorm.setLedOn();
   }
   else {

@@ -494,6 +494,8 @@ var flipped = 0;
 
 var touchOrClick = "Unknown";
 
+var startRobot = false;
+
 setInterval(function(){
 	var outputEl	= document.getElementById('result');
 	newX = Math.round(joystick.deltaX());
@@ -533,17 +535,27 @@ setInterval(function(){
 		outputEl.innerHTML	= '<b>' + touchOrClick + ':</b> ' + ' X:'+reportedX + ' Y:'+reportedY;
 	}
 
-	if ( newX != prevX || newY != prevY || weapspeed != prevW || weapPosSafe > 0)
+	if ( newX != prevX || newY != prevY || weapspeed != prevW || weapPosSafe > 0 || startRobot == false)
 	{
 		var xhr = new XMLHttpRequest();
 
-		var querystring = "./move?x="+reportedX+"&y="+reportedY;
-		if (advancedFeatures >= 1) {
-			querystring += "&flipped=" + flipped;
+		var querystring;
+		querystring = "./move?";
+		if (startRobot)
+		{
+			querystring += "x="+reportedX+"&y="+reportedY;
+			if (advancedFeatures >= 1) {
+				querystring += "&flipped=" + flipped;
+			}
+			if (advancedFeatures >= 2) {
+				querystring += "&weap=" + weapspeed;
+			}
 		}
-		if (advancedFeatures >= 2) {
-			querystring += "&weap=" + weapspeed;
+		else
+		{
+			querystring += "standby=true";
 		}
+
 		xhr.open('PUT', querystring);
 		xhr.onreadystatechange = function () {
 			var doneStatus = 4;
@@ -574,6 +586,14 @@ setInterval(function(){
 		prevW = weapspeed;
 	}
 }, 1/30 * 1000);
+
+function startrobot()
+{
+	var eleBtn = document.getElementById("standby");
+	eleBtn.outerHTML = ""; // remove the whole div
+	startRobot = true;
+	attachMultiTouchEventsToButtons();
+}
 
 function doOnOrientationChange()
 {
@@ -727,5 +747,3 @@ function handleJson(jsonObj)
 if (advancedFeatures >= 2) {
 	weapsetpossafe();
 }
-
-attachMultiTouchEventsToButtons();
