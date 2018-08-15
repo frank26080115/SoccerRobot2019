@@ -473,11 +473,11 @@ var joystick	= new VirtualJoystick({
 	stickRadius	: desiredStickRadius,
 });
 joystick.addEventListener('touchStart', function(){
-	console.log('down');
+	console.log('touchStart');
 	//document.getElementsByTagName("body")[0].classList.remove("bodybg");
 })
 joystick.addEventListener('touchEnd', function(){
-	console.log('up');
+	console.log('touchEnd');
 	//document.getElementsByTagName("body")[0].classList.add("bodybg");;
 })
 
@@ -491,6 +491,8 @@ var yDeadzone = xDeadzone / 2;
 
 var weapspeed = 0;
 var flipped = 0;
+
+var touchOrClick = "Unknown";
 
 setInterval(function(){
 	var outputEl	= document.getElementById('result');
@@ -618,6 +620,7 @@ doOnResize();
 
 function onMultiTouch(x, y)
 {
+	console.log("Multitouch X " + x + " Y " + y);
 	var inputElements = document.getElementsByTagName("input");
 	var i;
 	for (i = 0; i < inputElements.length; i++)
@@ -641,7 +644,7 @@ function attachMultiTouchEventsToButtons()
 		var ele = inputElements[i];
 		ele.addEventListener( 'touchstart' , function() {
 			if (joystick._pressed === true) {
-				this.preventDefault();
+				console.log("touchstart for button");
 				this.onclick.apply(this);
 			}
 		});
@@ -650,6 +653,7 @@ function attachMultiTouchEventsToButtons()
 
 function weapsetpossafe()
 {
+	console.log("weapsetpossafe");
 	if (advancedFeatures >= 2) {
 		weapspeed = weapPosSafe;
 	}
@@ -657,6 +661,7 @@ function weapsetpossafe()
 
 function weapsetposa()
 {
+	console.log("weapsetposa");
 	if (advancedFeatures >= 2) {
 		weapspeed = weapPosA;
 	}
@@ -664,6 +669,7 @@ function weapsetposa()
 
 function weapsetposb()
 {
+	console.log("weapsetposb");
 	if (advancedFeatures >= 2) {
 		weapspeed = weapPosB;
 	}
@@ -671,6 +677,7 @@ function weapsetposb()
 
 function flip()
 {
+	console.log("flip " + flipped);
 	if (advancedFeatures <= 0) {
 		return;
 	}
