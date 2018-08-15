@@ -1,3 +1,5 @@
+var touchOrClick = "Unknown";
+
 /*
 code borrowed from https://automatedhome.party/2017/07/15/wifi-controlled-car-with-a-self-hosted-htmljs-joystick-using-a-wemos-d1-miniesp8266/
 */
@@ -247,6 +249,7 @@ VirtualJoystick.prototype._onMouseUp	= function(event)
 
 VirtualJoystick.prototype._onMouseDown	= function(event)
 {
+	touchOrClick = "Mouse";
 	event.preventDefault();
 	var x	= event.clientX;
 	var y	= event.clientY;
@@ -266,6 +269,7 @@ VirtualJoystick.prototype._onMouseMove	= function(event)
 
 VirtualJoystick.prototype._onTouchStart	= function(event)
 {
+	touchOrClick = "Touch";
 	// if there is already a touch inprogress
 	if( this._touchIdx !== null )
 	{
@@ -524,7 +528,7 @@ setInterval(function(){
 	reportedY = Math.round(reportedY);
 
 	if (outputEl) {
-		outputEl.innerHTML	= '<b>Position:</b> ' + ' X:'+reportedX + ' Y:'+reportedY;
+		outputEl.innerHTML	= '<b>' + touchOrClick + ':</b> ' + ' X:'+reportedX + ' Y:'+reportedY;
 	}
 
 	if ( newX != prevX || newY != prevY || weapspeed != prevW || weapPosSafe > 0)
