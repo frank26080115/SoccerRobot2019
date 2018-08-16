@@ -496,8 +496,17 @@ var touchOrClick = "Unknown";
 
 var startRobot = false;
 
-setInterval(function(){
+var xhrTime = new Date();
+
+setInterval(function()
+{
 	var outputEl	= document.getElementById('result');
+
+	var timeNow = new Date();
+	if ((timeNow.getTime() - xhrTime.getTime()) > 2000) {
+		robotTimedOut(true);
+	}
+
 	newX = Math.round(joystick.deltaX());
 	newY = Math.round(joystick.deltaY()) * -1;
 
@@ -557,6 +566,8 @@ setInterval(function(){
 		}
 
 		xhr.open('PUT', querystring);
+		xhr.timeout = 2000;
+
 		xhr.onreadystatechange = function () {
 			var doneStatus = 4;
 			if (xhr.DONE != undefined) {
@@ -571,8 +582,15 @@ setInterval(function(){
 			if ((xhr.readyState == doneStatus || xhr.readyState === "complete") && xhr.status === 200) {
 				var jsonObj = JSON.parse(xhr.responseText);
 				handleJson(jsonObj);
+				robotTimedOut(false);
+				xhrTime = new Date();
 			}
 		}
+
+		xhr.ontimeout = function () {
+			robotTimedOut(true);
+		}
+
 		if (window.location.protocol != "file:") {
 			xhr.send();
 		}
@@ -593,6 +611,20 @@ function startrobot()
 	eleBtn.outerHTML = ""; // remove the whole div
 	startRobot = true;
 	attachMultiTouchEventsToButtons();
+	robotTimedOut(false);
+}
+
+function robotTimedOut(x)
+{
+	var ele = document.getElementById('connstat');
+	if (x === false)
+	{
+		ele.innerHTML = "&nbsp;";
+	}
+	else
+	{
+		ele.innerHTML = "<br />(CONNECTION LOST)";
+	}
 }
 
 function doOnOrientationChange()

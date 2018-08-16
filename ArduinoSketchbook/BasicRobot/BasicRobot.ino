@@ -37,7 +37,7 @@ signed int speedLeft = 0;
 signed int speedRight = 0;
 signed int speedX = 0;
 signed int speedY = 0;
-bool standbyRobot = false;
+volatile bool standbyRobot = false;
 #ifdef ENABLE_WEAPON
 signed int speedWeap = 0;
 #endif

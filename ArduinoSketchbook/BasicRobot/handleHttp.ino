@@ -25,6 +25,7 @@ void handleRoot()
     "Touch the screen and move<br />Robot SSID: "
   );
   server.sendContent(BookWorm.SSID);
+  server.sendContent("&nbsp;<span id='connstat'>&nbsp;</span>");
   if (BookWorm.nvm->advanced)
   {
     #ifdef ENABLE_BATTERY_MONITOR
@@ -193,12 +194,11 @@ void handleMove() {
     lastCommTimestamp = millis();
     moveMixedMode = (gotX && gotY);
   }
-  #ifndef ENABLE_BATTERY_MONITOR
-  serveBasicHeader();
-  #else
+
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   char buff[20] = {'\0'};
+  #ifdef ENABLE_BATTERY_MONITOR
   #ifndef SIMULATED_BATT_READING
   if (BookWorm.isBatteryLowWarning() && BookWorm.nvm->vdiv_r2 > 0)
   #else
@@ -219,11 +219,14 @@ void handleMove() {
     #endif
     );
   root["battVoltage"] = buff;
+  #endif
+  snprintf(buff, sizeof(buff), "%u", millis());
+  root["millis"] = buff;
   String response;
   root.printTo(response);
   server.send(200, "application/json", response);
-  #endif
   serverClientStop();
+
   haveConnected();
 }
 
