@@ -19,6 +19,10 @@
 	#define pinLed LED_BUILTIN // WARNING: ESP-01, usage of LED will disable serial port
 	#define pinLedOnState LOW
 	#define pinLedOffState HIGH
+
+	#define VDIV_R2_DEFAULT 0
+	#define VDIV_R1_DEFAULT 0
+	#define ADC_REF_MV 1000
 #endif
 
 #ifdef HWBOARD_ESP12
@@ -35,6 +39,10 @@
 	#define pinLed1OffState HIGH
 	#define pinLed2OnState HIGH
 	#define pinLed2OffState LOW
+
+	#define VDIV_R2_DEFAULT 1000
+	#define VDIV_R1_DEFAULT 7500
+	#define ADC_REF_MV 1000
 #endif
 
 #ifdef HWBOARD_ESP12_NANO
@@ -51,6 +59,10 @@
 	#define pinLed1OffState HIGH
 	#define pinLed2OnState HIGH
 	#define pinLed2OffState LOW
+
+	#define VDIV_R2_DEFAULT 470
+	#define VDIV_R1_DEFAULT 5600
+	#define ADC_REF_MV 1000
 #endif
 
 #endif

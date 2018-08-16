@@ -755,20 +755,26 @@ function handleJson(jsonObj)
 	}
 	var warn = false;
 	var battVolt = 0;
+	var overSymbol = "";
 	if (jsonObj.battWarning != undefined) {
-		if (jsonObj.battWarning == true || jsonObj.battWarning == "true") {
+		if (jsonObj.battWarning === true || jsonObj.battWarning == "true") {
 			warn = true;
+		}
+	}
+	if (jsonObj.battOver != undefined) {
+		if (jsonObj.battOver === true || jsonObj.battOver == "true") {
+			overSymbol = "over ";
 		}
 	}
 	if (jsonObj.battVoltage != undefined) {
 		battVolt = jsonObj.battVoltage;
-		battVolt /= 100.0;
-		battVolt = Math.round(battVolt);
 		battVolt /= 10.0;
+		battVolt = Math.round(battVolt);
+		battVolt /= 100.0;
 	}
 	var msg;
 	if (warn == false) {
-		msg = "Batt Voltage: " + battVolt.toString() + "V";
+		msg = "Batt Voltage: " + overSymbol + battVolt.toString() + "V";
 	}
 	else {
 		msg = "LOW BATT: " + battVolt.toString() + "V";

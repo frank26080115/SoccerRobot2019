@@ -15,10 +15,11 @@ EEPROM Version History:
 #define BOOKWORM_SSID_SIZE 31
 #define BOOKWORM_PASSWORD_SIZE 31
 #define ALL_SAFE_DEBUG_MODE
-//#define ENABLE_BATTERY_MONITOR
+#define ENABLE_BATTERY_MONITOR
 #define ENABLE_SIGNALCROSS_RESET
 #define ENABLE_CONFIG_WIFICHANNEL
 #define BOOKWORM_DEFAULT_PASSWORD "12345678"
+#define BATTERY_OVERLOAD_FILTER 32
 
 #include <Arduino.h>
 #include "WString.h"
@@ -144,6 +145,7 @@ public:
 	bool isBatteryLowWarning(void);
 	uint16_t calcMaxBattVoltage(void);
 	uint32_t adcToVoltage(uint16_t);
+	bool isBatteryOverload(void);
 	#endif
 
 	void delayWhileFeeding(int);
@@ -187,6 +189,9 @@ private:
 	bool pinsHaveLoaded;
 	#ifdef ENABLE_BATTERY_MONITOR
 	uint32_t batteryVoltageFiltered;
+	uint32_t batteryOverloadCnt;
+	int32_t vdivGcd;
+	int32_t calcResistorGcd(uint32_t u, uint32_t v);
 	#endif
 };
 

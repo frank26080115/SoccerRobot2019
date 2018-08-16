@@ -25,6 +25,9 @@ cBookWorm::cBookWorm(void)
 	memset((void*)this->nvm, 0, sizeof(bookworm_nvm_t));
 	this->serialHasBegun = false;
 	this->pinsHaveLoaded = false;
+	#ifdef ENABLE_BATTERY_MONITOR
+	this->vdivGcd = -1;
+	#endif
 }
 
 /*
@@ -338,9 +341,9 @@ void cBookWorm::defaultValues()
 	#endif
 	this->nvm->leftHanded = false;
 	#ifdef ENABLE_BATTERY_MONITOR
-	this->nvm->vdiv_r1 = 7500;
+	this->nvm->vdiv_r1 = VDIV_R1_DEFAULT;
 	this->nvm->vdiv_r2 = 0; // disable usage, 1000 in circuit
-	this->nvm->vdiv_filter = 50;
+	this->nvm->vdiv_filter = 0;
 	this->nvm->warning_voltage = 6000;
 	#endif
 	this->nvm->checksum = 0xABCD;

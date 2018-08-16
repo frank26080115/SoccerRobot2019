@@ -8,34 +8,34 @@
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
-<layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
-<layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
-<layer number="5" name="Route5" color="4" fill="4" visible="no" active="no"/>
-<layer number="6" name="Route6" color="1" fill="8" visible="no" active="no"/>
-<layer number="7" name="Route7" color="4" fill="8" visible="no" active="no"/>
-<layer number="8" name="Route8" color="1" fill="2" visible="no" active="no"/>
-<layer number="9" name="Route9" color="4" fill="2" visible="no" active="no"/>
-<layer number="10" name="Route10" color="1" fill="7" visible="no" active="no"/>
-<layer number="11" name="Route11" color="4" fill="7" visible="no" active="no"/>
-<layer number="12" name="Route12" color="1" fill="5" visible="no" active="no"/>
-<layer number="13" name="Route13" color="4" fill="5" visible="no" active="no"/>
-<layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="yes" active="no"/>
+<layer number="3" name="Route3" color="4" fill="3" visible="yes" active="no"/>
+<layer number="4" name="Route4" color="1" fill="4" visible="yes" active="no"/>
+<layer number="5" name="Route5" color="4" fill="4" visible="yes" active="no"/>
+<layer number="6" name="Route6" color="1" fill="8" visible="yes" active="no"/>
+<layer number="7" name="Route7" color="4" fill="8" visible="yes" active="no"/>
+<layer number="8" name="Route8" color="1" fill="2" visible="yes" active="no"/>
+<layer number="9" name="Route9" color="4" fill="2" visible="yes" active="no"/>
+<layer number="10" name="Route10" color="1" fill="7" visible="yes" active="no"/>
+<layer number="11" name="Route11" color="4" fill="7" visible="yes" active="no"/>
+<layer number="12" name="Route12" color="1" fill="5" visible="yes" active="no"/>
+<layer number="13" name="Route13" color="4" fill="5" visible="yes" active="no"/>
+<layer number="14" name="Route14" color="1" fill="6" visible="yes" active="no"/>
+<layer number="15" name="Route15" color="4" fill="6" visible="yes" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -44,8 +44,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -53,16 +53,16 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
-<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
-<layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="yes" active="no"/>
+<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="yes" active="no"/>
+<layer number="56" name="wert" color="7" fill="1" visible="yes" active="no"/>
 <layer number="88" name="SimResults" color="9" fill="1" visible="no" active="yes"/>
 <layer number="89" name="SimProbes" color="9" fill="1" visible="no" active="yes"/>
 <layer number="90" name="Modules" color="5" fill="1" visible="no" active="yes"/>
@@ -1419,7 +1419,7 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <text x="-1.27" y="-2.54" size="1" layer="37">&gt;TP_SIGNAL_NAME</text>
 <rectangle x1="-0.3302" y1="-0.3302" x2="0.3302" y2="0.3302" layer="51"/>
 <circle x="0" y="0" radius="0.898025" width="0" layer="30"/>
-<circle x="0" y="0" radius="0.8544" width="0" layer="22"/>
+<circle x="0" y="0" radius="0.8544" width="0" layer="21"/>
 </package>
 <package name="P1-13Y">
 <description>&lt;b&gt;TEST PAD&lt;/b&gt;</description>
@@ -3055,8 +3055,8 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 </classes>
 <parts>
 <part name="U1" library="dirtcheaprx_nano" deviceset="ESP12" device="SMD"/>
-<part name="R1" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="7K5Ω"/>
-<part name="R2" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="1KΩ"/>
+<part name="R1" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="5K6Ω"/>
+<part name="R2" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="470Ω"/>
 <part name="R3" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="470Ω"/>
 <part name="LED" library="dirtcheaprx_nano" deviceset="LED" device="5MM"/>
 <part name="BAT1" library="dirtcheaprx_nano" deviceset="BATTERY" device="-WIRE-CONN"/>
@@ -3064,11 +3064,11 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <part name="SERVO1" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
 <part name="SERVO2" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
 <part name="SERVO3" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
-<part name="IC1" library="dirtcheaprx_nano" deviceset="V_REG_78XX" device="-SOT" value="MCP1700"/>
+<part name="IC1" library="dirtcheaprx_nano" deviceset="V_REG_78XX" device="-SOT" value="MCP1703T-3302E/CB"/>
 <part name="P+1" library="dirtcheaprx_nano" deviceset="3.3V" device=""/>
-<part name="C1" library="dirtcheaprx_nano" deviceset="CAP" device="0603-CAP" value="100uF"/>
+<part name="C1" library="dirtcheaprx_nano" deviceset="CAP" device="0805" value="4u7"/>
 <part name="SUPPLY2" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
-<part name="C2" library="dirtcheaprx_nano" deviceset="CAP" device="0603-CAP" value="1u"/>
+<part name="C2" library="dirtcheaprx_nano" deviceset="CAP" device="0805" value="22u"/>
 <part name="GND1" library="dirtcheaprx_nano" deviceset="GND" device=""/>
 <part name="GND2" library="dirtcheaprx_nano" deviceset="GND" device=""/>
 <part name="P+2" library="dirtcheaprx_nano" deviceset="3.3V" device=""/>
@@ -3091,17 +3091,17 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <part name="SUPPLY4" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
 <part name="SUPPLY5" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
 <part name="SUPPLY6" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
-<part name="C3" library="dirtcheaprx_nano" deviceset="CAP" device="0603-CAP" value="100uF"/>
-<part name="R4" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="7K5Ω"/>
+<part name="C3" library="dirtcheaprx_nano" deviceset="CAP" device="0603-CAP" value="100n"/>
+<part name="R4" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="5K6Ω"/>
 <part name="P+4" library="dirtcheaprx_nano" deviceset="3.3V" device=""/>
 <part name="GND9" library="dirtcheaprx_nano" deviceset="GND" device=""/>
-<part name="R5" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="7K5Ω"/>
+<part name="R5" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="5K6Ω"/>
 <part name="GND10" library="dirtcheaprx_nano" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
-<text x="66.04" y="-12.7" size="1.778" layer="97">8.5V in to 1.0V out</text>
+<text x="66.04" y="-12.7" size="1.778" layer="97">12.9V in to 1.0V out</text>
 </plain>
 <instances>
 <instance part="U1" gate="G$1" x="5.08" y="-10.16" smashed="yes">
@@ -3119,7 +3119,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <instance part="SERVO3" gate="G$1" x="137.16" y="25.4" rot="R90"/>
 <instance part="IC1" gate="G$1" x="30.48" y="33.02" smashed="yes">
 <attribute name="NAME" x="33.02" y="25.4" size="1.778" layer="95"/>
-<attribute name="VALUE" x="25.4" y="38.1" size="1.778" layer="96"/>
+<attribute name="VALUE" x="30.48" y="38.1" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="P+1" gate="G$1" x="43.18" y="35.56"/>
 <instance part="C1" gate="G$1" x="43.18" y="25.4"/>
@@ -3246,6 +3246,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <pinref part="IC1" gate="G$1" pin="GND"/>
 <wire x1="30.48" y1="25.4" x2="30.48" y2="20.32" width="0.1524" layer="91"/>
 <junction x="30.48" y="20.32"/>
+<junction x="43.18" y="20.32"/>
 </segment>
 <segment>
 <pinref part="BAT1" gate="G$1" pin="-"/>

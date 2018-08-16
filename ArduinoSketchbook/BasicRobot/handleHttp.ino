@@ -211,14 +211,27 @@ void handleMove() {
     snprintf(buff, sizeof(buff), "false");
   }
   root["battWarning"] = buff;
-  snprintf(buff, sizeof(buff), "%u",
-    #ifndef SIMULATED_BATT_READING
+  uint16_t voltage = 
+  #ifndef SIMULATED_BATT_READING
       BookWorm.nvm->vdiv_r2 > 0 ? BookWorm.readBatteryVoltageFilteredLast() : 0
     #else
       millis() % 6000
     #endif
-    );
+    ;
+  snprintf(buff, sizeof(buff), "%u", voltage);
   root["battVoltage"] = buff;
+  #ifndef SIMULATED_BATT_READING
+  if (BookWorm.isBatteryOverload())
+  #else
+  if ((millis() / 3000) % 2 == 0)
+  #endif
+  {
+    snprintf(buff, sizeof(buff), "true");
+  }
+  else {
+    snprintf(buff, sizeof(buff), "false");
+  }
+  root["battOver"] = buff;
   #endif
   snprintf(buff, sizeof(buff), "%u", millis());
   root["millis"] = buff;
