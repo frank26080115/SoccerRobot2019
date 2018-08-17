@@ -10,11 +10,11 @@ EEPROM Version History:
 
 #define ENABLE_WEAPON
 #define BOOKWORM_DEBUG
-#define ENABLE_SERVO_DEBUG
+//#define ENABLE_SERVO_DEBUG
 #define BOOKWORM_BAUD 9600
 #define BOOKWORM_SSID_SIZE 31
 #define BOOKWORM_PASSWORD_SIZE 31
-#define ALL_SAFE_DEBUG_MODE
+//#define ALL_SAFE_DEBUG_MODE
 #define ENABLE_BATTERY_MONITOR
 #define ENABLE_SIGNALCROSS_RESET
 #define ENABLE_CONFIG_WIFICHANNEL
@@ -173,7 +173,7 @@ public:
 	bool robotFlip; // temporary flip, for inverted drive
 
 	#ifdef ENABLE_SIGNALCROSS_RESET
-	bool checkStartMode(void);
+	bool checkShouldReset(void);
 	#endif
 
 	void checkHardwareConfig(void* serverPtr, bool useSerial);

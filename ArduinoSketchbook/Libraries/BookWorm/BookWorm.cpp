@@ -59,9 +59,9 @@ void cBookWorm::begin(void)
 	}
 
 	#ifdef ENABLE_SIGNALCROSS_RESET
-	if (checkStartMode() != false)
+	if (checkShouldReset() != false)
 	{
-		printf("Signal Pins Factory Reset");
+		printf("Signal Pins Factory Reset\r\n");
 		this->defaultValues();
 		this->generateSsid(this->SSID);
 		this->setSsid(this->SSID);
@@ -352,11 +352,12 @@ void cBookWorm::defaultValues()
 }
 
 #ifdef ENABLE_SIGNALCROSS_RESET
-bool cBookWorm::checkStartMode(void)
+bool cBookWorm::checkShouldReset(void)
 {
 	bool ret = true;
 	#if defined(HWBOARD_ESP12_NANO) || defined(HWBOARD_ESP12)
 	uint32_t t;
+	//debugf("sL low\r\n");
 	pinMode(pinServoLeft, OUTPUT);
 	pinMode(pinServoRight, INPUT_PULLUP);
 	digitalWrite(pinServoLeft, LOW);
@@ -372,6 +373,7 @@ bool cBookWorm::checkStartMode(void)
 			return false;
 		}
 	}
+	//debugf("sR low\r\n");
 	pinMode(pinServoLeft, INPUT_PULLUP);
 	pinMode(pinServoRight, OUTPUT);
 	digitalWrite(pinServoRight, LOW);
@@ -387,6 +389,7 @@ bool cBookWorm::checkStartMode(void)
 			return false;
 		}
 	}
+	//debugf("sL high\r\n");
 	pinMode(pinServoLeft, OUTPUT);
 	pinMode(pinServoRight, INPUT);
 	digitalWrite(pinServoLeft, HIGH);
@@ -404,7 +407,9 @@ bool cBookWorm::checkStartMode(void)
 	if (ret == false) {
 		pinMode(pinServoLeft, INPUT);
 		pinMode(pinServoRight, INPUT);
+		return false;
 	}
+	//debugf("sR high\r\n");
 	pinMode(pinServoLeft, INPUT);
 	pinMode(pinServoRight, OUTPUT);
 	digitalWrite(pinServoRight, HIGH);
@@ -414,7 +419,7 @@ bool cBookWorm::checkStartMode(void)
 	}
 	while ((micros() - t) < 1500) {
 		ESP.wdtFeed();
-		if (digitalRead(pinServoLeft) != LOW) {
+		if (digitalRead(pinServoLeft) == LOW) {
 			ret = false;
 		}
 	}
@@ -422,6 +427,7 @@ bool cBookWorm::checkStartMode(void)
 	if (ret == false) {
 		pinMode(pinServoLeft, INPUT);
 		pinMode(pinServoRight, INPUT);
+		return false;
 	}
 	else {
 		return true;
