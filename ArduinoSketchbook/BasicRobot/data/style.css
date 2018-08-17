@@ -53,14 +53,14 @@ table td {
 }
 #standby {
 	position	: absolute;
-	top: 80pt;
+	top: 5vh;
 	left: 10vw;
 	text-align	: center;
 	width: 80vw;
-	height: 20vw;
+	height: 20vh;
 }
 #standby input{
 	font-size: 30pt;
 	width: 100%;
-	height: 100%;
+	height: 20vh;
 }

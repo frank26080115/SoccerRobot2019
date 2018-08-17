@@ -75,7 +75,8 @@ void handleRoot()
     server.sendContent("<tr><td><input type='button' value='Flip' onclick='flip()' /><input type='checkbox' id='flip2' onclick='flip()' /></td></tr>");
     server.sendContent("</table></div>");
   }
-  server.sendContent("<div id='standby'><input type='button' value='Start Robot' onclick='startrobot()' /></div>");
+  server.sendContent("<div id='standby'><input type='button' value='Start Robot' onclick='startrobot()' />");
+  server.sendContent("<br /><br /><input type='button' value='Config Robot' onclick='location.href=\"config\";' /></div>");
   server.sendContent("<script>\n");
   server.sendContent("var desiredStickRadius = "); server.sendContent(String(BookWorm.nvm->stickRadius)); server.sendContent(";\n");
   server.sendContent("var advancedFeatures = ");
@@ -522,7 +523,6 @@ void generateHexBlobField()
   server.sendContent("<tr><td>");
   serveConfigHexStr(true);
   server.sendContent("</td></tr>");
-  server.sendContent("<tr><td>&nbsp;</td></tr>");
   server.sendContent("<tr><td>Paste Data Here:</td></tr>");
   server.sendContent("<tr><td><form id='frm_hexblob' name='frm_hexblob' action='config' method='post' onsubmit='return validateHexblob();' />\n");
   server.sendContent("<textarea id='hexblob' name='hexblob' class='hexblob'></textarea><br />\n");

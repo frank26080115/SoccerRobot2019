@@ -167,8 +167,9 @@ void loop()
   int now10 = now / 100;
   now10 %= 10;
   bool ledOn = false;
+  bool isTimeOut = (now - lastCommTimestamp) > 1000;
 
-  if ((now - lastCommTimestamp) > 1000 || standbyRobot) // check for timeout
+  if (isTimeOut || standbyRobot) // check for timeout
   {
     // if timeout, stop the robot
     speedLeft = 0;
@@ -188,6 +189,12 @@ void loop()
     if (now10 == 0) { // blink at least once
       ledOn = true;
     }
+
+    /*
+    if (isTimeOut) {
+      standbyRobot = false;
+    }
+    */
   }
   else
   {
