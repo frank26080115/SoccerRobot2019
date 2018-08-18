@@ -174,6 +174,7 @@ void cBookWorm::factoryReset() {
 	defaultValues();
 	this->generateSsid(this->SSID);
 	this->setSsid(this->SSID);
+	ESP.eraseConfig();
 	this->printf("factory reset performed\r\n");
 }
 

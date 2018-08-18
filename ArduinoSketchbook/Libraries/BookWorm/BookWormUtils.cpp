@@ -1,8 +1,9 @@
 #include "BookWorm.h"
 #include <ESP8266WebServer.h>
 
-void cBookWorm::checkHardwareConfig(void* serverPtr, bool useSerial)
+bool cBookWorm::checkHardwareConfig(void* serverPtr, bool useSerial)
 {
+	bool flashConfigCorrect = false;
 	ESP8266WebServer* server = (ESP8266WebServer*)serverPtr;
 	uint32_t realSize = ESP.getFlashChipRealSize();
 	uint32_t ideSize = ESP.getFlashChipSize();
@@ -29,11 +30,13 @@ void cBookWorm::checkHardwareConfig(void* serverPtr, bool useSerial)
 
 	if (realSize == ideSize)
 	{
+		flashConfigCorrect = true;
 		sprintf(tmpbuff, "Flash Size: %u bytes\r\n", realSize);
 		if (server != NULL)  { server->sendContent(tmpbuff); server->sendContent("<br />"); } if (useSerial) { Serial.print(tmpbuff); }
 	}
 	else
 	{
+		flashConfigCorrect = false;
 		sprintf(tmpbuff, "Flash Actual Size: %u bytes\r\n", realSize);
 		if (server != NULL)  { server->sendContent(tmpbuff); server->sendContent("<br />"); } if (useSerial) { Serial.print(tmpbuff); }
 
@@ -57,6 +60,8 @@ void cBookWorm::checkHardwareConfig(void* serverPtr, bool useSerial)
 
 	sprintf(tmpbuff, "Free Heap Mem: %u bytes\r\n", ESP.getFreeHeap());
 	if (server != NULL)  { server->sendContent(tmpbuff); server->sendContent("<br />"); } if (useSerial) { Serial.print(tmpbuff); }
+
+	return flashConfigCorrect;
 }
 
 /*

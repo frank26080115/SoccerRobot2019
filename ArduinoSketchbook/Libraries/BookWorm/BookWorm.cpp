@@ -56,6 +56,7 @@ void cBookWorm::begin(void)
 		this->defaultValues();
 		this->generateSsid(this->SSID);
 		this->setSsid(this->SSID);
+		ESP.eraseConfig();
 	}
 
 	#ifdef ENABLE_SIGNALCROSS_RESET
@@ -65,6 +66,7 @@ void cBookWorm::begin(void)
 		this->defaultValues();
 		this->generateSsid(this->SSID);
 		this->setSsid(this->SSID);
+		ESP.eraseConfig();
 	}
 	#endif
 	debugf("BookWorm Library Begun\r\n");

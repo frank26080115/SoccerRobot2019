@@ -65,6 +65,12 @@ void setup()
   BookWorm.begin();
   SPIFFS.begin();
   BookWorm.printf("\r\n");
+
+  if (ESP.getFlashChipRealSize() != ESP.getFlashChipSize()) {
+    BookWorm.printf("ERROR: flash size misconfigured\r\n");
+    diagnostics = false;
+  }
+
   if (SPIFFS.exists("joy.js") == false && SPIFFS.exists("/joy.js") == false) {
     BookWorm.printf("ERROR: SPI FLASH FILESYSTEM ERROR: FILE \"joy.js\" MISSING\r\n");
     diagnostics = false;
