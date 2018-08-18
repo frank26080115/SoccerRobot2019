@@ -25,7 +25,7 @@
 <layer number="15" name="Route15" color="4" fill="6" visible="yes" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
+<layer number="18" name="Vias" color="14" fill="1" visible="yes" active="no"/>
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
 <layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="no"/>
@@ -1732,6 +1732,15 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <wire x1="8.9" y1="-7.7" x2="8.9" y2="-7.1" width="0" layer="41"/>
 <wire x1="7.4" y1="-5.7" x2="7.4" y2="4.9" width="0" layer="41"/>
 </package>
+<package name="SERVO-EDGE-F">
+<smd name="PWR" x="0" y="1.27" dx="2.54" dy="1.778" layer="1" rot="R270" cream="no"/>
+<smd name="GND" x="-2.3495" y="1.27" dx="2.54" dy="1.651" layer="1" rot="R270" cream="no"/>
+<smd name="SIG" x="2.54" y="1.27" dx="2.54" dy="1.778" layer="1" rot="R270" cream="no"/>
+<wire x1="-3.81" y1="2.54" x2="-3.81" y2="0" width="0.254" layer="21"/>
+<wire x1="-3.81" y1="0" x2="3.81" y2="0" width="0.254" layer="21"/>
+<wire x1="3.81" y1="0" x2="3.81" y2="2.54" width="0.254" layer="21"/>
+<wire x1="0.9525" y1="0" x2="1.5875" y2="0" width="0" layer="41"/>
+</package>
 </packages>
 <symbols>
 <symbol name="ESP12">
@@ -2310,6 +2319,16 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.</description>
 </technologies>
 </device>
 <device name="-SMD-EDGE-1" package="SERVO-EDGE">
+<connects>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="PWR" pad="PWR"/>
+<connect gate="G$1" pin="SIG" pad="SIG"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-SMD-EDGE-1F" package="SERVO-EDGE-F">
 <connects>
 <connect gate="G$1" pin="GND" pad="GND"/>
 <connect gate="G$1" pin="PWR" pad="PWR"/>
@@ -3061,7 +3080,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <part name="LED" library="dirtcheaprx_nano" deviceset="LED" device="5MM"/>
 <part name="BAT1" library="dirtcheaprx_nano" deviceset="BATTERY" device="-WIRE-CONN"/>
 <part name="SUPPLY1" library="dirtcheaprx_nano" deviceset="+6V" device=""/>
-<part name="SERVO1" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
+<part name="SERVO1" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1F" value="SERVO-SMD-EDGE-1F"/>
 <part name="SERVO2" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
 <part name="SERVO3" library="dirtcheaprx_nano" deviceset="SERVO" device="-SMD-EDGE-1" value="SERVO-SMD-EDGE-1"/>
 <part name="IC1" library="dirtcheaprx_nano" deviceset="V_REG_78XX" device="-SOT" value="MCP1703T-3302E/CB"/>
@@ -3097,6 +3116,8 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <part name="GND9" library="dirtcheaprx_nano" deviceset="GND" device=""/>
 <part name="R5" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="5K6Ω"/>
 <part name="GND10" library="dirtcheaprx_nano" deviceset="GND" device=""/>
+<part name="R6" library="dirtcheaprx_nano" deviceset="RESISTOR" device="0603-RES" value="5K6Ω"/>
+<part name="P+5" library="dirtcheaprx_nano" deviceset="3.3V" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -3153,6 +3174,8 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <instance part="GND9" gate="1" x="-30.48" y="0"/>
 <instance part="R5" gate="G$1" x="33.02" y="-25.4" rot="R90"/>
 <instance part="GND10" gate="1" x="33.02" y="-35.56"/>
+<instance part="R6" gate="G$1" x="45.72" y="-5.08" rot="R270"/>
+<instance part="P+5" gate="G$1" x="45.72" y="2.54"/>
 </instances>
 <busses>
 </busses>
@@ -3197,6 +3220,11 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <pinref part="P+4" gate="G$1" pin="3.3V"/>
 <wire x1="-27.94" y1="20.32" x2="-30.48" y2="20.32" width="0.1524" layer="91"/>
 <wire x1="-30.48" y1="20.32" x2="-30.48" y2="22.86" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="R6" gate="G$1" pin="1"/>
+<pinref part="P+5" gate="G$1" pin="3.3V"/>
+<wire x1="45.72" y1="0" x2="45.72" y2="2.54" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="+6V" class="0">
@@ -3392,6 +3420,10 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <pinref part="TP4" gate="G$1" pin="TP"/>
 <wire x1="20.32" y1="-12.7" x2="40.64" y2="-12.7" width="0.1524" layer="91"/>
 <wire x1="40.64" y1="-12.7" x2="40.64" y2="0" width="0.1524" layer="91"/>
+<pinref part="R6" gate="G$1" pin="2"/>
+<wire x1="40.64" y1="-12.7" x2="45.72" y2="-12.7" width="0.1524" layer="91"/>
+<wire x1="45.72" y1="-12.7" x2="45.72" y2="-10.16" width="0.1524" layer="91"/>
+<junction x="40.64" y="-12.7"/>
 </segment>
 </net>
 <net name="LED" class="0">

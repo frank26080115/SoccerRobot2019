@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -3267,6 +3267,15 @@ ROBOT-2019-R1</text>
 <wire x1="3.81" y1="0" x2="3.81" y2="2.54" width="0.254" layer="21"/>
 <wire x1="-1.5875" y1="2.54" x2="-0.9525" y2="2.54" width="0" layer="41"/>
 </package>
+<package name="SERVO-EDGE-F">
+<smd name="PWR" x="0" y="1.27" dx="2.54" dy="1.778" layer="1" rot="R270" cream="no"/>
+<smd name="GND" x="-2.3495" y="1.27" dx="2.54" dy="1.651" layer="1" rot="R270" cream="no"/>
+<smd name="SIG" x="2.54" y="1.27" dx="2.54" dy="1.778" layer="1" rot="R270" cream="no"/>
+<wire x1="-3.81" y1="2.54" x2="-3.81" y2="0" width="0.254" layer="21"/>
+<wire x1="-3.81" y1="0" x2="3.81" y2="0" width="0.254" layer="21"/>
+<wire x1="3.81" y1="0" x2="3.81" y2="2.54" width="0.254" layer="21"/>
+<wire x1="0.9525" y1="0" x2="1.5875" y2="0" width="0" layer="41"/>
+</package>
 </packages>
 <symbols>
 <symbol name="5V">
@@ -4886,6 +4895,16 @@ Button commonly used for reset or general input. Spark Fun Electronics SKU : COM
 </technologies>
 </device>
 <device name="-SMD-EDGE-1" package="SERVO-EDGE">
+<connects>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="PWR" pad="PWR"/>
+<connect gate="G$1" pin="SIG" pad="SIG"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-SMD-EDGE-1F" package="SERVO-EDGE-F">
 <connects>
 <connect gate="G$1" pin="GND" pad="GND"/>
 <connect gate="G$1" pin="PWR" pad="PWR"/>
