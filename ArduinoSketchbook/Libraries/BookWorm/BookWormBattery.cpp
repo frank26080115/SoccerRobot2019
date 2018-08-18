@@ -5,7 +5,7 @@
 
 #ifdef ENABLE_BATTERY_MONITOR
 
-uint32_t cBookWorm::adcToVoltage(uint16_t x)
+uint32_t cBookWorm::adcToVoltage(uint16_t x, uint32_t r1, uint32_t r2)
 {
 	/*
 	vout = vin * r2 / (r1 + r2)
@@ -17,8 +17,6 @@ uint32_t cBookWorm::adcToVoltage(uint16_t x)
 	uint32_t numer;
 	uint32_t denom;
 	uint32_t adc = x;
-	uint32_t r1 = nvm->vdiv_r1;
-	uint32_t r2 = nvm->vdiv_r2;
 	bool isHuge = false;
 
 	if (r2 <= 0) {
@@ -45,6 +43,11 @@ uint32_t cBookWorm::adcToVoltage(uint16_t x)
 	}
 
 	return numer / denom;
+}
+
+uint32_t cBookWorm::adcToVoltage(uint16_t x)
+{
+	return adcToVoltage(x, nvm->vdiv_r1, nvm->vdiv_r2);
 }
 
 uint32_t cBookWorm::readBatteryVoltageRaw(void)

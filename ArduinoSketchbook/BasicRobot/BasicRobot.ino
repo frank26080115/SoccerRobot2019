@@ -57,6 +57,8 @@ uint32_t noconnTime = 0;
 uint32_t last_servo_dbg = 0;
 #endif
 
+bool diagnostics = true;
+
 void setup()
 {
   delay(1000);
@@ -64,12 +66,13 @@ void setup()
   SPIFFS.begin();
   BookWorm.printf("\r\n");
   if (SPIFFS.exists("joy.js") == false && SPIFFS.exists("/joy.js") == false) {
-    BookWorm.printf("SPI FLASH FILESYSTEM ERROR: FILE \"joy.js\" MISSING\r\n");
+    BookWorm.printf("ERROR: SPI FLASH FILESYSTEM ERROR: FILE \"joy.js\" MISSING\r\n");
+    diagnostics = false;
   }
-  BookWorm.printf("Configuring access point...\r\n");
   /* You can remove the password parameter if you want the AP to be open. */
   if (WiFi.softAPConfig(apIP, apIP, netMsk) == false) {
-    BookWorm.printf("SoftAPConfig Failed!\r\n");
+    BookWorm.printf("ERROR: SoftAPConfig Failed!\r\n");
+    diagnostics = false;
   }
   BookWorm.printf("SSID: %s\r\n", BookWorm.SSID);
   BookWorm.printf("Password: %s\r\n", BookWorm.wifiPassword);
@@ -82,10 +85,38 @@ void setup()
       #endif
       ) == false)
       {
-        BookWorm.printf("SoftAP Failed to Start!\r\n");
+        BookWorm.printf("ERROR: SoftAP Failed to Start!\r\n");
+        diagnostics = false;
       }
-  delay(500); // Without delay I've seen the IP address blank
-  BookWorm.printf("AP IP address: %s\r\n", toStringIp(WiFi.softAPIP()).c_str());
+
+  #ifdef ENABLE_BATTERY_MONITOR
+  battLvl = BookWorm.adcToVoltage(analogRead(0), VDIV_R1_DEFAULT, VDIV_R2_FACTORY);
+  BookWorm.printf("Batt: %u\r\n", battLvl);
+  if (battLvl < 4500 || battLvl > 5500) {
+    diagnostics = false;
+  }
+  #endif
+
+  uint32_t ipAsInt;
+  delay(100);
+  for (int tries = 0; tries < 5;)
+  {
+    ipAsInt = WiFi.softAPIP();
+    if (ipAsInt == 0) {
+      delay(200); // Without delay I've seen the IP address blank
+      tries++;
+      continue;
+    }
+    BookWorm.printf("AP IP Addr: %s\r\n", toStringIp(ipAsInt).c_str());
+    break;
+  }
+
+  if (ipAsInt == 0) {
+    BookWorm.printf("ERROR: AP IP Addr is 0\r\n");
+    diagnostics = false;
+  }
+
+  //BookWorm.printf("Diagnostics: %s\r\n", diagnostics ? "PASS" : "FAIL");
 
   /* Setup the DNS server redirecting all the domains to the apIP */
   dnsServer.setErrorReplyCode(DNSReplyCode::NoError);

@@ -342,7 +342,7 @@ void cBookWorm::defaultValues()
 	this->nvm->leftHanded = false;
 	#ifdef ENABLE_BATTERY_MONITOR
 	this->nvm->vdiv_r1 = VDIV_R1_DEFAULT;
-	this->nvm->vdiv_r2 = 0; // disable usage, 1000 in circuit
+	this->nvm->vdiv_r2 = VDIV_R2_DEFAULT;
 	this->nvm->vdiv_filter = 0;
 	this->nvm->warning_voltage = 6000;
 	#endif

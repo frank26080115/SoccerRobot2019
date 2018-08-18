@@ -3,7 +3,7 @@
 
 // pick only one of these
 //#define HWBOARD_ESP01
-#define HWBOARD_ESP12
+#define HWBOARD_ESP12_NANO
 
 #define pinBoot 2
 
@@ -40,7 +40,8 @@
 	#define pinLed2OnState HIGH
 	#define pinLed2OffState LOW
 
-	#define VDIV_R2_DEFAULT 1000
+	#define VDIV_R2_FACTORY 1000
+	#define VDIV_R2_DEFAULT VDIV_R2_FACTORY
 	#define VDIV_R1_DEFAULT 7500
 	#define ADC_REF_MV 1000
 #endif
@@ -60,7 +61,8 @@
 	#define pinLed2OnState HIGH
 	#define pinLed2OffState LOW
 
-	#define VDIV_R2_DEFAULT 470
+	#define VDIV_R2_FACTORY 470
+	#define VDIV_R2_DEFAULT VDIV_R2_FACTORY
 	#define VDIV_R1_DEFAULT 5600
 	#define ADC_REF_MV 1000
 #endif

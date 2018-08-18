@@ -10,7 +10,7 @@ boolean isIp(String str) {
 }
 
 /** IP to String? */
-String toStringIp(IPAddress ip)
+String toStringIp(uint32_t ip)
 {
   String res = "";
   for (int i = 0; i < 3; i++) {
@@ -18,6 +18,11 @@ String toStringIp(IPAddress ip)
   }
   res += String(((ip >> 8 * 3)) & 0xFF);
   return res;
+}
+
+String toStringIp(IPAddress ip)
+{
+  toStringIp((uint32_t)ip);
 }
 
 String getContentType(String filename) { // convert the file extension to the MIME type
@@ -169,4 +174,3 @@ void haveConnected()
   }
   #endif
 }
-

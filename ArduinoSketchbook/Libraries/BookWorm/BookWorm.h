@@ -145,6 +145,7 @@ public:
 	bool isBatteryLowWarning(void);
 	uint16_t calcMaxBattVoltage(void);
 	uint32_t adcToVoltage(uint16_t);
+	uint32_t adcToVoltage(uint16_t x, uint32_t r1, uint32_t r2);
 	bool isBatteryOverload(void);
 	#endif
 
