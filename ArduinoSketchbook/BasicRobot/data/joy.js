@@ -544,7 +544,9 @@ setInterval(function()
 		outputEl.innerHTML	= '<b>' + touchOrClick + ':</b> ' + ' X:'+reportedX + ' Y:'+reportedY;
 	}
 
-	if ( newX != prevX || newY != prevY || weapspeed != prevW || weapPosSafe > 0 || startRobot == false)
+	if ( newX != prevX || newY != prevY || weapspeed != prevW || weapPosSafe > 0 || startRobot == false ||
+		true // permanently enable this block, since we are using the XHR timeout to detect if a connection is lost
+	)
 	{
 		var xhr = new XMLHttpRequest();
 
