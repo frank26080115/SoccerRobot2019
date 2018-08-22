@@ -1,7 +1,7 @@
 /** Handle root or redirect to captive portal */
 void handleRoot()
 {
-  BookWorm.printf("call handleRoot\r\n");
+  debugHandler("handleRoot");
   
   if (captivePortal()) { // If caprive portal redirect instead of displaying the page.
     return;
@@ -76,8 +76,12 @@ void handleRoot()
     server.sendContent("</table></div>");
   }
   server.sendContent("<div id='standby'><input type='button' value='Start Robot' onclick='startrobot()' />");
-  server.sendContent("<br /><br /><input type='button' value='Config Robot' onclick='location.href=\"config\";' /></div>");
+  server.sendContent("<br /><br /><input type='button' value='Config Robot' onclick='location.href=\"http://robot.local/config\";' /></div>");
   server.sendContent("<script>\n");
+
+  // this is a backup in case captive-portal redirection failed
+  server.sendContent("if (window.location.hostname != \"robot.local\") { window.location = \"http://robot.local/\"; }\n");
+
   server.sendContent("var desiredStickRadius = "); server.sendContent(String(BookWorm.nvm->stickRadius)); server.sendContent(";\n");
   server.sendContent("var advancedFeatures = ");
   if (BookWorm.nvm->advanced) {
@@ -116,10 +120,69 @@ void handleRoot()
 
 /** Redirect to captive portal if we got a request for another domain. Return true in that case so the page handler do not try to handle the request again. */
 boolean captivePortal() {
-  if (!isIp(server.hostHeader()) && server.hostHeader() != (String(myHostname) + ".local")) {
-    BookWorm.printf("Request redirected to captive portal, host header: %s\r\n", server.hostHeader().c_str());
-    server.sendHeader("Location", String("http://") + toStringIp(server.client().localIP()), true);
-    server.send(302, "text/plain", "");   // Empty content inhibits Content-length header so we have to close the socket ourselves.
+  static int captiveLimit = 0;
+  static int repeatedVisits = 0;
+  static char prevHostHeader[128];
+  
+  if (!isIp(server.hostHeader()) && server.hostHeader() != (String(myHostname) + ".local") && (repeatedVisits < captiveLimit || captiveLimit == 0)) {
+    BookWorm.printf("Request redirected to captive portal\r\n\thost header: %s\r\n\turi: %s\r\n", server.hostHeader().c_str(), server.uri().c_str());
+
+    // count the number of repeated visits to the same address
+    if (strcmp(prevHostHeader, server.hostHeader().c_str()) == 0) {
+      repeatedVisits++;
+    }
+    else {
+      repeatedVisits = 0;
+      strncpy(prevHostHeader, server.hostHeader().c_str(), 127);
+    }
+
+    if (repeatedVisits <= captiveLimit || captiveLimit == 0)
+    {
+      int sts = 302;
+      if (repeatedVisits == 1) {
+        sts = 302;
+        // 302 is the original behavior of this code.
+        // Wikipedia says 302 is deprecated and replaced with other codes.
+        // this seems to work on older Android.
+      }
+#if 0
+      else if (repeatedVisits == 2) {
+        sts = 301;
+      }
+      else if (repeatedVisits == 3) {
+        sts = 303;
+      }
+      else if (repeatedVisits == 4) {
+        sts = 307;
+      }
+      else if (repeatedVisits == 5) {
+        sts = 308;
+      }
+#endif
+      else {
+        captiveLimit = repeatedVisits;
+        sts = 0;
+      }
+      if (sts != 0) {
+        server.sendHeader("Location", String("http://") + (String(myHostname) + ".local"), true);
+        server.send(sts, "text/plain", "");
+        BookWorm.debugf("Redirecting using HTTP status code %u\r\n", sts);
+      }
+      else {
+        BookWorm.debugf("Attempting to serve page without redirect\r\n");
+        // redirecting didn't work, serving the web page but under the wrong address might cause problems loading resources.
+        // the page should attempt to use a javascript based redirect instead.
+        return false;
+      }
+    }
+    else {
+      BookWorm.debugf("Too many redirects, sending 204\r\n");
+      server.send(204, "text/plain", "");
+      // note: sending a 204 for generate_204 might trick android into thinking there is a valid internet connection.
+      // this isn't ideal because the captive portal won't show up, but at least the connection won't drop.
+      // the user will need to open up a browser page manually.
+    }
+    // Empty content inhibits Content-length header so we have to close the socket ourselves.
     serverClientStop();
     return true;
   }
@@ -128,7 +191,7 @@ boolean captivePortal() {
 
 void handleMove() {
   #ifndef ENABLE_SERVO_DEBUG
-  BookWorm.debugf("call handleMove\r\n");
+  debugHandler("handleMove");
   #endif
   int i;
   bool gotLeft = false;
@@ -250,7 +313,7 @@ void handleConfig() {
   bool reboot = false;
   bool factoryreset = false;
 
-  BookWorm.debugf("call handleConfig\r\n");
+  debugHandler("handleConfig");
 
   serveConfigHeader();
 

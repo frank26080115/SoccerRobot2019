@@ -24,7 +24,7 @@ DNSServer dnsServer;
 ESP8266WebServer server(80);
 
 /* Soft AP network parameters */
-IPAddress apIP(192, 168, 4, 1);
+IPAddress apIP(193, 169, 5, 1); // apparently the newer Android OS doesn't like 192.168.x.x for detecting internet connections
 IPAddress netMsk(255, 255, 255, 0);
 
 /** Current WLAN status */
@@ -133,7 +133,7 @@ void setup()
   server.on("/",             handleRoot);
   server.on("/index.htm",    handleRoot);
   server.on("/index.html",   handleRoot);
-  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handleZ
+  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/generate204",  handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/fwlink",       handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/connecttest.txt", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.

@@ -158,9 +158,11 @@ void serverClientStop()
 
 void serveBasicHeader()
 {
+  // makes sure the page is never cached
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   server.sendHeader("Pragma", "no-cache");
   server.sendHeader("Expires", "-1");
+
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
 }
@@ -173,4 +175,9 @@ void haveConnected()
     noconnTime = 1;
   }
   #endif
+}
+
+void debugHandler(char* func)
+{
+  BookWorm.debugf("call %s, %s, %s\r\n", func, server.hostHeader().c_str(), server.uri().c_str());
 }
