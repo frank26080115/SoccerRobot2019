@@ -3,7 +3,8 @@
 
 // pick only one of these
 //#define HWBOARD_ESP01
-#define HWBOARD_ESP12_NANO
+#define HWBOARD_WEMOS
+//#define HWBOARD_ESP12_NANO
 
 #define pinBoot 2
 
@@ -22,6 +23,24 @@
 
 	#define VDIV_R2_DEFAULT 0
 	#define VDIV_R1_DEFAULT 0
+	#define ADC_REF_MV 1000
+#endif
+
+#ifdef HWBOARD_WEMOS
+	#define pinServoLeft         13
+	#define pinServoRight        4
+
+	#ifdef ENABLE_WEAPON
+	#error No Weapon on WEMOS PCB
+	#endif
+
+	#define pinLed 2
+	#define pinLedOnState LOW
+	#define pinLedOffState HIGH
+
+	#define VDIV_R2_FACTORY 100
+	#define VDIV_R2_DEFAULT VDIV_R2_FACTORY
+	#define VDIV_R1_DEFAULT 220
 	#define ADC_REF_MV 1000
 #endif
 
