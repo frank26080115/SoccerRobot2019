@@ -544,9 +544,7 @@ setInterval(function()
 		outputEl.innerHTML	= '<b>' + touchOrClick + ':</b> ' + ' X:'+reportedX + ' Y:'+reportedY;
 	}
 
-	if ( newX != prevX || newY != prevY || weapspeed != prevW || weapPosSafe > 0 || startRobot == false ||
-		true // permanently enable this block, since we are using the XHR timeout to detect if a connection is lost
-	)
+	//if ( newX != prevX || newY != prevY || weapspeed != prevW || weapPosSafe > 0 || startRobot == false )
 	{
 		var xhr = new XMLHttpRequest();
 
@@ -605,7 +603,7 @@ setInterval(function()
 	if (advancedFeatures) {
 		prevW = weapspeed;
 	}
-}, 1/30 * 1000);
+}, 1/15 * 1000);
 
 function startrobot()
 {
