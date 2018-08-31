@@ -481,6 +481,8 @@ joystick.addEventListener('touchEnd', function(){
 	//document.getElementsByTagName("body")[0].classList.add("bodybg");;
 })
 
+var refreshRate = 1/15;
+
 var prevX = 0;
 var prevY = 0;
 var prevW = 0;
@@ -584,6 +586,7 @@ setInterval(function()
 				handleJson(jsonObj);
 				robotTimedOut(false);
 				xhrTime = new Date();
+				refreshRate = 1/15;
 			}
 		}
 
@@ -603,7 +606,7 @@ setInterval(function()
 	if (advancedFeatures) {
 		prevW = weapspeed;
 	}
-}, 1/15 * 1000);
+}, refreshRate * 1000);
 
 function startrobot()
 {
@@ -624,6 +627,7 @@ function robotTimedOut(x)
 	else
 	{
 		ele.innerHTML = "<br />(CONNECTION LOST)";
+		refreshRate = 1/4;
 	}
 }
 
